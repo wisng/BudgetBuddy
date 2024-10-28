@@ -8,7 +8,8 @@
 
 ### 1. Clone the Repository
 
-```Bash git clone https://github.com/your-username/your-repository-name.git
+```Bash
+git clone https://github.com/your-username/your-repository-name.git
 
 ```
 
