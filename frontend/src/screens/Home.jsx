@@ -1,14 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
+import BudgetFunction from "../components/BudgetFunction";
+import MonthPicker from "../components/MonthPicker";
+import PaidIcon from "@mui/icons-material/Paid";
+import AdsClickIcon from "@mui/icons-material/AdsClick";
+import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
+import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
+import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 
 const Home = () => {
+  const handleClick = () => {
+    alert("Paper clicked!");
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Header />
       <Navbar />
+      <Grid container spacing={2}>
+        <Grid size={2} sx={{}}></Grid>
+        <Grid size={8}>
+          <MonthPicker handleSubmit={() => alert("HELLO")} />
+        </Grid>
+        <Grid size={2} sx={{}}></Grid>
+      </Grid>
+
       <Grid container spacing={2}>
         <Grid size={2} sx={{}}></Grid>
         <Grid container size={5} sx={{ height: "300px" }}>
@@ -59,11 +77,28 @@ const Home = () => {
       <Grid container spacing={2} sx={{ marginTop: 2, marginBottom: 2 }}>
         <Grid size={2} sx={{}}></Grid>
         <Grid container size={4} sx={{}}>
-          <Paper elevation={3} sx={{ minHeight: "100px", width: "100%", borderRadius: "20px" }}></Paper>
-          <Paper elevation={3} sx={{ minHeight: "100px", width: "100%", borderRadius: "20px" }}></Paper>
-          <Paper elevation={3} sx={{ minHeight: "100px", width: "100%", borderRadius: "20px" }}></Paper>
-          <Paper elevation={3} sx={{ minHeight: "100px", width: "100%", borderRadius: "20px" }}></Paper>
-          {/* <Paper elevation={3} sx={{minHeight: "100px", width: "100%", borderRadius: "20px"}}></Paper> */}
+          <BudgetFunction
+            title="Add Transaction"
+            icon={<PaidIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
+            handleClick={handleClick}
+          />
+          <BudgetFunction
+            title="Add Goal"
+            icon={<AdsClickIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
+            handleClick={handleClick}
+          />
+          <BudgetFunction
+            title="Add Custom Category"
+            icon={<AddCircleRoundedIcon sx={{ color: "#7459D9", fontSize: "60px" }} handleClick={handleClick} />}
+          />
+          <BudgetFunction
+            title="Add User"
+            icon={<AccountCircleRoundedIcon sx={{ color: "#7459D9", fontSize: "60px" }} handleClick={handleClick} />}
+          />
+          <BudgetFunction
+            title="View Financial Report"
+            icon={<PieChartSharpIcon sx={{ color: "#7459D9", fontSize: "60px" }} handleClick={handleClick} />}
+          />
         </Grid>
         <Grid
           container
