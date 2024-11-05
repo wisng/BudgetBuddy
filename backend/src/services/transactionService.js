@@ -19,7 +19,7 @@ const createTransaction = (budgetId, transaction, userId) => {
 		transaction.recurrenceEndDate || null,
 	];
 
-	return new Promise((resolve, reject) => {
+	new Promise((resolve, reject) => {
 		db.query(transactionQuery, transactionValues, (error, results) => {
 			if (error) return reject(error);
 
@@ -32,6 +32,8 @@ const createTransaction = (budgetId, transaction, userId) => {
 			});
 		});
 	});
+
+	return budgetService.updateBudget(budgetId);
 };
 
 const getTransaction = (id) => {
