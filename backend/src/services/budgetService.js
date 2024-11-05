@@ -1,19 +1,17 @@
 const db = require("../../config/db");
 const transactionService = require("./transactionService");
 
-const createBudget = (budgetData) => {
+const ACCOUNT_TYPE = {
+	INDIVIDUAL: "INDIVIDUAL",
+	SHARED: "SHARED",
+};
+
+const createBudget = (userId) => {
 	const budgetQuery = `
 	  INSERT INTO Budget (totalBalance, totalIncome, totalExpenses, accountType, financialHealthScore, creationDate)
 	  VALUES (?, ?, ?, ?, ?, ?)
 	`;
-	const budgetValues = [
-		budgetData.totalBalance,
-		budgetData.totalIncome,
-		budgetData.totalExpenses,
-		budgetData.accountType,
-		budgetData.financialHealthScore,
-		budgetData.creationDate,
-	];
+	const budgetValues = [0, 0, 0, ACCOUNT_TYPE.INDIVIDUAL, 0, new Date()]; // For now, default will be Individual.
 
 	return new Promise((resolve, reject) => {
 		db.query(budgetQuery, budgetValues, (error, budgetResults) => {

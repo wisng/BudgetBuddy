@@ -1,12 +1,8 @@
 const budgetService = require("../services/budgetService");
 
 const createBudget = async (req, res) => {
-	const budgetData = {
-		...req.body,
-		userId: req.userId,
-	};
 	try {
-		await budgetService.createBudget(budgetData);
+		await budgetService.createBudget(req.userId);
 		res.status(201).json({ message: "Budget created successfully" });
 	} catch (error) {
 		res.status(500).json({ message: error.message });
