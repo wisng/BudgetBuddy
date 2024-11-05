@@ -1,4 +1,5 @@
 const authService = require("../services/authService");
+const jwtUtil = require("../utils/jwtUtil");
 
 const register = async (req, res) => {
 	const { email, password } = req.body;
@@ -21,8 +22,9 @@ const login = async (req, res) => {
 	}
 
 	try {
-		const result = await authService.loginUser(email, password);
-		res.json(result);
+		const user = await authService.loginUser(email, password);
+		const token = jwtUtil.generateToken(user);
+		res.json({ token });
 	} catch (error) {
 		res.status(401).json({ error });
 	}
