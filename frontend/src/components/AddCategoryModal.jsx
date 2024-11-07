@@ -4,25 +4,14 @@ import {
   TextField,
   Box,
   Button,
-  Typography,
   FormControl,
   Select,
   InputLabel,
   MenuItem,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Avatar,
   Paper,
-  InputAdornment,
-  IconButton,
-  OutlinedInput,
   Grid2 as Grid,
 } from "@mui/material";
 import { MuiColorInput } from "mui-color-input";
-
-const USERS = ["User 1", "User 2", "User 3"];
 
 const AddCategoryModal = ({ showModal, setShowModal }) => {
   const [type, setType] = useState();

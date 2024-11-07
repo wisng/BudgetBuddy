@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
+import { Box, Paper, Grid2 as Grid } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";

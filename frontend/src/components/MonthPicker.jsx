@@ -5,8 +5,8 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const MonthPicker = ({ handleSubmit }) => {
-  const [month, setMonth] = React.useState("");
-  const [year, setYear] = React.useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
 
   const handleMonthChange = (event) => {
     setMonth(event.target.value);
