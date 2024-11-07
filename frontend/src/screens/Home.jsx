@@ -10,11 +10,17 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
+import AddTransactionModal from "../components/AddTransactionModal";
+import AddGoalModal from "../components/AddGoalModal";
+import AddCategoryModal from "../components/AddCategoryModal";
+import AddUserModal from "../components/AddUserModal";
 
 const Home = () => {
-  const handleClick = () => {
-    alert("Paper clicked!");
-  };
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [showGoalModal, setShowGoalModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Header />
@@ -80,24 +86,26 @@ const Home = () => {
           <BudgetFunction
             title="Add Transaction"
             icon={<PaidIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
-            handleClick={handleClick}
+            handleClick={setShowTransactionModal}
           />
           <BudgetFunction
             title="Add Goal"
             icon={<AdsClickIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
-            handleClick={handleClick}
+            handleClick={setShowGoalModal}
           />
           <BudgetFunction
             title="Add Custom Category"
-            icon={<AddCircleRoundedIcon sx={{ color: "#7459D9", fontSize: "60px" }} handleClick={handleClick} />}
+            icon={<AddCircleRoundedIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
+            handleClick={setShowCategoryModal}
           />
           <BudgetFunction
             title="Add User"
-            icon={<AccountCircleRoundedIcon sx={{ color: "#7459D9", fontSize: "60px" }} handleClick={handleClick} />}
+            icon={<AccountCircleRoundedIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
+            handleClick={setShowUserModal}
           />
           <BudgetFunction
             title="View Financial Report"
-            icon={<PieChartSharpIcon sx={{ color: "#7459D9", fontSize: "60px" }} handleClick={handleClick} />}
+            icon={<PieChartSharpIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
           />
         </Grid>
         <Grid
@@ -179,6 +187,10 @@ const Home = () => {
         </Grid>
         <Grid size={2} sx={{}}></Grid>
       </Grid>
+      <AddTransactionModal showModal={showTransactionModal} setShowModal={setShowTransactionModal} />
+      <AddGoalModal showModal={showGoalModal} setShowModal={setShowGoalModal} />
+      <AddCategoryModal showModal={showCategoryModal} setShowModal={setShowCategoryModal} />
+      <AddUserModal showModal={showUserModal} setShowModal={setShowUserModal} />
     </Box>
   );
 };
