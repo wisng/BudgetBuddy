@@ -9,6 +9,7 @@ import Signup from "./screens/Signup.jsx";
 import Home from "./screens/Home.jsx";
 import Insights from "./screens/Insights.jsx";
 import Transactions from "./screens/Transactions.jsx";
+import Wrapper from "./screens/Wrapper.jsx";
 
 const router = createBrowserRouter([
   {
@@ -21,15 +22,15 @@ const router = createBrowserRouter([
   },
   {
     path: "/home",
-    element: <Home />,
+    element: <Wrapper Component={Home} />,
   },
   {
     path: "/insights",
-    element: <Insights />,
+    element: <Wrapper Component={Insights} />,
   },
   {
     path: "/transactions",
-    element: <Transactions />,
+    element: <Wrapper Component={Transactions} />,
   },
 ]);
 
@@ -60,7 +61,6 @@ function App() {
       </p> */}
 
       <RouterProvider router={router} />
-      
     </>
   );
 }

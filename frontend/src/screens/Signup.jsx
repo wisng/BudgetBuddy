@@ -119,7 +119,6 @@ const Signup = () => {
                   id="password"
                   fullWidth
                   label="Password"
-                  margin="normal"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -153,7 +152,6 @@ const Signup = () => {
                   id="confirm-password"
                   fullWidth
                   label="Confirm Password"
-                  margin="normal"
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}

@@ -1,11 +1,20 @@
-import React from "react";
-import { Button, Grid2 as Grid } from "@mui/material";
+import React, { useState } from "react";
+import { Avatar, ListItemIcon, Divider, Box, Button, Menu, MenuItem, Grid2 as Grid } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import PersonAdd from "@mui/icons-material/PersonAdd";
+import AddSharedBudgetModal from "./AddSharedBudget";
 
-const Navbar = () => {
+const ACCOUNTS = ["My Shared Budget 1", "My Shared Budget 2"];
+const Navbar = ({ account, setAccount }) => {
   let navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [showSharedBudgetModal, setShowSharedBudgetModal] = useState(false);
+  const open = Boolean(anchorEl);
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <Grid container spacing={0} sx={{ padding: "10px" }}>
@@ -15,7 +24,7 @@ const Navbar = () => {
       </Grid>
       <Grid size={4} sx={{}}></Grid>
       <Grid size={5} sx={{}}>
-        <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
           <Button
             {...(pathname && pathname == "/insights" ? { variant: "contained" } : {})}
             fullWidth={false}
@@ -47,9 +56,8 @@ const Navbar = () => {
           <Button
             {...(pathname && pathname == "/home" ? { variant: "contained" } : {})}
             fullWidth={false}
-            onClick={() => {
-              console.log(" HELLO");
-              navigate("/home");
+            onClick={(event) => {
+              setAnchorEl(event.currentTarget);
             }}
             style={
               pathname && pathname == "/home"
@@ -57,9 +65,62 @@ const Navbar = () => {
                 : { textTransform: "none", fontSize: 16, color: "#7459D9" }
             }
           >
-            My Budget
+            {account}
           </Button>
-        </div>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                setAccount("My Budget");
+                navigate("/home");
+              }}
+            >
+              <Avatar sx={{ marginRight: 2 }} /> My Budget
+            </MenuItem>
+            {ACCOUNTS.map((a, i) => (
+              <MenuItem
+                key={i}
+                onClick={() => {
+                  handleClose();
+                  setAccount(a);
+                  navigate("/home");
+                }}
+              >
+                <Avatar sx={{ marginRight: 2 }} /> {a}
+              </MenuItem>
+            ))}
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                setShowSharedBudgetModal(true);
+              }}
+            >
+              <ListItemIcon>
+                <PersonAdd fontSize="small" />
+              </ListItemIcon>
+              Add shared account
+            </MenuItem>
+
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                navigate("/login");
+              }}
+            >
+              Logout
+            </MenuItem>
+          </Menu>
+        </Box>
+        <AddSharedBudgetModal showModal={showSharedBudgetModal} setShowModal={setShowSharedBudgetModal} />
       </Grid>
     </Grid>
   );

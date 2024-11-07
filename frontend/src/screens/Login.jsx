@@ -92,30 +92,12 @@ const Login = () => {
                   },
                 }}
               />
-              {/* <TextField
-                fullWidth
-                label="Password"
-                margin="normal"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                size="small"
-                sx={{
-                  marginTop: 3,
-                  borderRadius: 16,
-                  boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 16,
-                  },
-                }}
-              /> */}
               <FormControl sx={{ width: "100%", marginTop: 3 }} size="small">
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <OutlinedInput
                   id="password"
                   fullWidth
                   label="Password"
-                  margin="normal"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

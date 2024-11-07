@@ -7,9 +7,11 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  FormControl,
   Paper,
   IconButton,
   InputAdornment,
+  InputLabel,
   OutlinedInput,
   Grid2 as Grid,
 } from "@mui/material";
@@ -71,40 +73,42 @@ const AddUserModal = ({ showModal, setShowModal }) => {
                 borderRadius: 8,
               }}
             >
-              <OutlinedInput
-                fullWidth
-                label="User"
-                margin="normal"
-                placeholder="Add by username or email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                size="small"
-                sx={{
-                  marginTop: 3,
-                  borderRadius: 16,
-                  boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
-                  "& .MuiOutlinedInput-root": {
+              <FormControl fullWidth sx={{ marginTop: 3 }}>
+                <InputLabel htmlFor="username">User</InputLabel>
+                <OutlinedInput
+                  id="username"
+                  fullWidth
+                  label="User"
+                  placeholder="Add by username or email"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  size="small"
+                  sx={{
                     borderRadius: 16,
-                  },
-                }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="add user"
-                      onClick={() => {
-                        if (!users.includes(username)) {
-                          setUsers([...users, username]);
-                        }
-                      }}
-                      onMouseDown={handleMouseDownPassword}
-                      onMouseUp={handleMouseUpPassword}
-                      edge="end"
-                    >
-                      <AddCircleIcon />
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />
+                    boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 16,
+                    },
+                  }}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="add user"
+                        onClick={() => {
+                          if (!users.includes(username)) {
+                            setUsers([...users, username]);
+                          }
+                        }}
+                        onMouseDown={handleMouseDownPassword}
+                        onMouseUp={handleMouseUpPassword}
+                        edge="end"
+                      >
+                        <AddCircleIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
 
               <Grid container spacing={0} sx={{ marginTop: 3, width: "100%", background: "transparent" }}>
                 <Grid size={12}>
