@@ -4,12 +4,15 @@ const authController = require("../controllers/authController");
 const categoryController = require("../controllers/categoryController");
 const budgetController = require("../controllers/budgetController");
 const transactionController = require("../controllers/transactionController");
+const passport = require("./passportConfig");
 
 const router = express.Router();
 
 // Auth Routes
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.get("/google", authController.google);
+router.get("/google/callback", authController.googleCallback);
 
 // Budget Routes
 router.post("/budget", authMiddleware, budgetController.createBudget);
@@ -73,6 +76,50 @@ router.delete(
 	"/budget/:budgetID/transaction/:transactionId",
 	authMiddleware,
 	transactionController.deleteTransaction
+);
+
+// Spending Goal Routes
+router.post(
+	"/budget/:budgetID/spendinggoal",
+	authMiddleware,
+	budgetController.createSpendingGoal
+);
+router.get(
+	"/budget/:budgetID/spendinggoal",
+	authMiddleware,
+	budgetController.getSpendingGoal
+);
+router.put(
+	"/budget/:budgetID/spendinggoal",
+	authMiddleware,
+	budgetController.updateSpendingGoal
+);
+router.delete(
+	"/budget/:budgetID/spendinggoal",
+	authMiddleware,
+	budgetController.deleteSpendingGoal
+);
+
+// Financial Report Routes
+router.post(
+	"/budget/:budgetID/financialreport",
+	authMiddleware,
+	budgetController.createFinancialReport
+);
+router.get(
+	"/budget/:budgetID/financialreport",
+	authMiddleware,
+	budgetController.getFinancialReport
+);
+router.get(
+	"/budget/:budgetID/financialreports",
+	authMiddleware,
+	budgetController.getAllFinancialReports
+);
+router.delete(
+	"/budget/:budgetID/financialreport",
+	authMiddleware,
+	budgetController.deleteFinancialReport
 );
 
 module.exports = router;

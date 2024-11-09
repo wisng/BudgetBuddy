@@ -12,9 +12,9 @@ const createCategory = (categoryData) => {
 	];
 
 	return new Promise((resolve, reject) => {
-		db.query(query, values, (error, results) => {
+		db.query(query, values, (error) => {
 			if (error) return reject(error);
-			resolve({ id: results.insertId, ...categoryData });
+			resolve();
 		});
 	});
 };

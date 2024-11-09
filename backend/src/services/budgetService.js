@@ -1,49 +1,49 @@
 const db = require("../../config/db");
 const transactionService = require("./transactionService");
+const categoryService = require("./categoryService");
 
 const ACCOUNT_TYPE = {
-	INDIVIDUAL: "INDIVIDUAL",
-	SHARED: "SHARED",
+	INDIVIDUAL: "Individual",
+	SHARED: "Shared",
 };
 
-const createBudget = (userId) => {
+const createBudget = async (userId) => {
 	const budgetQuery = `
 	  INSERT INTO Budget (totalBalance, totalIncome, totalExpenses, accountType, financialHealthScore, creationDate)
 	  VALUES (?, ?, ?, ?, ?, ?)
 	`;
 	const budgetValues = [0, 0, 0, ACCOUNT_TYPE.INDIVIDUAL, 0, new Date()]; // For now, default will be Individual.
 
-	return new Promise((resolve, reject) => {
+	const budgetId = await new Promise((resolve, reject) => {
 		db.query(budgetQuery, budgetValues, (error, budgetResults) => {
 			if (error) return reject(error);
 
 			const userBudgetQuery = `
 		  INSERT INTO UserBudget (userID, budgetID) VALUES (?, ?)
 		`;
-			const userBudgetValues = [
-				budgetData.userID,
-				budgetResults.insertId,
-			];
+			const userBudgetValues = [userId, budgetResults.insertId];
 
 			db.query(userBudgetQuery, userBudgetValues, (error) => {
 				if (error) return reject(error);
-				resolve({ id: budgetResults.insertId, ...budgetData });
+				resolve(budgetResults.insertId);
 			});
 		});
 	});
+
+	return budgetCategoryInit(budgetId);
 };
 
-const getBudget = (id) => {
-	const query = `SELECT * FROM Budget WHERE budgetID = ?`;
+const getBudget = (budgetId, userId) => {
+	const query = `SELECT Budget.* FROM Budget INNER JOIN UserBudget ON Budget.budgetID = UserBudget.budgetID WHERE UserBudget.userID = ? AND Budget.budgetID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [id], (error, results) => {
+		db.query(query, [userId, budgetId], (error, results) => {
 			if (error) return reject(error);
 			resolve(results[0]);
 		});
 	});
 };
 
-const getAllBudgets = () => {
+const getAllBudgets = (userId) => {
 	const query = `
     SELECT Budget.* 
     FROM Budget 
@@ -51,7 +51,7 @@ const getAllBudgets = () => {
     WHERE UserBudget.userID = ?
   `;
 	return new Promise((resolve, reject) => {
-		db.query(query, (error, results) => {
+		db.query(query, [userId], (error, results) => {
 			if (error) return reject(error);
 			resolve(results);
 		});
@@ -116,6 +116,38 @@ const deleteBudget = (budgetId, userId) => {
 			});
 		});
 	});
+};
+
+const budgetCategoryInit = (budgetId) => {
+	const categoryData = [
+		{
+			name: "Entertainment",
+			colour: "#00FF00",
+			isCustom: false,
+			budgetID: budgetId,
+		},
+		{
+			name: "Shopping",
+			colour: "#FF0000",
+			isCustom: false,
+			budgetID: budgetId,
+		},
+		{
+			name: "Dining Out",
+			colour: "#0000FF",
+			isCustom: false,
+			budgetID: budgetId,
+		},
+		{
+			name: "Transportation",
+			colour: "#00FFFF",
+			isCustom: false,
+			budgetID: budgetId,
+		},
+	];
+	for (const category of categoryData) {
+		categoryService.createCategory(category);
+	}
 };
 
 module.exports = {

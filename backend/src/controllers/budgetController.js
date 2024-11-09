@@ -12,7 +12,7 @@ const createBudget = async (req, res) => {
 const getBudget = async (req, res) => {
 	const { budgetId } = req.params;
 	try {
-		const budget = await budgetService.getBudget(budgetId);
+		const budget = await budgetService.getBudget(budgetId, req.userId);
 		if (!budget)
 			return res.status(404).json({ message: "Budget not found" });
 		res.json(budget);

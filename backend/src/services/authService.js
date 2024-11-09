@@ -3,7 +3,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 const registerUser = async (email, password) => {
-	return await userService.createUser(email, password);
+	try {
+		return await userService.createUser(email, password);
+	} catch (error) {
+		throw error;
+	}
 };
 
 const loginUser = async (email, password) => {

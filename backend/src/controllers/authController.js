@@ -30,4 +30,22 @@ const login = async (req, res) => {
 	}
 };
 
-module.exports = { register, login };
+const google = async (req, res) => {
+	passport.authenticate("google", { scope: ["profile", "email"] });
+};
+
+const googleCallback = async (req, res) => {
+	passport.authenticate("google"),
+		(req, res) => {
+			const token = jwt.sign(
+				{ id: req.user.id },
+				process.env.JWT_SECRET,
+				{
+					expiresIn: "1h",
+				}
+			);
+			res.json({ token });
+		};
+};
+
+module.exports = { register, login, googleCallback, google };

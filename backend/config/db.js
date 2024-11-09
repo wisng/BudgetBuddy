@@ -45,9 +45,9 @@ db.connect((err) => {
 
 			const createUserBudgetTable = `
         CREATE TABLE IF NOT EXISTS UserBudget (
-	      userID INT
-          budgetID INT,
-		  PRIMARY KEY (userID, budgetID),
+	      userID INT,
+        budgetID INT,
+		    PRIMARY KEY (userID, budgetID),
           FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
           FOREIGN KEY (budgetID) REFERENCES Budget(budgetID) ON DELETE CASCADE
         )`;
@@ -109,9 +109,9 @@ db.connect((err) => {
           categoryID INT,
           budgetID INT,
           spendingLimit DOUBLE,
+          currAmount DOUBLE,
           startDate DATE,
           endDate DATE,
-          isExceeded BOOLEAN,
           FOREIGN KEY (categoryID) REFERENCES Category(categoryID),
           FOREIGN KEY (budgetID) REFERENCES Budget(budgetID)
         )`;

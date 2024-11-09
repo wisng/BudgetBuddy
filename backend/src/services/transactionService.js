@@ -1,7 +1,7 @@
 const db = require("../../config/db");
 const budgetService = require("./budgetService");
 
-const createTransaction = (budgetId, transaction, userId) => {
+const createTransaction = async (budgetId, transaction, userId) => {
 	const transactionQuery = `
 	  INSERT INTO Transaction (budgetID, title, userID, categoryID, amount, date, transactionType, recurrenceFrequency, recurrenceStartDate, recurrenceEndDate)
 	  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -19,7 +19,7 @@ const createTransaction = (budgetId, transaction, userId) => {
 		transaction.recurrenceEndDate || null,
 	];
 
-	new Promise((resolve, reject) => {
+	await new Promise((resolve, reject) => {
 		db.query(transactionQuery, transactionValues, (error, results) => {
 			if (error) return reject(error);
 
