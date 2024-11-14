@@ -1,16 +1,12 @@
 const userService = require("./userService");
-const jwt = require("jsonwebtoken");
+const jwtUtil = require("../utils/jwtUtil");
 const bcrypt = require("bcryptjs");
 
 const registerUser = async (username, email, password) => {
 	try {
-		const userId = await userService.createUser(username, email, password);
-		const user = await userService.findUserById(userId);
-		const token = jwt.sign(
-			{ userId: user.userId, userType: user.userType },
-			process.env.JWT_SECRET,
-			{ expiresIn: "1h" }
-		);
+		const userID = await userService.createUser(username, email, password);
+		const user = await userService.findUserByID(userID);
+		const token = jwtUtil.generateToken(user.userID, user.userType);
 
 		return { token: token };
 	} catch (error) {
@@ -27,11 +23,7 @@ const loginUser = async (identifier, password) => {
 		if (!isPasswordValid)
 			throw new Error("Invalid email/username or password");
 
-		const token = jwt.sign(
-			{ userId: user.userId, accountType: user.accountType },
-			process.env.JWT_SECRET,
-			{ expiresIn: "1h" }
-		);
+		const token = jwtUtil.generateToken(user.userID, user.userType);
 
 		return { token: token };
 	} catch (error) {

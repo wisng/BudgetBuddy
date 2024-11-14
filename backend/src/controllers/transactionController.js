@@ -1,12 +1,12 @@
 const transactionService = require("../services/transactionService");
 
 const createTransaction = async (req, res) => {
-	const { budgetId } = req.params;
+	const { budgetID } = req.params;
 	try {
 		const transaction = await transactionService.createTransaction(
-			budgetId,
+			budgetID,
 			req.body,
-			req.userId
+			req.userID
 		);
 		res.status(201).json(transaction);
 	} catch (error) {
@@ -15,12 +15,12 @@ const createTransaction = async (req, res) => {
 };
 
 const getTransaction = async (req, res) => {
-	const { budgetId, transactionId } = req.params;
+	const { budgetID, transactionID } = req.params;
 	try {
 		const transaction = await transactionService.getTransaction(
-			budgetId,
-			transactionId,
-			req.userId
+			budgetID,
+			transactionID,
+			req.userID
 		);
 		if (!transaction)
 			return res.status(404).json({ message: "Transaction not found" });
@@ -31,13 +31,13 @@ const getTransaction = async (req, res) => {
 };
 
 const getAllTransaction = async (req, res) => {
-	const { budgetId } = req.params;
+	const { budgetID } = req.params;
 	const { day, month, year } = req.query;
 	try {
 		const transactions = await transactionService.getAllTransaction(
-			budgetId,
+			budgetID,
 			{ day, month, year },
-			req.userId
+			req.userID
 		);
 		res.json(transactions);
 	} catch (error) {
@@ -46,13 +46,13 @@ const getAllTransaction = async (req, res) => {
 };
 
 const updateTransaction = async (req, res) => {
-	const { budgetId, transactionId } = req.params;
+	const { budgetID, transactionID } = req.params;
 	try {
 		const updatedTransaction = await transactionService.updateTransaction(
-			transactionId,
+			transactionID,
 			req.body,
-			budgetId,
-			req.userId
+			budgetID,
+			req.userID
 		);
 		res.json(updatedTransaction);
 	} catch (error) {
@@ -61,12 +61,12 @@ const updateTransaction = async (req, res) => {
 };
 
 const deleteTransaction = async (req, res) => {
-	const { budgetId, transactionId } = req.params;
+	const { budgetID, transactionID } = req.params;
 	try {
 		await transactionService.deleteTransaction(
-			transactionId,
-			req.userId,
-			budgetId
+			transactionID,
+			req.userID,
+			budgetID
 		);
 		res.status(204).send();
 	} catch (error) {

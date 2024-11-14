@@ -6,21 +6,30 @@ const ACCOUNT_TYPE = {
 	SHARED: "Shared",
 };
 
-const createBudget = async (userId) => {
+const createBudget = async (userID) => {
 	const budgetQuery = `
-	  INSERT INTO Budget (totalBalance, totalIncome, totalExpenses, accountType, financialHealthScore, creationDate)
-	  VALUES (?, ?, ?, ?, ?, ?)
+	  INSERT INTO Budget (totalBalance, totalIncome, totalExpenses, accountType, financialHealthScore, creationDate, ownerID, title)
+	  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`;
-	const budgetValues = [0, 0, 0, ACCOUNT_TYPE.INDIVIDUAL, 0, new Date()]; // For now, default will be Individual.
+	const budgetValues = [
+		0,
+		0,
+		0,
+		ACCOUNT_TYPE.INDIVIDUAL,
+		0,
+		new Date(),
+		userID,
+		"Default",
+	];
 
-	const budgetId = await new Promise((resolve, reject) => {
+	const budgetID = await new Promise((resolve, reject) => {
 		db.query(budgetQuery, budgetValues, (error, budgetResults) => {
 			if (error) return reject(error);
 
 			const userBudgetQuery = `
 		  INSERT INTO UserBudget (userID, budgetID) VALUES (?, ?)
 		`;
-			const userBudgetValues = [userId, budgetResults.insertId];
+			const userBudgetValues = [userID, budgetResults.insertId];
 
 			db.query(userBudgetQuery, userBudgetValues, (error) => {
 				if (error) return reject(error);
@@ -28,21 +37,21 @@ const createBudget = async (userId) => {
 			});
 		});
 	});
-
-	return budgetId;
+	I;
+	return budgetID;
 };
 
-const getBudget = (budgetId, userId) => {
+const getBudget = (budgetID, userID) => {
 	const query = `SELECT Budget.* FROM Budget INNER JOIN UserBudget ON Budget.budgetID = UserBudget.budgetID WHERE UserBudget.userID = ? AND Budget.budgetID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [userId, budgetId], (error, results) => {
+		db.query(query, [userID, budgetID], (error, results) => {
 			if (error) return reject(error);
 			resolve(results[0]);
 		});
 	});
 };
 
-const getAllBudgets = (userId) => {
+const getAllBudgets = (userID) => {
 	const query = `
     SELECT Budget.* 
     FROM Budget 
@@ -50,17 +59,17 @@ const getAllBudgets = (userId) => {
     WHERE UserBudget.userID = ?
   `;
 	return new Promise((resolve, reject) => {
-		db.query(query, [userId], (error, results) => {
+		db.query(query, [userID], (error, results) => {
 			if (error) return reject(error);
 			resolve(results);
 		});
 	});
 };
 
-const updateBudget = (budgetId, userId) => {
+const updateBudget = (budgetID, userID) => {
 	const transactions = transactionService.getAllTransaction(
-		budgetId,
-		(userId = userId)
+		budgetID,
+		(userID = userID)
 	);
 
 	let totalBalance = 0;
@@ -100,27 +109,129 @@ const updateBudget = (budgetId, userId) => {
 	});
 };
 
-const deleteBudget = (budgetId, userId) => {
+const deleteBudget = (budgetID, userID) => {
 	return new Promise((resolve, reject) => {
+		const checkBudgetCount = `SELECT COUNT(*) FROM UserBudget WHERE userID = ?`;
+
+		if (checkBudgetCount === 1) {
+			return reject({ message: "User must have at least one budget" });
+		}
+
 		const checkOwnershipQuery = `
 		  SELECT * FROM UserBudget WHERE budgetID = ? AND userID = ?
 		`;
 
-		db.query(checkOwnershipQuery, [budgetId, userId], (error, results) => {
+		db.query(checkOwnershipQuery, [budgetID, userID], (error, results) => {
 			if (error) return reject(error);
 			if (results.length === 0) {
 				return resolve({ affectedRows: 0 });
 			}
 
 			const deleteUserBudgetQuery = `DELETE FROM UserBudget WHERE budgetID = ?`;
-			db.query(deleteUserBudgetQuery, [budgetId], (error) => {
+			db.query(deleteUserBudgetQuery, [budgetID], (error) => {
 				if (error) return reject(error);
 
 				const deleteBudgetQuery = `DELETE FROM Budget WHERE budgetID = ?`;
-				db.query(deleteBudgetQuery, [budgetId], (error, results) => {
+				db.query(deleteBudgetQuery, [budgetID], (error, results) => {
 					if (error) return reject(error);
 					resolve(results);
 				});
+			});
+		});
+	});
+};
+
+const addUser = (budgetID, ownerID, identifier) => {
+	return new Promise((resolve, reject) => {
+		getBudget(budgetID, ownerID).then((budget) => {
+			if (!budget) {
+				return reject({ message: "Budget not found" });
+			}
+			if (budget.ownerID !== ownerID) {
+				return reject({
+					message: "You are not the owner of this budget",
+				});
+			}
+
+			// check if user exists
+
+			const userQuery = `SELECT * FROM User WHERE email = ? OR username = ?`;
+			db.query(userQuery, [identifier, identifier], (error, results) => {
+				if (error) return reject(error);
+				if (results.length === 0) {
+					return reject({ message: "User not found" });
+				} else {
+					// add user to budget
+					const userID = results[0].userID;
+					const insertQuery = `INSERT INTO UserBudget (budgetID, userID) VALUES (?, ?)`;
+					db.query(
+						insertQuery,
+						[budgetID, userID],
+						(error, results) => {
+							if (error) return reject(error);
+							resolve(results);
+						}
+					);
+				}
+				// change budget to shared
+				const updateQuery = `UPDATE Budget SET accountType = ? WHERE budgetID = ?`;
+				db.query(
+					updateQuery,
+					[ACCOUNT_TYPE.SHARED, budgetID],
+					(error) => {
+						if (error) return reject(error);
+					}
+				);
+			});
+		});
+	});
+};
+
+const updateTitle = (budgetID, userID, title) => {
+	const query = `UPDATE Budget SET title = ? WHERE budgetID = ? AND ownerID = ?`;
+	return new Promise((resolve, reject) => {
+		db.query(query, [title, budgetID, userID], (error, results) => {
+			if (error) return reject(error);
+			resolve(results[0]);
+		});
+	});
+};
+
+const removeUser = (budgetID, ownerID, userID) => {
+	if (ownerID === userID) {
+		return reject({ message: "You cannot remove yourself from a budget" });
+	}
+	return new Promise((resolve, reject) => {
+		getBudget(budgetID, ownerID).then((budget) => {
+			if (!budget) {
+				return reject({ message: "Budget not found" });
+			}
+			if (budget.ownerID !== ownerID) {
+				return reject({
+					message: "You are not the owner of this budget",
+				});
+			}
+		});
+
+		const query = `DELETE FROM UserBudget WHERE budgetID = ? AND userID = ? AND userID != ?`;
+		db.query(query, [budgetID, userID, ownerID], (error, results) => {
+			if (error) return reject(error);
+			resolve(results);
+		});
+	});
+};
+
+const getAllBudgetUsers = (budgetID, userID) => {
+	return new Promise((resolve, reject) => {
+		getBudget(budgetID, userID).then((budget) => {
+			if (!budget) {
+				return reject({ message: "Budget not found" });
+			}
+
+			const query = `SELECT * FROM UserBudget WHERE budgetID = ?`;
+			db.query(query, [budgetID], (error, results) => {
+				if (error) return reject(error);
+				resolve(results);
 			});
 		});
 	});
@@ -132,4 +243,8 @@ module.exports = {
 	getAllBudgets,
 	updateBudget,
 	deleteBudget,
+	addUser,
+	removeUser,
+	updateTitle,
+	getAllBudgetUsers,
 };

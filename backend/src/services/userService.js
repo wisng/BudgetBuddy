@@ -47,31 +47,31 @@ const createUser = async (
 			}
 		);
 	});
-	const budgetId = await budgetService.createBudget(user.insertId);
+	const budgetID = await budgetService.createBudget(user.insertId);
 	const categoryData = [
 		{
 			name: "Entertainment",
 			colour: "#00FF00",
 			isCustom: false,
-			budgetID: budgetId,
+			budgetID: budgetID,
 		},
 		{
 			name: "Shopping",
 			colour: "#FF0000",
 			isCustom: false,
-			budgetID: budgetId,
+			budgetID: budgetID,
 		},
 		{
 			name: "Dining Out",
 			colour: "#0000FF",
 			isCustom: false,
-			budgetID: budgetId,
+			budgetID: budgetID,
 		},
 		{
 			name: "Transportation",
 			colour: "#00FFFF",
 			isCustom: false,
-			budgetID: budgetId,
+			budgetID: budgetID,
 		},
 	];
 	for (const category of categoryData) {
@@ -93,11 +93,11 @@ const findUser = (identifier) => {
 	});
 };
 
-const findUserById = (userId) => {
-	console.log(userId);
+const findUserByID = (userID) => {
+	console.log(userID);
 	const query = `SELECT * FROM User WHERE userID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [userId], (err, results) => {
+		db.query(query, [userID], (err, results) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -107,4 +107,4 @@ const findUserById = (userId) => {
 	});
 };
 
-module.exports = { createUser, findUser, findUserById };
+module.exports = { createUser, findUser, findUserByID };

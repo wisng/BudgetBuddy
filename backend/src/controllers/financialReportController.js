@@ -2,12 +2,12 @@ const financialReportService = require("../services/financialReportService");
 
 const createFinancialReport = async (req, res) => {
 	try {
-		const { budgetId } = req.params;
-		const userId = req.userId;
+		const { budgetID } = req.params;
+		const userID = req.userID;
 		const data = req.body;
 		const report = await financialReportService.createFinancialReport(
-			budgetId,
-			userId,
+			budgetID,
+			userID,
 			data
 		);
 		res.status(201).json(report);
@@ -18,11 +18,11 @@ const createFinancialReport = async (req, res) => {
 
 const getFinancialReport = async (req, res) => {
 	try {
-		const { budgetId } = req.params;
-		const userId = req.userId;
+		const { budgetID } = req.params;
+		const userID = req.userID;
 		const report = await financialReportService.getFinancialReport(
-			budgetId,
-			userId
+			budgetID,
+			userID
 		);
 		res.json(report);
 	} catch (error) {
@@ -32,9 +32,9 @@ const getFinancialReport = async (req, res) => {
 
 const getAllFinancialReports = async (req, res) => {
 	try {
-		const userId = req.userId;
+		const userID = req.userID;
 		const reports = await financialReportService.getAllFinancialReports(
-			userId
+			userID
 		);
 		res.json(reports);
 	} catch (error) {
@@ -44,9 +44,9 @@ const getAllFinancialReports = async (req, res) => {
 
 const deleteFinancialReport = async (req, res) => {
 	try {
-		const { budgetId } = req.params;
-		const userId = req.userId;
-		await financialReportService.deleteFinancialReport(budgetId, userId);
+		const { budgetID } = req.params;
+		const userID = req.userID;
+		await financialReportService.deleteFinancialReport(budgetID, userID);
 		res.status(204).send();
 	} catch (error) {
 		res.status(500).json({ error: error.message });

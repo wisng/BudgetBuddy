@@ -1,15 +1,14 @@
 const db = require("../../config/db");
 const budgetService = require("./budgetService");
 
-const createTransaction = async (budgetId, transaction, userId) => {
+const createTransaction = async (budgetID, transaction, userID) => {
 	const transactionQuery = `
-	  INSERT INTO Transaction (budgetID, title, userID, categoryID, amount, date, transactionType, recurrenceFrequency, recurrenceStartDate, recurrenceEndDate)
-	  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	  INSERT INTO Transaction (budgetID, title, categoryID, amount, date, transactionType, recurrenceFrequency, recurrenceStartDate, recurrenceEndDate)
+	  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`;
 	const transactionValues = [
-		budgetId,
+		budgetID,
 		transaction.title,
-		userId,
 		transaction.categoryID,
 		transaction.amount,
 		transaction.date,
@@ -24,7 +23,7 @@ const createTransaction = async (budgetId, transaction, userId) => {
 			if (error) return reject(error);
 
 			const userTransactionQuery = `INSERT INTO UserTransaction (userID, transactionID) VALUES (?, ?)`;
-			const userTransactionValues = [userId, results.insertId];
+			const userTransactionValues = [userID, results.insertId];
 
 			db.query(userTransactionQuery, userTransactionValues, (error) => {
 				if (error) return reject(error);
@@ -33,22 +32,22 @@ const createTransaction = async (budgetId, transaction, userId) => {
 		});
 	});
 
-	return budgetService.updateBudget(budgetId);
+	return budgetService.updateBudget(budgetID);
 };
 
-const getTransaction = (transactionId, userId) => {
+const getTransaction = (transactionID, userID) => {
 	const query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.transactionID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [userId, transactionId], (error, results) => {
+		db.query(query, [userID, transactionID], (error, results) => {
 			if (error) return reject(error);
 			resolve(results[0]);
 		});
 	});
 };
 
-const getAllTransaction = (budgetID, { day, month, year }, userId) => {
+const getAllTransaction = (budgetID, { day, month, year }, userID) => {
 	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
-	const queryParams = [budgetID, userId];
+	const queryParams = [budgetID, userID];
 
 	if (year) {
 		query += ` AND YEAR(date) = ?`;
@@ -84,10 +83,10 @@ const getAllTransaction = (budgetID, { day, month, year }, userId) => {
 };
 
 const updateTransaction = (
-	transactionId,
+	transactionID,
 	transactionData,
-	budgetId,
-	userId
+	budgetID,
+	userID
 ) => {
 	const query = `
     UPDATE Transaction
@@ -106,8 +105,8 @@ const updateTransaction = (
 		transactionData.recurrenceFrequency || null,
 		transactionData.recurrenceStartDate || null,
 		transactionData.recurrenceEndDate || null,
-		transactionId,
-		userId,
+		transactionID,
+		userID,
 	];
 
 	new Promise((resolve, reject) => {
@@ -117,10 +116,10 @@ const updateTransaction = (
 		});
 	});
 
-	return budgetService.updateBudget(budgetId);
+	return budgetService.updateBudget(budgetID);
 };
 
-const deleteTransaction = (transactionId, userId, budgetId) => {
+const deleteTransaction = (transactionID, userID, budgetID) => {
 	new Promise((resolve, reject) => {
 		const checkOwnershipQuery = `
 		SELECT * FROM UserTransaction WHERE transactionID = ? AND userID = ?
@@ -128,7 +127,7 @@ const deleteTransaction = (transactionId, userId, budgetId) => {
 
 		db.query(
 			checkOwnershipQuery,
-			[transactionId, userId],
+			[transactionID, userID],
 			(error, results) => {
 				if (error) return reject(error);
 				if (results.length === 0) {
@@ -138,13 +137,13 @@ const deleteTransaction = (transactionId, userId, budgetId) => {
 				const deleteUserTransactionQuery = `DELETE FROM UserTransaction WHERE transactionID = ?`;
 				db.query(
 					deleteUserTransactionQuery,
-					[transactionId],
+					[transactionID],
 					(error) => {
 						if (error) return reject(error);
 						const deleteTransactionQuery = `DELETE FROM Transaction WHERE transactionID = ?`;
 						db.query(
 							deleteTransactionQuery,
-							[transactionId],
+							[transactionID],
 							(error, results) => {
 								if (error) return reject(error);
 								resolve(results);
@@ -156,7 +155,7 @@ const deleteTransaction = (transactionId, userId, budgetId) => {
 		);
 	});
 
-	return budgetService.updateBudget(budgetId);
+	return budgetService.updateBudget(budgetID);
 };
 
 module.exports = {

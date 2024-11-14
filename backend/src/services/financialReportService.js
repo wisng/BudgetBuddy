@@ -1,6 +1,6 @@
 const db = require("../../config/db");
 
-const createFinancialReport = (budgetId, userId, data) => {
+const createFinancialReport = (budgetID, userID, data) => {
 	const financialReportQuery = `
         INSERT INTO FinancialReport ( userID, budgetID, generatedDate, reportPeriodStartDate, reportPeriodEndDate, totalIncome, totalExpenses, spendingPerCategory, savings )
         VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )
@@ -16,7 +16,7 @@ const createFinancialReport = (budgetId, userId, data) => {
 	return new Promise((resolve, reject) => {
 		db.query(
 			transactionQuery,
-			[budgetId, data.reportPeriodStartDate, data.reportPeriodEndDate],
+			[budgetID, data.reportPeriodStartDate, data.reportPeriodEndDate],
 			(err, results) => {
 				if (err) {
 					reject(err);
@@ -79,8 +79,8 @@ const createFinancialReport = (budgetId, userId, data) => {
 					db.query(
 						financialReportQuery,
 						[
-							userId,
-							budgetId,
+							userID,
+							budgetID,
 							data.generatedDate,
 							data.reportPeriodStartDate,
 							data.reportPeriodEndDate,
@@ -103,13 +103,13 @@ const createFinancialReport = (budgetId, userId, data) => {
 	});
 };
 
-const getFinancialReport = (reportId, userId) => {
+const getFinancialReport = (reportID, userID) => {
 	const financialReportQuery = `
 		SELECT * FROM FinancialReport WHERE reportID = ? AND userID = ?
 	`;
 
 	return new Promise((resolve, reject) => {
-		db.query(financialReportQuery, [reportId, userId], (err, results) => {
+		db.query(financialReportQuery, [reportID, userID], (err, results) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -119,13 +119,13 @@ const getFinancialReport = (reportId, userId) => {
 	});
 };
 
-const getAllFinancialReports = (budgetId, userId) => {
+const getAllFinancialReports = (budgetID, userID) => {
 	const financialReportQuery = `
 		SELECT * FROM FinancialReport WHERE userID = ? AND budgetID = ?
 	`;
 
 	return new Promise((resolve, reject) => {
-		db.query(financialReportQuery, [userId, budgetId], (err, results) => {
+		db.query(financialReportQuery, [userID, budgetID], (err, results) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -135,13 +135,13 @@ const getAllFinancialReports = (budgetId, userId) => {
 	});
 };
 
-const deleteFinancialReport = (reportId, userId) => {
+const deleteFinancialReport = (reportID, userID) => {
 	const financialReportQuery = `
 		DELETE FROM FinancialReport WHERE reportID = ? AND userID = ?
 	`;
 
 	return new Promise((resolve, reject) => {
-		db.query(financialReportQuery, [reportId, userId], (err, results) => {
+		db.query(financialReportQuery, [reportID, userID], (err, results) => {
 			if (err) {
 				reject(err);
 			} else {

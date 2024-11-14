@@ -25,7 +25,7 @@ db.connect((err) => {
 			const createUserTable = `
         CREATE TABLE IF NOT EXISTS User (
           userID INT PRIMARY KEY AUTO_INCREMENT,
-          username VARCHAR(255),
+          username VARCHAR(255) NOT NULL UNIQUE,
           email VARCHAR(255) NOT NULL UNIQUE,
           password VARCHAR(255) NOT NULL,
           userType ENUM('Client', 'FinancialAdvisor'),
@@ -35,12 +35,15 @@ db.connect((err) => {
 			const createBudgetTable = `
         CREATE TABLE IF NOT EXISTS Budget (
           budgetID INT PRIMARY KEY AUTO_INCREMENT,
+          title VARCHAR(255) NOT NULL,
           totalBalance DOUBLE,
           totalIncome DOUBLE,
           totalExpenses DOUBLE,
           accountType ENUM('Individual', 'Shared'),
           financialHealthScore INT,
-          creationDate DATE
+          creationDate DATE,
+          ownerID INT,
+          FOREIGN KEY (ownerID) REFERENCES User(userID) ON DELETE CASCADE
         )`;
 
 			const createUserBudgetTable = `

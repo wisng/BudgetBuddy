@@ -1,5 +1,4 @@
 const authService = require("../services/authService");
-const jwtUtil = require("../utils/jwtUtil");
 
 const register = async (req, res) => {
 	const { username, email, password } = req.body;

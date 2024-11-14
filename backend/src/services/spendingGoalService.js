@@ -1,14 +1,14 @@
 const db = require("../../config/db");
+const budgetService = require("./budgetService");
 
-const createSpendingGoal = async (budgetId, spendingGoal, userId) => {
-	const budget = await budgetService.getBudget(budgetId, userId);
+const createSpendingGoal = async (budgetID, spendingGoal, userID) => {
+	const budget = await budgetService.getBudget(budgetID, userID);
 	const spendingGoalQuery = `
-        INSERT INTO SpendingGoal (spendingGoalID, categoryID, budgetID, spendingLimit, currAmount, startDate, endDate)
+        INSERT INTO SpendingGoal (categoryID, budgetID, spendingLimit, currAmount, startDate, endDate)
         Values(?, ?, ?, ?, ?, ?)
     `;
 
 	const spendingGoalValues = [
-		spendingGoal.spendingGoalID,
 		spendingGoal.categoryID,
 		budget.budgetID,
 		spendingGoal.spendingLimit,
@@ -25,19 +25,19 @@ const createSpendingGoal = async (budgetId, spendingGoal, userId) => {
 	});
 };
 
-const getSpendingGoal = async (budgetId, spendingGoalId, userId) => {
-	const budget = await budgetService.getBudget(budgetId, userId);
+const getSpendingGoal = async (budgetID, spendingGoalID, userID) => {
+	const budget = await budgetService.getBudget(budgetID, userID);
 	const query = `SELECT * FROM SpendingGoal WHERE spendingGoalID = ? AND budgetID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [spendingGoalId, budget.budgetID], (error, results) => {
+		db.query(query, [spendingGoalID, budget.budgetID], (error, results) => {
 			if (error) return reject(error);
 			resolve(results[0]);
 		});
 	});
 };
 
-const getAllSpendingGoals = async (budgetId, { day, month, year }, userId) => {
-	const budget = await budgetService.getBudget(budgetId, userId);
+const getAllSpendingGoals = async (budgetID, { day, month, year }, userID) => {
+	const budget = await budgetService.getBudget(budgetID, userID);
 	let query = `SELECT * FROM SpendingGoal WHERE budgetID = ? AND endDate >= ?`;
 	const queryParams = [budget.budgetID];
 
@@ -62,12 +62,12 @@ const getAllSpendingGoals = async (budgetId, { day, month, year }, userId) => {
 };
 
 const updateSpendingGoal = async (
-	spendingGoalId,
-	budgetId,
+	spendingGoalID,
+	budgetID,
 	spendingGoalData,
-	userId
+	userID
 ) => {
-	const budget = await budgetService.getBudget(budgetId, userId);
+	const budget = await budgetService.getBudget(budgetID, userID);
 	const spendingGoalQuery = `UPDATE SpendingGoal SET categoryID = ?, spendingLimit = ?, currAmount = ?, startDate = ?, endDate = ? WHERE spendingGoalID = ? AND budgetID = ?`;
 	const spendingGoalValues = [
 		spendingGoalData.categoryID,
@@ -75,7 +75,7 @@ const updateSpendingGoal = async (
 		spendingGoalData.currAmount,
 		spendingGoalData.startDate,
 		spendingGoalData.endDate,
-		spendingGoalId,
+		spendingGoalID,
 		budget.budgetID,
 	];
 
@@ -87,11 +87,11 @@ const updateSpendingGoal = async (
 	});
 };
 
-const deleteSpendingGoal = async (spendingGoalId, userId) => {
-	const budget = await budgetService.getBudget(budgetId, userId);
+const deleteSpendingGoal = async (spendingGoalID, userID) => {
+	const budget = await budgetService.getBudget(budgetID, userID);
 	const query = `DELETE FROM SpendingGoal WHERE spendingGoalID = ? AND budgetID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [spendingGoalId, budget.budgetID], (error, results) => {
+		db.query(query, [spendingGoalID, budget.budgetID], (error, results) => {
 			if (error) return reject(error);
 			resolve(results);
 		});

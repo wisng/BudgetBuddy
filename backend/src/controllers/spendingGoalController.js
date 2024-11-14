@@ -1,12 +1,12 @@
 const spendingGoalService = require("../services/spendingGoalService");
 
 const createSpendingGoal = async (req, res) => {
-	const { budgetId } = req.params;
+	const { budgetID } = req.params;
 	try {
 		const spendingGoal = await spendingGoalService.createSpendingGoal(
-			budgetId,
+			budgetID,
 			req.body,
-			req.userId
+			req.userID
 		);
 		res.status(201).json(spendingGoal);
 	} catch (error) {
@@ -15,12 +15,12 @@ const createSpendingGoal = async (req, res) => {
 };
 
 const getSpendingGoal = async (req, res) => {
-	const { budgetId, spendingGoalId } = req.params;
+	const { budgetID, spendingGoalID } = req.params;
 	try {
 		const spendingGoal = await spendingGoalService.getSpendingGoal(
-			budgetId,
-			spendingGoalId,
-			req.userId
+			budgetID,
+			spendingGoalID,
+			req.userID
 		);
 		if (!spendingGoal)
 			return res.status(404).json({ message: "spendingGoal not found" });
@@ -31,13 +31,13 @@ const getSpendingGoal = async (req, res) => {
 };
 
 const getAllSpendingGoal = async (req, res) => {
-	const { budgetId } = req.params;
+	const { budgetID } = req.params;
 	const { day, month, year } = req.query;
 	try {
 		const spendingGoals = await spendingGoalService.getAllSpendingGoals(
-			budgetId,
+			budgetID,
 			{ day, month, year },
-			req.userId
+			req.userID
 		);
 		res.json(spendingGoals);
 	} catch (error) {
@@ -46,14 +46,14 @@ const getAllSpendingGoal = async (req, res) => {
 };
 
 const updateSpendingGoal = async (req, res) => {
-	const { budgetId, spendingGoalId } = req.params;
+	const { budgetID, spendingGoalID } = req.params;
 	try {
 		const updatedSpendingGoal =
 			await spendingGoalService.updateSpendingGoal(
-				spendingGoalId,
-				budgetId,
+				spendingGoalID,
+				budgetID,
 				req.body,
-				req.userId
+				req.userID
 			);
 		res.json(updatedSpendingGoal);
 	} catch (error) {
@@ -62,11 +62,11 @@ const updateSpendingGoal = async (req, res) => {
 };
 
 const deleteSpendingGoal = async (req, res) => {
-	const { spendingGoalId } = req.params;
+	const { spendingGoalID } = req.params;
 	try {
 		await spendingGoalService.deleteSpendingGoal(
-			spendingGoalId,
-			req.userId
+			spendingGoalID,
+			req.userID
 		);
 		res.status(204).send();
 	} catch (error) {
