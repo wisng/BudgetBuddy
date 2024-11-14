@@ -1,7 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from '@mui/material';
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const changeScreen = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:3000/api/login", { email, password });
+      // localStorage.setItem("jwt-token", res.data.token);
+      changeScreen("/home");
+    }
+    catch (err) {
+      console.log(err.message);
+      console.log(err.response?.data?.error);
+    }
+  };
+
   return (
     <Box sx={{ flexGrow: 1}}>
       <Grid container spacing={0} sx={{ position: "relative"}}>
@@ -45,11 +64,13 @@ const Login = () => {
                 }}
                 sx={{height: "12%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
+                onChange={(e) => setEmail(e.target.value)}
               />
 
               {/* Password Input */}
               <TextField
                 fullWidth
+                type="password"
                 label=""
                 variant="standard"
                 margin="normal"
@@ -60,6 +81,7 @@ const Login = () => {
                 }}
                 sx={{height: "12%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
+                onChange={(e) => setPassword(e.target.value)}
               />
           
               {/* Google Sign-In Button */}
@@ -78,6 +100,7 @@ const Login = () => {
                 variant="contained"
                 fullWidth={false}
                 style={{backgroundColor:  "#7459D9", width: "120px"}}
+                onClick={handleLogin}
               >
                 Login
               </Button>

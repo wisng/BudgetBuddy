@@ -1,8 +1,43 @@
-
-import React from "react";
-import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from '@mui/material';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Typography, TextField, FormControl, FormLabel, FormControlLabel, Radio, RadioGroup, Button, Box, Link, Paper, Grid2 as Grid } from '@mui/material';
 
 const Signup = () => {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmationPassword, setConfirmationPassword] = useState("");
+  const [role, setRole] = useState("Client");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSucessMsg] = useState("");
+  const changeScreen = useNavigate();
+
+  const handleRegistration = async (e) => {
+    console.log("Registration: User info intaking");
+    e.preventDefault();
+    if (password !== confirmationPassword) {
+      alert("Passwords do not match");
+      // setErrorMsg("Passwords do not match");
+    }
+    else {
+      try {
+        const res = await axios.post("http://localhost:3000/api/register", { email, name, username, password, role });
+        alert(`${res.data.message}, redirecting to login page...`);
+        // setSuccessMsg(`${res.data.message}, redirecting to login page...`);
+        setTimeout(() => {
+          changeScreen("/login");
+        }, 3000);
+      }
+      catch (err) {
+        console.log(err.message);
+        console.log(err.response?.data?.error);
+        // setErrorMsg(err.message);
+      }
+    }
+  };
+
   return (
     <Box sx={{ flexGrow: 1}}>
       <Grid container spacing={0} sx={{ position: "relative"}}>
@@ -21,7 +56,7 @@ const Signup = () => {
           </Paper>
         </Grid>
         <Grid size={4} sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-          <Paper elevation={3} sx={{height: "450px", width: "100%", borderRadius:8}}>
+          <Paper elevation={3} sx={{height: "auto", width: "100%", borderRadius:8}}>
              {/* Form Container */}
             <Box
               style={{  padding:"20px", paddingTop: "10px",}}
@@ -46,6 +81,23 @@ const Signup = () => {
                 }}
                 sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+
+              {/* Name Input */}
+              <TextField
+                fullWidth
+                label=""
+                variant="standard"
+                margin="normal"
+                placeholder="Name"
+                size="medium"
+                inputProps={{
+                  style: { paddingLeft:"15px", padding: "10px"},
+                }}
+                sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
+                InputProps={{disableUnderline: true}}
+                onChange={(e) => setName(e.target.value)}
               />
 
               {/* Username Input */}
@@ -61,11 +113,13 @@ const Signup = () => {
                 }}
                 sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
+                onChange={(e) => setUsername(e.target.value)}
               />
 
               {/* Password Input */}
               <TextField
                 fullWidth
+                type="password"
                 label=""
                 variant="standard"
                 margin="normal"
@@ -76,10 +130,12 @@ const Signup = () => {
                 }}
                 sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
+                onChange={(e) => setPassword(e.target.value)}
               />
               {/* Confirmation Password Input */}
               <TextField
                 fullWidth
+                type="password"
                 label=""
                 variant="standard"
                 margin="normal"
@@ -90,7 +146,25 @@ const Signup = () => {
                 }}
                 sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
+                onChange={(e) => setConfirmationPassword(e.target.value)}
               />
+
+              {/* Role Selection */}
+              <FormControl fullWidth>
+                <RadioGroup
+                  row
+                  aria-label="role"
+                  name="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                >
+                  <FormControlLabel value="Client" control={<Radio />} label="Client" />
+                  <FormControlLabel value="FinancialAdvisor" control={<Radio />} label="Financial Advisor" />
+                </RadioGroup>
+              </FormControl>
+
+
+
 
               {/* Google Sign-In Button */}
               {/* <Button
@@ -108,6 +182,7 @@ const Signup = () => {
                 variant="contained"
                 fullWidth={false}
                 style={{backgroundColor:  "#7459D9", width: "120px"}}
+                onClick={handleRegistration}
               >
                 Sign Up
               </Button>

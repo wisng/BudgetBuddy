@@ -2,8 +2,9 @@ const userService = require("./userService");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const registerUser = async (email, password) => {
-	return await userService.createUser(email, password);
+const registerUser = async (email, name, username, password, role) => {
+	console.log(`Registering user ${name} with info: ${email}, ${username}, ${role}`);
+	return await userService.createUser(email, name, username, password, role);
 };
 
 const loginUser = async (email, password) => {
