@@ -5,6 +5,7 @@ const createSpendingGoal = (budgetId, spendingGoal) => {
         INSERT INTO SpendingGoal (spendingGoalID, categoryID, budgetID, spendingLimit, currAmount, startDate, endDate)
         Values(?, ?, ?, ?, ?, ?)
     `;
+
 	const spendingGoalValues = [
 		spendingGoal.spendingGoalID,
 		spendingGoal.categoryID,
@@ -23,10 +24,10 @@ const createSpendingGoal = (budgetId, spendingGoal) => {
 	});
 };
 
-const getSpendingGoal = (id) => {
-	const query = `SELECT * FROM SpendingGoal WHERE spendingGoalID = ?`;
+const getSpendingGoal = (budgetId, spendingGoalId) => {
+	const query = `SELECT * FROM SpendingGoal WHERE spendingGoalID = ? AND budgetID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [id], (error, results) => {
+		db.query(query, [spendingGoalId, budgetId], (error, results) => {
 			if (error) return reject(error);
 			resolve(results[0]);
 		});
@@ -71,15 +72,16 @@ const getAllSpendingGoals = (budgetId, { day, month, year }) => {
 	});
 };
 
-const updateSpendingGoal = (id, spendingGoalData) => {
-	const spendingGoalQuery = `UPDATE SpendingGoal SET categoryID = ?, spendingLimit = ?, currAmount = ?, startDate = ?, endDate = ? WHERE spendingGoalID = ?`;
+const updateSpendingGoal = (spendingGoalId, budgetId, spendingGoalData) => {
+	const spendingGoalQuery = `UPDATE SpendingGoal SET categoryID = ?, spendingLimit = ?, currAmount = ?, startDate = ?, endDate = ? WHERE spendingGoalID = ? AND budgetID = ?`;
 	const spendingGoalValues = [
 		spendingGoalData.categoryID,
 		spendingGoalData.spendingLimit,
 		spendingGoalData.currAmount,
 		spendingGoalData.startDate,
 		spendingGoalData.endDate,
-		id,
+		spendingGoalId,
+		budgetId,
 	];
 
 	return new Promise((resolve, reject) => {
@@ -90,10 +92,10 @@ const updateSpendingGoal = (id, spendingGoalData) => {
 	});
 };
 
-const deleteSpendingGoal = (id) => {
+const deleteSpendingGoal = (spendingGoalId) => {
 	const query = `DELETE FROM SpendingGoal WHERE spendingGoalID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [id], (error, results) => {
+		db.query(query, [spendingGoalId], (error, results) => {
 			if (error) return reject(error);
 			resolve(results);
 		});

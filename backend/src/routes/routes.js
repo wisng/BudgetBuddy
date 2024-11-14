@@ -4,7 +4,8 @@ const authController = require("../controllers/authController");
 const categoryController = require("../controllers/categoryController");
 const budgetController = require("../controllers/budgetController");
 const transactionController = require("../controllers/transactionController");
-const passport = require("./passportConfig");
+const financialReportController = require("../controllers/financialReportController");
+const spendingGoalController = require("../controllers/spendingGoalController");
 
 const router = express.Router();
 
@@ -80,46 +81,46 @@ router.delete(
 
 // Spending Goal Routes
 router.post(
-	"/budget/:budgetID/spendinggoal",
+	"/budget/:budgetID/spendingGoal",
 	authMiddleware,
-	budgetController.createSpendingGoal
+	spendingGoalController.createSpendingGoal
 );
 router.get(
-	"/budget/:budgetID/spendinggoal",
+	"/budget/:budgetID/spendingGoal",
 	authMiddleware,
-	budgetController.getSpendingGoal
+	spendingGoalController.getSpendingGoal
 );
 router.put(
-	"/budget/:budgetID/spendinggoal",
+	"/budget/:budgetID/spendingGoal",
 	authMiddleware,
-	budgetController.updateSpendingGoal
+	spendingGoalController.updateSpendingGoal
 );
 router.delete(
-	"/budget/:budgetID/spendinggoal",
+	"/budget/:budgetID/spendingGoal",
 	authMiddleware,
-	budgetController.deleteSpendingGoal
+	spendingGoalController.deleteSpendingGoal
 );
 
 // Financial Report Routes
 router.post(
-	"/budget/:budgetID/financialreport",
+	"/budget/:budgetID/financialReport",
 	authMiddleware,
-	budgetController.createFinancialReport
+	financialReportController.createFinancialReport
 );
 router.get(
-	"/budget/:budgetID/financialreport",
+	"/budget/:budgetID/financialReport",
 	authMiddleware,
-	budgetController.getFinancialReport
+	financialReportController.getFinancialReport
 );
 router.get(
-	"/budget/:budgetID/financialreports",
+	"/budget/:budgetID/financialReports",
 	authMiddleware,
-	budgetController.getAllFinancialReports
+	financialReportController.getAllFinancialReports
 );
 router.delete(
-	"/budget/:budgetID/financialreport",
+	"/budget/:budgetID/financialReport",
 	authMiddleware,
-	budgetController.deleteFinancialReport
+	financialReportController.deleteFinancialReport
 );
 
 module.exports = router;
