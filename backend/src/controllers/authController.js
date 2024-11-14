@@ -29,9 +29,10 @@ const login = async (req, res) => {
 	}
 
 	try {
-		const user = await authService.loginUser(email, password);
-		const token = jwtUtil.generateToken(user);
-		res.json({ token });
+		// const user = await authService.loginUser(email, password);
+		const { token, user } = await authService.loginUser(email, password);
+		// const token = jwtUtil.generateToken(user);
+		res.json({ token, user });
 	} catch (error) {
 		res.status(401).json({ error });
 	}

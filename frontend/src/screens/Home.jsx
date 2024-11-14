@@ -1,10 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
+// import jwt from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode";
 import { PieChart } from "@mui/x-charts/PieChart";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 
 const Home = () => {
+  const [budgetData, setBudgetData] = useState({});
+  const [userID, setUserID] = useState(null);
+  
+
+  // NOT WORKING YET
+  // useEffect(() => {
+  //   const token = localStorage.getItem("jwt-token");
+  //   if (token) {
+  //     const decoded = jwtDecode(token);
+  //     console.log(token);
+  //     console.log("userid", decoded.userId);
+  //     setUserID(decoded.userId);
+  //   }
+  // }, []);
+
+  // const getBudgetData = async () => {
+  //   const res = await axios.get("http://localhost:5000/api/budgets", { userID });
+  //   console.log(res.data);
+  //   setBudgetData(res.data);
+  // };
+
+  // useEffect(() => {
+  //   getBudgetData();
+  // }, []);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Header />

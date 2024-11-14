@@ -12,12 +12,12 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:3000/api/login", { email, password });
-      // localStorage.setItem("jwt-token", res.data.token);
+      localStorage.setItem("jwt-token", res.data.token);
       changeScreen("/home");
     }
     catch (err) {
       console.log(err.message);
-      console.log(err.response?.data?.error);
+      alert(err.response?.data?.error);
     }
   };
 

@@ -44,7 +44,7 @@ const getBudget = (id) => {
 	});
 };
 
-const getAllBudgets = () => {
+const getAllBudgets = (userId) => {
 	const query = `
     SELECT Budget.* 
     FROM Budget 
@@ -52,7 +52,7 @@ const getAllBudgets = () => {
     WHERE UserBudget.userID = ?
   `;
 	return new Promise((resolve, reject) => {
-		db.query(query, (error, results) => {
+		db.query(query, [userId], (error, results) => {
 			if (error) return reject(error);
 			resolve(results);
 		});

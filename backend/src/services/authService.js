@@ -16,14 +16,15 @@ const loginUser = async (email, password) => {
 		if (!isPasswordValid) throw new Error("Invalid email or password");
 
 		// Add jwt tokens when frontend is ready
-		//   const token = jwt.sign(
-		// 	{ userId: user.userId, accountType: user.accountType },
-		// 	process.env.JWT_SECRET,
-		// 	{ expiresIn: '1h' }
-		//   );
+		const token = jwt.sign(
+			{ userId: user.userId, accountType: user.accountType },
+			process.env.JWT_SECRET,
+			{ expiresIn: '1h' }
+		);
 
-		//   return { token, message: "Login successful" };
-		return { message: "Login successful" };
+		// return { token, message: "Login successful" };
+		return { token, user };
+		// return { message: "Login successful" };
 	} catch (error) {
 		throw error;
 	}
