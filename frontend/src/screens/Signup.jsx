@@ -1,7 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Typography, TextField, FormControl, FormLabel, FormControlLabel, Radio, RadioGroup, Button, Box, Link, Paper, Grid2 as Grid } from '@mui/material';
+import {
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Link,
+  Paper,
+  FormControl,
+  OutlinedInput,
+  InputLabel,
+  IconButton,
+  InputAdornment,
+  Grid2 as Grid,
+} from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +27,8 @@ const Signup = () => {
   const [role, setRole] = useState("Client");
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSucessMsg] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const changeScreen = useNavigate();
 
   const handleRegistration = async (e) => {
@@ -38,46 +55,72 @@ const Signup = () => {
     }
   };
 
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (event) => {
+    event.preventDefault();
+  };
+
   return (
-    <Box sx={{ flexGrow: 1}}>
-      <Grid container spacing={0} sx={{ position: "relative"}}>
-        <Grid size={8} sx={{ backgroundColor: "#F2F2F7", height: "100vh"}}></Grid>
-        <Grid size={4} sx={{ height: "100vh"}}></Grid>
+    <Box sx={{ flexGrow: 1 }}>
+      <Grid container spacing={0} sx={{ position: "relative" }}>
+        <Grid size={8} sx={{ backgroundColor: "#F2F2F7", height: "100vh" }}></Grid>
+        <Grid size={4} sx={{ height: "100vh" }}></Grid>
       </Grid>
-      <Grid container spacing={2} sx={{ position: "absolute", top:0, left:0, zIndex: 3, height: "100vh", width: "100vw", justifyContent: "center"}}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: 3,
+          height: "100vh",
+          width: "100vw",
+          justifyContent: "center",
+        }}
+      >
         <Grid size={1}></Grid>
-        <Grid size={5} sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-          <Paper elevation={0} sx={{background: "transparent"}}>
-          <h1 style={{color: "#7459D9" , fontSize: "2rem", fontWeight: "bold", textAlign:"left"}}>BudgetBuddy</h1>
-          <div style={{width: "80%"}}>
-            <p style={{textAlign:"left", color: "#6c757d", marginTop: "10px"}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
-          </div>
-         
+        <Grid size={5} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Paper elevation={0} sx={{ background: "transparent" }}>
+            <h1 style={{ color: "#7459D9", fontSize: "2rem", fontWeight: "bold", textAlign: "left" }}>BudgetBuddy</h1>
+            <div style={{ width: "80%" }}>
+              <p style={{ textAlign: "left", color: "#6c757d", marginTop: "10px" }}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit
+              </p>
+            </div>
           </Paper>
         </Grid>
         <Grid size={4} sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
           <Paper elevation={3} sx={{height: "auto", width: "100%", borderRadius:8}}>
              {/* Form Container */}
             <Box
-              style={{  padding:"20px", paddingTop: "10px",}}
+              style={{ padding: "20px", paddingTop: "10px" }}
               sx={{
                 height: "100%",
-                display:"flex",
+                display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-evenly",
-                alignItems: "flex-end"
+                alignItems: "flex-end",
               }}
             >
-              {/* Email Input */}
               <TextField
                 fullWidth
-                label=""
-                variant="standard"
+                label="Email"
                 margin="normal"
                 placeholder="Email"
-                size="medium"
-                inputProps={{
-                  style: { paddingLeft:"15px", padding: "10px"},
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                size="small"
+                sx={{
+                  marginTop: 3,
+                  borderRadius: 16,
+                  boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 16,
+                  },
                 }}
                 sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
@@ -99,73 +142,90 @@ const Signup = () => {
                 InputProps={{disableUnderline: true}}
                 onChange={(e) => setName(e.target.value)}
               />
-
-              {/* Username Input */}
               <TextField
                 fullWidth
-                label=""
-                variant="standard"
+                label="Username"
                 margin="normal"
                 placeholder="Username"
-                size="medium"
-                inputProps={{
-                  style: { paddingLeft:"15px", padding: "10px"},
-                }}
-                sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
-                InputProps={{disableUnderline: true}}
+                value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                size="small"
+                sx={{
+                  marginTop: 3,
+                  borderRadius: 16,
+                  boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 16,
+                  },
+                }}
               />
 
-              {/* Password Input */}
-              <TextField
-                fullWidth
-                type="password"
-                label=""
-                variant="standard"
-                margin="normal"
-                placeholder="Password"
-                size="medium"
-                inputProps={{
-                  style: { paddingLeft:"15px", padding: "10px"},
-                }}
-                sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
-                InputProps={{disableUnderline: true}}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              {/* Confirmation Password Input */}
-              <TextField
-                fullWidth
-                type="password"
-                label=""
-                variant="standard"
-                margin="normal"
-                placeholder="Confirmation Password"
-                size="medium"
-                inputProps={{
-                  style: { paddingLeft:"15px", padding: "10px"},
-                }}
-                sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
-                InputProps={{disableUnderline: true}}
-                onChange={(e) => setConfirmationPassword(e.target.value)}
-              />
-
-              {/* Role Selection */}
-              <FormControl fullWidth>
-                <RadioGroup
-                  row
-                  aria-label="role"
-                  name="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <FormControlLabel value="Client" control={<Radio />} label="Client" />
-                  <FormControlLabel value="FinancialAdvisor" control={<Radio />} label="Financial Advisor" />
-                </RadioGroup>
+              <FormControl sx={{ width: "100%", marginTop: 3 }} size="small">
+                <InputLabel htmlFor="password">Password</InputLabel>
+                <OutlinedInput
+                  id="password"
+                  fullWidth
+                  label="Password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  size="small"
+                  sx={{
+                    borderRadius: 16,
+                    boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 16,
+                    },
+                  }}
+                  type={showPassword ? "text" : "password"}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={showPassword ? "hide the password" : "display the password"}
+                        onClick={() => setShowPassword(!showPassword)}
+                        onMouseDown={handleMouseDownPassword}
+                        onMouseUp={handleMouseUpPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
               </FormControl>
-
-
-
-
+              <FormControl sx={{ width: "100%", marginTop: 3 }} size="small">
+                <InputLabel htmlFor="confirm-password">Confirm Password</InputLabel>
+                <OutlinedInput
+                  id="confirm-password"
+                  fullWidth
+                  label="Confirm Password"
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  size="small"
+                  sx={{
+                    borderRadius: 16,
+                    boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 16,
+                    },
+                  }}
+                  type={showConfirmPassword ? "text" : "password"}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={showConfirmPassword ? "hide the password" : "display the password"}
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onMouseDown={handleMouseDownPassword}
+                        onMouseUp={handleMouseUpPassword}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
               {/* Google Sign-In Button */}
               {/* <Button
                 fullWidth
@@ -189,9 +249,9 @@ const Signup = () => {
               {/* </ThemeProvider> */}
 
               {/* Sign In Link */}
-              <Box sx={{ textAlign: 'center'}}>
+              <Box sx={{ textAlign: "center" }}>
                 <Typography variant="body2">
-                  Have an account?{' '}
+                  Have an account?{" "}
                   <Link href="/login" color="primary">
                     Login instead
                   </Link>
@@ -203,7 +263,6 @@ const Signup = () => {
         <Grid size={2}></Grid>
       </Grid>
     </Box>
-
   );
 };
 

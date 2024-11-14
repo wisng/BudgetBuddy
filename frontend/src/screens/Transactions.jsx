@@ -1,14 +1,17 @@
 import React from "react";
-import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from '@mui/material';
-import Navbar from "../components/Navbar";
-import Header from "../components/Header";
+import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
+import MonthPicker from "../components/MonthPicker";
 
-const Transactions = () => {
+const Transactions = ({ budget, goals }) => {
   return (
-    <Box sx={{ flexGrow: 1}}>
-      <Header/>
-      <Navbar/>
-      <h1>Transactions Page</h1>
+    <Box>
+      <Grid container spacing={2}>
+        <Grid size={2} sx={{}}></Grid>
+        <Grid size={8}>
+          <MonthPicker startDate={budget.creationDate} handleSubmit={() => alert("HELLO")} />
+        </Grid>
+        <Grid size={2} sx={{}}></Grid>
+      </Grid>
     </Box>
   );
 };

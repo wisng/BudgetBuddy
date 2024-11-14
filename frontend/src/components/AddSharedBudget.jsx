@@ -5,21 +5,19 @@ import {
   Box,
   Button,
   FormControl,
-  Select,
   InputLabel,
-  MenuItem,
   Paper,
+  InputAdornment,
+  OutlinedInput,
   Grid2 as Grid,
 } from "@mui/material";
-import { MuiColorInput } from "mui-color-input";
 
-const AddCategoryModal = ({ showModal, setShowModal }) => {
-  const [type, setType] = useState();
+const AddSharedBudgetModal = ({ showModal, setShowModal }) => {
   const [title, setTitle] = useState("");
-  const [colour, setColour] = useState("#7459D9");
+  const [amount, setAmount] = useState();
 
   const handleSubmit = () => {
-    console.log(type, colour, title);
+    console.log(title, amount);
   };
 
   return (
@@ -58,41 +56,6 @@ const AddCategoryModal = ({ showModal, setShowModal }) => {
                 borderRadius: 8,
               }}
             >
-              <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
-                <Grid size={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                  <FormControl sx={{ width: "100%" }} size="small">
-                    <InputLabel id="type-select-label">Type</InputLabel>
-                    <Select
-                      labelId="type-select-label"
-                      id="type-select"
-                      value={type}
-                      label="Type"
-                      sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
-                      onChange={(e) => setType(e.target.value)}
-                    >
-                      <MenuItem value="Expense">Expense</MenuItem>
-                      <MenuItem value="Income">Income</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                  <MuiColorInput
-                    format="hex"
-                    size="small"
-                    label="Colour"
-                    value={colour}
-                    onChange={(c) => setColour(c)}
-                    sx={{
-                      borderRadius: 16,
-                      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 16,
-                      },
-                    }}
-                  />
-                </Grid>
-              </Grid>
-
               <TextField
                 fullWidth
                 label="Title"
@@ -111,6 +74,23 @@ const AddCategoryModal = ({ showModal, setShowModal }) => {
                 }}
               />
 
+              <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
+                <Grid size={6}>
+                  <FormControl fullWidth>
+                    <InputLabel htmlFor="amount">Starting Amount</InputLabel>
+                    <OutlinedInput
+                      id="amount"
+                      placeholder="0.00"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                      label="Starting Amount"
+                      size="small"
+                      sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
+                    />
+                  </FormControl>
+                </Grid>
+              </Grid>
               <Grid
                 container
                 spacing={0}
@@ -127,7 +107,7 @@ const AddCategoryModal = ({ showModal, setShowModal }) => {
                     style={{ backgroundColor: "#7459D9" }}
                     onClick={handleSubmit}
                   >
-                    Add Custom Category
+                    Add Shared Budget
                   </Button>
                 </Grid>
               </Grid>
@@ -140,4 +120,4 @@ const AddCategoryModal = ({ showModal, setShowModal }) => {
   );
 };
 
-export default AddCategoryModal;
+export default AddSharedBudgetModal;
