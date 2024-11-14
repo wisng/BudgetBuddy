@@ -228,7 +228,8 @@ const getAllBudgetUsers = (budgetID, userID) => {
 				return reject({ message: "Budget not found" });
 			}
 
-			const query = `SELECT * FROM UserBudget WHERE budgetID = ?`;
+			//Select all users, userID and email in the user budget
+			const query = `SELECT User.userID, User.email, User.username FROM User INNER JOIN UserBudget ON User.userID = UserBudget.userID WHERE UserBudget.budgetID = ?`;
 			db.query(query, [budgetID], (error, results) => {
 				if (error) return reject(error);
 				resolve(results);
