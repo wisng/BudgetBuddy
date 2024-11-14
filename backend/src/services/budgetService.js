@@ -21,13 +21,14 @@ const createBudget = (userId) => {
 		  INSERT INTO UserBudget (userID, budgetID) VALUES (?, ?)
 		`;
 			const userBudgetValues = [
-				budgetData.userID,
+				// budgetData.userID,
+				userId,
 				budgetResults.insertId,
 			];
 
 			db.query(userBudgetQuery, userBudgetValues, (error) => {
 				if (error) return reject(error);
-				resolve({ id: budgetResults.insertId, ...budgetData });
+				resolve({ id: budgetResults.insertId, ...budgetValues });
 			});
 		});
 	});

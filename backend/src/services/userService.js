@@ -14,7 +14,7 @@ const createUser = async (email, name, username, password, role) => {
 	return new Promise((resolve, reject) => {
 		db.query(query, [email, name, username, hashedPassword, role], (err, result) => {
 			if (err) reject(err);
-			else resolve(result);
+			else resolve({ userID: result.insertId, email, name, username, role });
 		});
 	});
 };

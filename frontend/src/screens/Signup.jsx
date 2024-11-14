@@ -26,6 +26,10 @@ const Signup = () => {
         const res = await axios.post("http://localhost:3000/api/register", { email, name, username, password, role });
         alert(`${res.data.message}, redirecting to login page...`);
         // setSuccessMsg(`${res.data.message}, redirecting to login page...`);
+
+        
+
+
         setTimeout(() => {
           changeScreen("/login");
         }, 3000);

@@ -1,4 +1,5 @@
 const authService = require("../services/authService");
+const budgetService = require("../services/budgetService");
 const jwtUtil = require("../utils/jwtUtil");
 
 const register = async (req, res) => {
@@ -8,7 +9,13 @@ const register = async (req, res) => {
 	}
 
 	try {
-		await authService.registerUser(email, name, username, password, role);
+		const user = await authService.registerUser(email, name, username, password, role);
+
+		// Create initial individual budget for new user
+		if (role === "Client") {
+			await budgetService.createBudget(user.userID);
+		}
+
 		res.status(201).json({ message: "User registered successfully" });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
