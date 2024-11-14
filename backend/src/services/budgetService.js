@@ -1,6 +1,5 @@
 const db = require("../../config/db");
 const transactionService = require("./transactionService");
-const categoryService = require("./categoryService");
 
 const ACCOUNT_TYPE = {
 	INDIVIDUAL: "Individual",
@@ -30,7 +29,7 @@ const createBudget = async (userId) => {
 		});
 	});
 
-	return budgetCategoryInit(budgetId);
+	return budgetId;
 };
 
 const getBudget = (budgetId, userId) => {
@@ -58,8 +57,11 @@ const getAllBudgets = (userId) => {
 	});
 };
 
-const updateBudget = (budgetId) => {
-	const transactions = transactionService.getAllTransaction(budgetId);
+const updateBudget = (budgetId, userId) => {
+	const transactions = transactionService.getAllTransaction(
+		budgetId,
+		(userId = userId)
+	);
 
 	let totalBalance = 0;
 	let totalIncome = 0;
@@ -75,12 +77,18 @@ const updateBudget = (budgetId) => {
 		}
 	}
 
+	const savingsRate = (totalBalance - totalExpenses) / totalBalance;
+	const expenseRatio = totalExpenses / totalBalance;
+	const balanceStability = totalBalance / totalExpenses;
+
+	financialHealthScore = (savingsRate + expenseRatio + balanceStability) / 3;
+
 	const query = `UPDATE Budget SET totalBalance = ?, totalIncome = ?, totalExpenses = ?, financialHealthScore = ? WHERE budgetID = ?`;
 	const values = [
 		totalBalance,
 		totalIncome,
 		totalExpenses,
-		financialHealthScore, // Need to update how to calcualte this.
+		financialHealthScore,
 		id,
 	];
 
@@ -116,38 +124,6 @@ const deleteBudget = (budgetId, userId) => {
 			});
 		});
 	});
-};
-
-const budgetCategoryInit = (budgetId) => {
-	const categoryData = [
-		{
-			name: "Entertainment",
-			colour: "#00FF00",
-			isCustom: false,
-			budgetID: budgetId,
-		},
-		{
-			name: "Shopping",
-			colour: "#FF0000",
-			isCustom: false,
-			budgetID: budgetId,
-		},
-		{
-			name: "Dining Out",
-			colour: "#0000FF",
-			isCustom: false,
-			budgetID: budgetId,
-		},
-		{
-			name: "Transportation",
-			colour: "#00FFFF",
-			isCustom: false,
-			budgetID: budgetId,
-		},
-	];
-	for (const category of categoryData) {
-		categoryService.createCategory(category);
-	}
 };
 
 module.exports = {

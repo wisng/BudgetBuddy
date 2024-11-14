@@ -109,7 +109,7 @@ const getFinancialReport = (reportId, userId) => {
 	`;
 
 	return new Promise((resolve, reject) => {
-		db.query(financialReportQuery, [reportId], (err, results) => {
+		db.query(financialReportQuery, [reportId, userId], (err, results) => {
 			if (err) {
 				reject(err);
 			} else {

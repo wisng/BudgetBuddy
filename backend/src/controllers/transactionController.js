@@ -20,7 +20,7 @@ const getTransaction = async (req, res) => {
 		const transaction = await transactionService.getTransaction(
 			budgetId,
 			transactionId,
-			req.params.id
+			req.userId
 		);
 		if (!transaction)
 			return res.status(404).json({ message: "Transaction not found" });
@@ -36,7 +36,8 @@ const getAllTransaction = async (req, res) => {
 	try {
 		const transactions = await transactionService.getAllTransaction(
 			budgetId,
-			{ day, month, year }
+			{ day, month, year },
+			req.userId
 		);
 		res.json(transactions);
 	} catch (error) {
@@ -50,7 +51,8 @@ const updateTransaction = async (req, res) => {
 		const updatedTransaction = await transactionService.updateTransaction(
 			transactionId,
 			req.body,
-			budgetId
+			budgetId,
+			req.userId
 		);
 		res.json(updatedTransaction);
 	} catch (error) {

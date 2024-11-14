@@ -2,31 +2,38 @@ const userService = require("./userService");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const registerUser = async (email, password) => {
+const registerUser = async (username, email, password) => {
 	try {
-		return await userService.createUser(email, password);
+		const userId = await userService.createUser(username, email, password);
+		const user = await userService.findUserById(userId);
+		const token = jwt.sign(
+			{ userId: user.userId, userType: user.userType },
+			process.env.JWT_SECRET,
+			{ expiresIn: "1h" }
+		);
+
+		return { token: token };
 	} catch (error) {
 		throw error;
 	}
 };
 
-const loginUser = async (email, password) => {
+const loginUser = async (identifier, password) => {
 	try {
-		const user = await userService.findUserByEmail(email);
-		if (!user) throw new Error("Invalid email or password");
+		const user = await userService.findUser(identifier);
+		if (!user) throw new Error("Invalid email/username or password");
 
 		const isPasswordValid = await bcrypt.compare(password, user.password);
-		if (!isPasswordValid) throw new Error("Invalid email or password");
+		if (!isPasswordValid)
+			throw new Error("Invalid email/username or password");
 
-		// Add jwt tokens when frontend is ready
-		//   const token = jwt.sign(
-		// 	{ userId: user.userId, accountType: user.accountType },
-		// 	process.env.JWT_SECRET,
-		// 	{ expiresIn: '1h' }
-		//   );
+		const token = jwt.sign(
+			{ userId: user.userId, accountType: user.accountType },
+			process.env.JWT_SECRET,
+			{ expiresIn: "1h" }
+		);
 
-		//   return { token, message: "Login successful" };
-		return { message: "Login successful" };
+		return { token: token };
 	} catch (error) {
 		throw error;
 	}

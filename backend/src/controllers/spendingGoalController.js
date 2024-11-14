@@ -5,7 +5,8 @@ const createSpendingGoal = async (req, res) => {
 	try {
 		const spendingGoal = await spendingGoalService.createSpendingGoal(
 			budgetId,
-			req.body
+			req.body,
+			req.userId
 		);
 		res.status(201).json(spendingGoal);
 	} catch (error) {
@@ -18,7 +19,8 @@ const getSpendingGoal = async (req, res) => {
 	try {
 		const spendingGoal = await spendingGoalService.getSpendingGoal(
 			budgetId,
-			spendingGoalId
+			spendingGoalId,
+			req.userId
 		);
 		if (!spendingGoal)
 			return res.status(404).json({ message: "spendingGoal not found" });
@@ -34,7 +36,8 @@ const getAllSpendingGoal = async (req, res) => {
 	try {
 		const spendingGoals = await spendingGoalService.getAllSpendingGoals(
 			budgetId,
-			{ day, month, year }
+			{ day, month, year },
+			req.userId
 		);
 		res.json(spendingGoals);
 	} catch (error) {
@@ -45,13 +48,14 @@ const getAllSpendingGoal = async (req, res) => {
 const updateSpendingGoal = async (req, res) => {
 	const { budgetId, spendingGoalId } = req.params;
 	try {
-		const updatedspendingGoal =
+		const updatedSpendingGoal =
 			await spendingGoalService.updateSpendingGoal(
 				spendingGoalId,
 				budgetId,
-				req.body
+				req.body,
+				req.userId
 			);
-		res.json(updatedspendingGoal);
+		res.json(updatedSpendingGoal);
 	} catch (error) {
 		res.status(500).json({ message: error.message });
 	}
@@ -60,7 +64,10 @@ const updateSpendingGoal = async (req, res) => {
 const deleteSpendingGoal = async (req, res) => {
 	const { spendingGoalId } = req.params;
 	try {
-		await spendingGoalService.deleteSpendingGoal(spendingGoalId);
+		await spendingGoalService.deleteSpendingGoal(
+			spendingGoalId,
+			req.userId
+		);
 		res.status(204).send();
 	} catch (error) {
 		res.status(500).json({ message: error.message });

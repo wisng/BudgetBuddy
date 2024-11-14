@@ -25,7 +25,7 @@ db.connect((err) => {
 			const createUserTable = `
         CREATE TABLE IF NOT EXISTS User (
           userID INT PRIMARY KEY AUTO_INCREMENT,
-          name VARCHAR(255),
+          username VARCHAR(255),
           email VARCHAR(255) NOT NULL UNIQUE,
           password VARCHAR(255) NOT NULL,
           userType ENUM('Client', 'FinancialAdvisor'),

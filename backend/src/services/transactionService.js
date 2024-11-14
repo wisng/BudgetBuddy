@@ -36,19 +36,19 @@ const createTransaction = async (budgetId, transaction, userId) => {
 	return budgetService.updateBudget(budgetId);
 };
 
-const getTransaction = (id) => {
-	const query = `SELECT * FROM Transaction WHERE transactionID = ?`;
+const getTransaction = (transactionId, userId) => {
+	const query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.transactionID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [id], (error, results) => {
+		db.query(query, [userId, transactionId], (error, results) => {
 			if (error) return reject(error);
 			resolve(results[0]);
 		});
 	});
 };
 
-const getAllTransaction = (budgetID, { day, month, year }) => {
-	let query = `SELECT * FROM Transaction WHERE budgetID = ?`;
-	const queryParams = [budgetID];
+const getAllTransaction = (budgetID, { day, month, year }, userId) => {
+	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
+	const queryParams = [budgetID, userId];
 
 	if (year) {
 		query += ` AND YEAR(date) = ?`;
@@ -83,13 +83,19 @@ const getAllTransaction = (budgetID, { day, month, year }) => {
 	});
 };
 
-const updateTransaction = (transactionID, transactionData, budgetId) => {
+const updateTransaction = (
+	transactionId,
+	transactionData,
+	budgetId,
+	userId
+) => {
 	const query = `
-	  UPDATE Transaction
-	  SET title = ?, categoryID = ?, amount = ?, date = ?, transactionType = ?, 
-		  recurrenceFrequency = ?, recurrenceStartDate = ?, recurrenceEndDate = ?
-	  WHERE transactionID = ?
-	`;
+    UPDATE Transaction
+    INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID
+    SET title = ?, categoryID = ?, amount = ?, date = ?, transactionType = ?, 
+        recurrenceFrequency = ?, recurrenceStartDate = ?, recurrenceEndDate = ?
+    WHERE Transaction.transactionID = ? AND UserTransaction.userID = ?
+  `;
 
 	const values = [
 		transactionData.title,
@@ -100,7 +106,8 @@ const updateTransaction = (transactionID, transactionData, budgetId) => {
 		transactionData.recurrenceFrequency || null,
 		transactionData.recurrenceStartDate || null,
 		transactionData.recurrenceEndDate || null,
-		transactionID,
+		transactionId,
+		userId,
 	];
 
 	new Promise((resolve, reject) => {

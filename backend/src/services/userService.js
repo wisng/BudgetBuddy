@@ -1,17 +1,23 @@
 const db = require("../../config/db");
 const bcrypt = require("bcryptjs");
 const budgetService = require("./budgetService");
+const categoryService = require("./categoryService");
 
 const USER_TYPE = {
-	Client: "Client",
+	CLIENT: "Client",
 	FINANCIAL_ADVISOR: "FinancialAdvisor",
 };
 
-const createUser = async (email, password, userType = USER_TYPE.USER) => {
+const createUser = async (
+	username,
+	email,
+	password,
+	userType = USER_TYPE.CLIENT
+) => {
 	await new Promise((resolve, reject) => {
 		db.query(
-			`SELECT * FROM User WHERE email = ?`,
-			[email],
+			`SELECT * FROM User WHERE email = ? OR username = ?`,
+			[email, username],
 			(err, results) => {
 				if (err) {
 					reject(err);
@@ -27,23 +33,57 @@ const createUser = async (email, password, userType = USER_TYPE.USER) => {
 	});
 
 	const hashedPassword = await bcrypt.hash(password, 10);
-	const query = `INSERT INTO User (email, password, userType) VALUES (?, ?, ?)`;
+	const query = `INSERT INTO User (username, email, password, userType) VALUES (?, ?, ?, ?)`;
 	const user = await new Promise((resolve, reject) => {
-		db.query(query, [email, hashedPassword, userType], (err, result) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(result);
+		db.query(
+			query,
+			[username, email, hashedPassword, userType],
+			(err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(result);
+				}
 			}
-		});
+		);
 	});
-	return await budgetService.createBudget(user.insertId);
+	const budgetId = await budgetService.createBudget(user.insertId);
+	const categoryData = [
+		{
+			name: "Entertainment",
+			colour: "#00FF00",
+			isCustom: false,
+			budgetID: budgetId,
+		},
+		{
+			name: "Shopping",
+			colour: "#FF0000",
+			isCustom: false,
+			budgetID: budgetId,
+		},
+		{
+			name: "Dining Out",
+			colour: "#0000FF",
+			isCustom: false,
+			budgetID: budgetId,
+		},
+		{
+			name: "Transportation",
+			colour: "#00FFFF",
+			isCustom: false,
+			budgetID: budgetId,
+		},
+	];
+	for (const category of categoryData) {
+		categoryService.createCategory(category, user.insertId);
+	}
+	return user.insertId;
 };
 
-const findUserByEmail = (email) => {
-	const query = `SELECT * FROM User WHERE email = ?`;
+const findUser = (identifier) => {
+	const query = `SELECT * FROM User WHERE email = ? OR username = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [email], (err, results) => {
+		db.query(query, [identifier, identifier], (err, results) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -53,4 +93,18 @@ const findUserByEmail = (email) => {
 	});
 };
 
-module.exports = { createUser, findUserByEmail };
+const findUserById = (userId) => {
+	console.log(userId);
+	const query = `SELECT * FROM User WHERE userID = ?`;
+	return new Promise((resolve, reject) => {
+		db.query(query, [userId], (err, results) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(results[0] || null);
+			}
+		});
+	});
+};
+
+module.exports = { createUser, findUser, findUserById };
