@@ -2,18 +2,18 @@ const db = require("../../config/db");
 const transactionService = require("./transactionService");
 
 const ACCOUNT_TYPE = {
-	INDIVIDUAL: "INDIVIDUAL",
-	SHARED: "SHARED",
+	INDIVIDUAL: "Individual",
+	SHARED: "Shared",
 };
 
-const createBudget = (userId) => {
+const createBudget = async (userId) => {
 	const budgetQuery = `
 	  INSERT INTO Budget (totalBalance, totalIncome, totalExpenses, accountType, financialHealthScore, creationDate)
 	  VALUES (?, ?, ?, ?, ?, ?)
 	`;
 	const budgetValues = [0, 0, 0, ACCOUNT_TYPE.INDIVIDUAL, 0, new Date()]; // For now, default will be Individual.
 
-	return new Promise((resolve, reject) => {
+	const budgetId = await new Promise((resolve, reject) => {
 		db.query(budgetQuery, budgetValues, (error, budgetResults) => {
 			if (error) return reject(error);
 
@@ -32,12 +32,14 @@ const createBudget = (userId) => {
 			});
 		});
 	});
+
+	return budgetId;
 };
 
-const getBudget = (id) => {
-	const query = `SELECT * FROM Budget WHERE budgetID = ?`;
+const getBudget = (budgetId, userId) => {
+	const query = `SELECT Budget.* FROM Budget INNER JOIN UserBudget ON Budget.budgetID = UserBudget.budgetID WHERE UserBudget.userID = ? AND Budget.budgetID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [id], (error, results) => {
+		db.query(query, [userId, budgetId], (error, results) => {
 			if (error) return reject(error);
 			resolve(results[0]);
 		});
@@ -59,8 +61,11 @@ const getAllBudgets = (userId) => {
 	});
 };
 
-const updateBudget = (budgetId) => {
-	const transactions = transactionService.getAllTransaction(budgetId);
+const updateBudget = (budgetId, userId) => {
+	const transactions = transactionService.getAllTransaction(
+		budgetId,
+		(userId = userId)
+	);
 
 	let totalBalance = 0;
 	let totalIncome = 0;
@@ -76,12 +81,18 @@ const updateBudget = (budgetId) => {
 		}
 	}
 
+	const savingsRate = (totalBalance - totalExpenses) / totalBalance;
+	const expenseRatio = totalExpenses / totalBalance;
+	const balanceStability = totalBalance / totalExpenses;
+
+	financialHealthScore = (savingsRate + expenseRatio + balanceStability) / 3;
+
 	const query = `UPDATE Budget SET totalBalance = ?, totalIncome = ?, totalExpenses = ?, financialHealthScore = ? WHERE budgetID = ?`;
 	const values = [
 		totalBalance,
 		totalIncome,
 		totalExpenses,
-		financialHealthScore, // Need to update how to calcualte this.
+		financialHealthScore,
 		id,
 	];
 

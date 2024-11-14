@@ -14,6 +14,8 @@ import {
   IconButton,
   InputAdornment,
   Grid2 as Grid,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -24,7 +26,7 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
-  const [role, setRole] = useState("Client");
+  const [userType, setUserType] = useState("Client");
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSucessMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -40,11 +42,12 @@ const Signup = () => {
     }
     else {
       try {
-        const res = await axios.post("http://localhost:3000/api/register", { email, name, username, password, role });
-        alert(`${res.data.message}, redirecting to login page...`);
+        const res = await axios.post("http://localhost:3000/api/register", { email, name, username, password, userType });
+        alert(`${res.data.message}, redirecting to home page...`);
         // setSuccessMsg(`${res.data.message}, redirecting to login page...`);
         setTimeout(() => {
-          changeScreen("/login");
+          // changeScreen("/login");
+          changeScreen("/home");
         }, 1000);
       }
       catch (err) {
@@ -200,8 +203,8 @@ const Signup = () => {
                   fullWidth
                   label="Confirm Password"
                   placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={confirmationPassword}
+                  onChange={(e) => setConfirmationPassword(e.target.value)}
                   size="small"
                   sx={{
                     borderRadius: 16,
@@ -226,6 +229,22 @@ const Signup = () => {
                   }
                 />
               </FormControl>
+
+              {/* userType Selection */}
+              <FormControl fullWidth>
+                <RadioGroup
+                  row
+                  aria-label="userType"
+                  name="userType"
+                  value={userType}
+                  onChange={(e) => setUserType(e.target.value)}
+                >
+                  <FormControlLabel value="Client" control={<Radio />} label="Client" />
+                  <FormControlLabel value="FinancialAdvisor" control={<Radio />} label="Financial Advisor" />
+                </RadioGroup>
+              </FormControl>
+
+
               {/* Google Sign-In Button */}
               {/* <Button
                 fullWidth

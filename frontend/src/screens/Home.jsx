@@ -23,10 +23,8 @@ const Home = ({ budget, goals }) => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
 
-const Home = () => {
   const [budgetData, setBudgetData] = useState({});
   const [userID, setUserID] = useState(null);
-  
 
   // NOT WORKING YET
   // useEffect(() => {

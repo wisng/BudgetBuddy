@@ -1,6 +1,8 @@
 const db = require("../../config/db");
+const budgetService = require("./budgetService");
 
-const createCategory = (categoryData) => {
+const createCategory = async (categoryData, userId) => {
+	const budget = await budgetService.getBudget(categoryData.budgetID, userId);
 	const query = `
     INSERT INTO Category (name, colour, isCustom, budgetID) 
     VALUES (?, ?, ?, ?)`;
@@ -8,38 +10,41 @@ const createCategory = (categoryData) => {
 		categoryData.name,
 		categoryData.colour,
 		categoryData.isCustom,
-		categoryData.budgetID,
+		budget.budgetID,
 	];
 
 	return new Promise((resolve, reject) => {
-		db.query(query, values, (error, results) => {
+		db.query(query, values, (error) => {
 			if (error) return reject(error);
-			resolve({ id: results.insertId, ...categoryData });
+			resolve();
 		});
 	});
 };
 
-const getCategory = (budgetID, id) => {
+const getCategory = async (budgetID, categoryId, userId) => {
+	const budget = await budgetService.getBudget(budgetID, userId);
 	const query = `SELECT * FROM Category WHERE budgetID = ? AND categoryID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [budgetID, id], (error, results) => {
+		db.query(query, [budget.budgetID, categoryId], (error, results) => {
 			if (error) return reject(error);
 			resolve(results[0]);
 		});
 	});
 };
 
-const getAllCategories = (budgetID) => {
+const getAllCategories = async (budgetID, userId) => {
+	const budget = await budgetService.getBudget(budgetID, userId);
 	const query = `SELECT * FROM Category WHERE budgetID = ? AND isCustom = true`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [budgetID], (error, results) => {
+		db.query(query, [budget.budgetID], (error, results) => {
 			if (error) return reject(error);
 			resolve(results);
 		});
 	});
 };
 
-const updateCategory = (budgetID, id, categoryData) => {
+const updateCategory = async (budgetID, categoryId, categoryData, userId) => {
+	const budget = await budgetService.getBudget(budgetID, userId);
 	const query = `
     UPDATE Category 
     SET name = ?, colour = ?, isCustom = ? 
@@ -48,8 +53,8 @@ const updateCategory = (budgetID, id, categoryData) => {
 		categoryData.name,
 		categoryData.colour,
 		categoryData.isCustom,
-		budgetID,
-		id,
+		budget.budgetID,
+		categoryId,
 	];
 
 	return new Promise((resolve, reject) => {
@@ -60,13 +65,18 @@ const updateCategory = (budgetID, id, categoryData) => {
 	});
 };
 
-const deleteCategory = (budgetID, id) => {
+const deleteCategory = async (budgetID, categoryId, userId) => {
+	const budget = await budgetService.getBudget(budgetID, userId);
 	const query = `DELETE FROM Category WHERE budgetID = ? AND categoryID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [budgetID, id], (error, results) => {
-			if (error) return reject(error);
-			resolve(results.affectedRows > 0);
-		});
+		db.query(
+			query,
+			[budget.budgetID, categoryId, userId],
+			(error, results) => {
+				if (error) return reject(error);
+				resolve(results.affectedRows > 0);
+			}
+		);
 	});
 };
 
