@@ -15,12 +15,13 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-	if (!email || !password) {
+	const { identifier, password } = req.body;
+	if (!identifier || !password) {
 		return res.status(400).json({ error: "All fields are required" });
 	}
 
 	try {
-		const token = await authService.loginUser(req.body);
+		const token = await authService.loginUser(identifier, password);
 		return res.status(201).json(token);
 	} catch (error) {
 		res.status(401).json({ error });
