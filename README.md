@@ -1,1 +1,5 @@
 # BudgetBuddy
+
+# Introduction
+
+# Architecture
