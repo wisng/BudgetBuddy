@@ -21,14 +21,13 @@ const createBudget = async (userId) => {
 		  INSERT INTO UserBudget (userID, budgetID) VALUES (?, ?)
 		`;
 			const userBudgetValues = [
-				// budgetData.userID,
 				userId,
 				budgetResults.insertId,
 			];
 
 			db.query(userBudgetQuery, userBudgetValues, (error) => {
 				if (error) return reject(error);
-				resolve({ id: budgetResults.insertId, ...budgetValues });
+				resolve(budgetResults.insertId);
 			});
 		});
 	});

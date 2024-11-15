@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import customAxiosInstance from "../utils/customAxiosInstance";
 import {
   Typography,
   TextField,
@@ -16,6 +17,7 @@ import {
   Grid2 as Grid,
   RadioGroup,
   FormControlLabel,
+  Radio,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -42,13 +44,11 @@ const Signup = () => {
     }
     else {
       try {
-        const res = await axios.post("http://localhost:3000/api/register", { email, name, username, password, userType });
-        alert(`${res.data.message}, redirecting to home page...`);
+        const res = await customAxiosInstance.post("/register", { email, name, username, password, userType });
+        alert(`Login successful, going to Home page...`);
+        localStorage.setItem("jwt-token", res.data.token);
+        changeScreen("/home");
         // setSuccessMsg(`${res.data.message}, redirecting to login page...`);
-        setTimeout(() => {
-          // changeScreen("/login");
-          changeScreen("/home");
-        }, 1000);
       }
       catch (err) {
         console.log(err.message);
@@ -125,23 +125,25 @@ const Signup = () => {
                     borderRadius: 16,
                   },
                 }}
-                sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
-                onChange={(e) => setEmail(e.target.value)}
               />
 
               {/* Name Input */}
               <TextField
                 fullWidth
-                label=""
+                label="Name"
                 variant="standard"
                 margin="normal"
                 placeholder="Name"
-                size="medium"
-                inputProps={{
-                  style: { paddingLeft:"15px", padding: "10px"},
+                size="small"
+                sx={{
+                  marginTop: 3,
+                  borderRadius: 16,
+                  boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 16,
+                  },
                 }}
-                sx={{height: "10%", borderRadius: "16px", boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)"}}
                 InputProps={{disableUnderline: true}}
                 onChange={(e) => setName(e.target.value)}
               />

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import Header from "../components/Header";
 import Navbar from "../components/Navbar";
+import customAxiosInstance from "../utils/customAxiosInstance";
 
 const BUDGET = {
   budgetID: 1,
@@ -61,12 +62,39 @@ const GOALS = [
 ];
 
 const Wrapper = ({ Component }) => {
-  const [account, setAccount] = useState("My Budget");
+  const [account, setAccount] = useState("My Budgets");
+  const [budgets, setBudgets] = useState([]);
+  const [selectedBudget, setSelectedBudget] = useState({});
+  const [goals, setGoals] = useState(GOALS);
+
+
+  const fetchAllBudgetData = async () => {
+    try {
+      const budgetRes = await customAxiosInstance.get("/budgets");
+      console.log(budgetRes.data);
+      setBudgets(budgetRes.data);
+      if (budgetRes.data.length > 0) {
+        setSelectedBudget(budgetRes.data[0]);
+      }
+    } 
+    catch (error) {
+      console.error(error.response?.data?.error || error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllBudgetData();
+  }, []);
+
+  if (budgets.length === 0) {
+    return <div>Loading budget...</div>;
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Header />
-      <Navbar account={account} setAccount={setAccount} />
-      <Component budget={BUDGET} goals={GOALS} /> {/* Render the passed-in component here */}
+      <Navbar account={account} setAccount={setAccount} budgets={budgets} setSelectedBudget={setSelectedBudget} />
+      <Component budget={selectedBudget} goals={GOALS} /> {/* Render the passed-in component here */}
     </Box>
   );
 };

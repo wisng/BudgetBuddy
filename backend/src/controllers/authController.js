@@ -8,26 +8,44 @@ const register = async (req, res) => {
 		return res.status(400).json({ error: "All fields are required" });
 	}
 	try {
-		const token = await authService.registerUser(email, name, username, password, userType);
+		let token = await authService.registerUser(email, name, username, password, userType);
 		res.status(201).json(token);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
 };
 
+
+// WAHAJ - CAUSING ERROR
+
+// const login = async (req, res) => {
+// 	const { identifier, password } = req.body;
+// 	if (!identifier || !password) {
+// 		return res.status(400).json({ error: "All fields are required" });
+// 	}
+
+// 	try {
+// 		const token = await authService.loginUser(identifier, password);
+// 		return res.status(201).json(token);
+// 	} catch (error) {
+// 		res.status(401).json({ error });
+// 	}
+// };
+
 const login = async (req, res) => {
-	const { identifier, password } = req.body;
-	if (!identifier || !password) {
+	const { email, password } = req.body;
+	if (!email || !password) {
 		return res.status(400).json({ error: "All fields are required" });
 	}
 
 	try {
-		const token = await authService.loginUser(identifier, password);
+		let token = await authService.loginUser(email, password);
 		return res.status(201).json(token);
 	} catch (error) {
 		res.status(401).json({ error });
 	}
 };
+
 
 const google = async (req, res) => {
 	passport.authenticate("google", { scope: ["profile", "email"] });
@@ -36,7 +54,7 @@ const google = async (req, res) => {
 const googleCallback = async (req, res) => {
 	passport.authenticate("google"),
 		(req, res) => {
-			const token = jwt.sign(
+			let token = jwt.sign(
 				{ id: req.user.id },
 				process.env.JWT_SECRET,
 				{

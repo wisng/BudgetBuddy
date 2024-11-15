@@ -23,29 +23,7 @@ const Home = ({ budget, goals }) => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
 
-  const [budgetData, setBudgetData] = useState({});
-  const [userID, setUserID] = useState(null);
-
-  // NOT WORKING YET
-  // useEffect(() => {
-  //   const token = localStorage.getItem("jwt-token");
-  //   if (token) {
-  //     const decoded = jwtDecode(token);
-  //     console.log(token);
-  //     console.log("userid", decoded.userId);
-  //     setUserID(decoded.userId);
-  //   }
-  // }, []);
-
-  // const getBudgetData = async () => {
-  //   const res = await axios.get("http://localhost:5000/api/budgets", { userID });
-  //   console.log(res.data);
-  //   setBudgetData(res.data);
-  // };
-
-  // useEffect(() => {
-  //   getBudgetData();
-  // }, []);
+  console.log(budget);
 
   return (
     <Box>
