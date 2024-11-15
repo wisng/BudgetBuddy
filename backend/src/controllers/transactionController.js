@@ -1,15 +1,19 @@
 const transactionService = require("../services/transactionService");
+const budgetService = require("../services/budgetService");
 
 const createTransaction = async (req, res) => {
-	const { budgetId } = req.params;
+	console.log(req.params);
+	const { budgetID } = req.params;
 	try {
 		const transaction = await transactionService.createTransaction(
-			budgetId,
+			budgetID,
 			req.body,
 			req.userId
 		);
+		await budgetService.updateBudget(budgetID, req.userId);
 		res.status(201).json(transaction);
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({ message: error.message });
 	}
 };

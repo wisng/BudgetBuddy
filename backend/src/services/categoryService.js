@@ -34,6 +34,17 @@ const getCategory = async (budgetID, categoryId, userId) => {
 
 const getAllCategories = async (budgetID, userId) => {
 	const budget = await budgetService.getBudget(budgetID, userId);
+	const query = `SELECT * FROM Category WHERE budgetID = ?`;
+	return new Promise((resolve, reject) => {
+		db.query(query, [budget.budgetID], (error, results) => {
+			if (error) return reject(error);
+			resolve(results);
+		});
+	});
+};
+
+const getAllCustomCategories = async (budgetID, userId) => {
+	const budget = await budgetService.getBudget(budgetID, userId);
 	const query = `SELECT * FROM Category WHERE budgetID = ? AND isCustom = true`;
 	return new Promise((resolve, reject) => {
 		db.query(query, [budget.budgetID], (error, results) => {

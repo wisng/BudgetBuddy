@@ -60,11 +60,15 @@ const getAllBudgets = (userId) => {
 	});
 };
 
-const updateBudget = (budgetId, userId) => {
-	const transactions = transactionService.getAllTransaction(
-		budgetId,
+const updateBudget = async (budgetID, userId) => {
+	console.log(userId)
+	const transactions = await transactionService.getAllTransaction(
+		budgetID,
+		{},
 		(userId = userId)
 	);
+
+	console.log(transactions);
 
 	let totalBalance = 0;
 	let totalIncome = 0;
@@ -72,17 +76,23 @@ const updateBudget = (budgetId, userId) => {
 	let financialHealthScore = 0;
 
 	for (const transaction of transactions) {
-		totalBalance += transaction.amount;
+		// totalBalance += transaction.amount;
 		if (transaction.transactionType === "Income") {
 			totalIncome += transaction.amount;
+			totalBalance += transaction.amount;
 		} else if (transaction.transactionType === "Expense") {
 			totalExpenses += transaction.amount;
+			totalBalance -= transaction.amount;
 		}
 	}
+	
+	console.log("total balance", totalBalance);
+	console.log("total income", totalIncome);
+	console.log("total expenses", totalExpenses);
 
-	const savingsRate = (totalBalance - totalExpenses) / totalBalance;
-	const expenseRatio = totalExpenses / totalBalance;
-	const balanceStability = totalBalance / totalExpenses;
+	const savingsRate = totalBalance !== 0 ? (totalBalance - totalExpenses) / totalBalance : 0;
+	const expenseRatio = totalBalance !== 0 ? (totalExpenses / totalBalance) : 0;
+	const balanceStability = totalExpenses !== 0 ? (totalBalance / totalExpenses) : 0;
 
 	financialHealthScore = (savingsRate + expenseRatio + balanceStability) / 3;
 
@@ -92,13 +102,15 @@ const updateBudget = (budgetId, userId) => {
 		totalIncome,
 		totalExpenses,
 		financialHealthScore,
-		id,
+		budgetID,
 	];
 
 	return new Promise((resolve, reject) => {
-		db.query(query, values, (error) => {
+		db.query(query, values, (error, results) => {
 			if (error) return reject(error);
-			resolve({ id, ...budgetData });
+			// resolve({ budgetId, ...budgetData });
+			// resolve(results);
+			resolve(budgetID);
 		});
 	});
 };

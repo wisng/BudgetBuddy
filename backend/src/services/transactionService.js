@@ -3,20 +3,21 @@ const budgetService = require("./budgetService");
 
 const createTransaction = async (budgetId, transaction, userId) => {
 	const transactionQuery = `
-	  INSERT INTO Transaction (budgetID, title, userID, categoryID, amount, date, transactionType, recurrenceFrequency, recurrenceStartDate, recurrenceEndDate)
-	  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	  INSERT INTO Transaction (budgetID, title, categoryID, amount, date, transactionType, recurrenceFrequency, recurrenceStartDate, recurrenceEndDate)
+	  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`;
+
 	const transactionValues = [
 		budgetId,
 		transaction.title,
-		userId,
+		// userId,
 		transaction.categoryID,
-		transaction.amount,
-		transaction.date,
+		parseFloat(transaction.amount),
+		transaction.date.split("T")[0],
 		transaction.transactionType,
 		transaction.recurrenceFrequency || null,
-		transaction.recurrenceStartDate || null,
-		transaction.recurrenceEndDate || null,
+		transaction.recurrenceStartDate ? transaction.recurrenceStartDate.split("T")[0] : null,
+		transaction.recurrenceEndDate ? transaction.recurrenceEndDate.split("T")[0] : null,
 	];
 
 	await new Promise((resolve, reject) => {
@@ -33,7 +34,6 @@ const createTransaction = async (budgetId, transaction, userId) => {
 		});
 	});
 
-	return budgetService.updateBudget(budgetId);
 };
 
 const getTransaction = (transactionId, userId) => {
@@ -46,7 +46,10 @@ const getTransaction = (transactionId, userId) => {
 	});
 };
 
-const getAllTransaction = (budgetID, { day, month, year }, userId) => {
+const getAllTransaction = (budgetID, { day, month, year, current }, userId) => {
+	console.log(budgetID);
+	console.log(userId);
+
 	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
 	const queryParams = [budgetID, userId];
 
@@ -65,7 +68,7 @@ const getAllTransaction = (budgetID, { day, month, year }, userId) => {
 		queryParams.push(day);
 	}
 
-	if (!year && !month && !day) {
+	if (!year && !month && !day && current) {
 		const currentDate = new Date();
 		const currentYear = currentDate.getFullYear();
 		const currentMonth = currentDate.getMonth() + 1;

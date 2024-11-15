@@ -94,7 +94,7 @@ const Wrapper = ({ Component }) => {
     <Box sx={{ flexGrow: 1 }}>
       <Header />
       <Navbar account={account} setAccount={setAccount} budgets={budgets} setSelectedBudget={setSelectedBudget} />
-      <Component budget={selectedBudget} goals={GOALS} /> {/* Render the passed-in component here */}
+      <Component budget={selectedBudget} setSelectedBudget={setSelectedBudget} goals={GOALS} /> {/* Render the passed-in component here */}
     </Box>
   );
 };
