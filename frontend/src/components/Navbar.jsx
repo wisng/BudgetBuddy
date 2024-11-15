@@ -6,6 +6,30 @@ import AddSharedBudgetModal from "./AddSharedBudget";
 
 const ACCOUNTS = ["My Shared Budget 1", "My Shared Budget 2"];
 const Navbar = ({ account, setAccount, budgets, setSelectedBudget }) => {
+
+  budgets = [
+    ...budgets,
+    {
+      budgetID: 2,
+      totalBalance: 15000.22,
+      totalIncome: 45000.55,
+      totalExpenses: 30000.31,
+      accountType: "Individual",
+      financialHealthScore: 75,
+      creationDate: "2023-01-15",
+    },
+    {
+      budgetID: 3,
+      totalBalance: 20000.00,
+      totalIncome: 50000.00,
+      totalExpenses: 30000.00,
+      accountType: "Shared",
+      financialHealthScore: 80,
+      creationDate: "2023-02-20",
+    },
+  ];
+
+
   let navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
