@@ -107,17 +107,22 @@ router.post(
 	spendingGoalController.createSpendingGoal
 );
 router.get(
-	"/budget/:budgetID/spendingGoal",
+	"/budget/:budgetID/spendingGoal/:spendingGoalID",
 	authMiddleware,
 	spendingGoalController.getSpendingGoal
 );
+router.get(
+	"/budget/:budgetID/spendingGoals",
+	authMiddleware,
+	spendingGoalController.getAllSpendingGoal
+);
 router.put(
-	"/budget/:budgetID/spendingGoal",
+	"/budget/:budgetID/spendingGoal/:spendingGoalID",
 	authMiddleware,
 	spendingGoalController.updateSpendingGoal
 );
 router.delete(
-	"/budget/:budgetID/spendingGoal",
+	"/budget/:budgetID/spendingGoal/:spendingGoalID",
 	authMiddleware,
 	spendingGoalController.deleteSpendingGoal
 );
@@ -129,7 +134,7 @@ router.post(
 	financialReportController.createFinancialReport
 );
 router.get(
-	"/budget/:budgetID/financialReport",
+	"/budget/:budgetID/financialReport/:financialReportID",
 	authMiddleware,
 	financialReportController.getFinancialReport
 );
@@ -139,7 +144,7 @@ router.get(
 	financialReportController.getAllFinancialReports
 );
 router.delete(
-	"/budget/:budgetID/financialReport",
+	"/budget/:budgetID/financialReport/:financialReportID",
 	authMiddleware,
 	financialReportController.deleteFinancialReport
 );

@@ -1,5 +1,5 @@
 const db = require("../../config/db");
-const budgetService = require("./budgetService");
+const helperService = require("./helperService");
 
 const createTransaction = async (budgetID, transaction, userID) => {
 	const transactionQuery = `
@@ -32,7 +32,7 @@ const createTransaction = async (budgetID, transaction, userID) => {
 		});
 	});
 
-	return budgetService.updateBudget(budgetID);
+	return await helperService.updateBudget(budgetID, userID);
 };
 
 const getTransaction = (transactionID, userID) => {
@@ -45,7 +45,7 @@ const getTransaction = (transactionID, userID) => {
 	});
 };
 
-const getAllTransaction = (budgetID, { day, month, year }, userID) => {
+const getAllTransaction = (budgetID, userID, { day, month, year }) => {
 	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
 	const queryParams = [budgetID, userID];
 
@@ -82,7 +82,7 @@ const getAllTransaction = (budgetID, { day, month, year }, userID) => {
 	});
 };
 
-const updateTransaction = (
+const updateTransaction = async (
 	transactionID,
 	transactionData,
 	budgetID,
@@ -116,10 +116,10 @@ const updateTransaction = (
 		});
 	});
 
-	return budgetService.updateBudget(budgetID);
+	return await helperService.updateBudget(budgetID, userID);
 };
 
-const deleteTransaction = (transactionID, userID, budgetID) => {
+const deleteTransaction = async (transactionID, userID, budgetID) => {
 	new Promise((resolve, reject) => {
 		const checkOwnershipQuery = `
 		SELECT * FROM UserTransaction WHERE transactionID = ? AND userID = ?
@@ -155,7 +155,7 @@ const deleteTransaction = (transactionID, userID, budgetID) => {
 		);
 	});
 
-	return budgetService.updateBudget(budgetID);
+	return await helperService.updateBudget(budgetID, userID);
 };
 
 module.exports = {

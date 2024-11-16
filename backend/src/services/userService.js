@@ -52,25 +52,25 @@ const createUser = async (
 		{
 			name: "Entertainment",
 			colour: "#00FF00",
-			isCustom: false,
+			isCustom: true,
 			budgetID: budgetID,
 		},
 		{
 			name: "Shopping",
 			colour: "#FF0000",
-			isCustom: false,
+			isCustom: true,
 			budgetID: budgetID,
 		},
 		{
 			name: "Dining Out",
 			colour: "#0000FF",
-			isCustom: false,
+			isCustom: true,
 			budgetID: budgetID,
 		},
 		{
 			name: "Transportation",
 			colour: "#00FFFF",
-			isCustom: false,
+			isCustom: true,
 			budgetID: budgetID,
 		},
 	];

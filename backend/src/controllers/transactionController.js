@@ -36,8 +36,8 @@ const getAllTransaction = async (req, res) => {
 	try {
 		const transactions = await transactionService.getAllTransaction(
 			budgetID,
-			{ day, month, year },
-			req.userID
+			req.userID,
+			{ day, month, year }
 		);
 		res.json(transactions);
 	} catch (error) {

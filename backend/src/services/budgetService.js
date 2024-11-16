@@ -1,17 +1,18 @@
 const db = require("../../config/db");
-const transactionService = require("./transactionService");
+const helperService = require("./helperService");
 
 const ACCOUNT_TYPE = {
 	INDIVIDUAL: "Individual",
 	SHARED: "Shared",
 };
 
-const createBudget = async (userID) => {
+const createBudget = async (userID, budgetData = null) => {
+	// budgetData expects { accountType, title, initalBalance }
 	const budgetQuery = `
 	  INSERT INTO Budget (totalBalance, totalIncome, totalExpenses, accountType, financialHealthScore, creationDate, ownerID, title)
 	  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`;
-	const budgetValues = [
+	let budgetValues = [
 		0,
 		0,
 		0,
@@ -21,6 +22,19 @@ const createBudget = async (userID) => {
 		userID,
 		"Default",
 	];
+
+	if (budgetData) {
+		budgetValues = [
+			0,
+			0,
+			0,
+			ACCOUNT_TYPE.INDIVIDUAL,
+			0,
+			new Date(),
+			userID,
+			budgetData.title,
+		];
+	}
 
 	const budgetID = await new Promise((resolve, reject) => {
 		db.query(budgetQuery, budgetValues, (error, budgetResults) => {
@@ -37,7 +51,31 @@ const createBudget = async (userID) => {
 			});
 		});
 	});
-	I;
+	if (budgetData && budgetData.initialBalance > 0) {
+		const category = await helperService.createCategory(
+			{
+				name: "Initial Balance",
+				colour: "#808080",
+				isCustom: false,
+				budgetID: budgetID,
+			},
+			userID
+		);
+		await helperService.createTransaction(
+			budgetID,
+			{
+				title: "Initial Balance",
+				categoryID: category.insertId,
+				amount: budgetData.initialBalance,
+				date: new Date(),
+				transactionType: "Income",
+				recurrenceFrequency: null,
+				recurrenceStartDate: null,
+				recurrenceEndDate: null,
+			},
+			userID
+		);
+	}
 	return budgetID;
 };
 
@@ -62,49 +100,6 @@ const getAllBudgets = (userID) => {
 		db.query(query, [userID], (error, results) => {
 			if (error) return reject(error);
 			resolve(results);
-		});
-	});
-};
-
-const updateBudget = (budgetID, userID) => {
-	const transactions = transactionService.getAllTransaction(
-		budgetID,
-		(userID = userID)
-	);
-
-	let totalBalance = 0;
-	let totalIncome = 0;
-	let totalExpenses = 0;
-	let financialHealthScore = 0;
-
-	for (const transaction of transactions) {
-		totalBalance += transaction.amount;
-		if (transaction.transactionType === "Income") {
-			totalIncome += transaction.amount;
-		} else if (transaction.transactionType === "Expense") {
-			totalExpenses += transaction.amount;
-		}
-	}
-
-	const savingsRate = (totalBalance - totalExpenses) / totalBalance;
-	const expenseRatio = totalExpenses / totalBalance;
-	const balanceStability = totalBalance / totalExpenses;
-
-	financialHealthScore = (savingsRate + expenseRatio + balanceStability) / 3;
-
-	const query = `UPDATE Budget SET totalBalance = ?, totalIncome = ?, totalExpenses = ?, financialHealthScore = ? WHERE budgetID = ?`;
-	const values = [
-		totalBalance,
-		totalIncome,
-		totalExpenses,
-		financialHealthScore,
-		id,
-	];
-
-	return new Promise((resolve, reject) => {
-		db.query(query, values, (error) => {
-			if (error) return reject(error);
-			resolve({ id, ...budgetData });
 		});
 	});
 };
@@ -242,7 +237,6 @@ module.exports = {
 	createBudget,
 	getBudget,
 	getAllBudgets,
-	updateBudget,
 	deleteBudget,
 	addUser,
 	removeUser,

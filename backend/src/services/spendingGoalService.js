@@ -1,8 +1,8 @@
 const db = require("../../config/db");
-const budgetService = require("./budgetService");
+const helperService = require("./helperService");
 
 const createSpendingGoal = async (budgetID, spendingGoal, userID) => {
-	const budget = await budgetService.getBudget(budgetID, userID);
+	const budget = await helperService.checkBudgetExists(budgetID, userID);
 	const spendingGoalQuery = `
         INSERT INTO SpendingGoal (categoryID, budgetID, spendingLimit, currAmount, startDate, endDate)
         Values(?, ?, ?, ?, ?, ?)
@@ -26,7 +26,7 @@ const createSpendingGoal = async (budgetID, spendingGoal, userID) => {
 };
 
 const getSpendingGoal = async (budgetID, spendingGoalID, userID) => {
-	const budget = await budgetService.getBudget(budgetID, userID);
+	const budget = await helperService.checkBudgetExists(budgetID, userID);
 	const query = `SELECT * FROM SpendingGoal WHERE spendingGoalID = ? AND budgetID = ?`;
 	return new Promise((resolve, reject) => {
 		db.query(query, [spendingGoalID, budget.budgetID], (error, results) => {
@@ -37,7 +37,7 @@ const getSpendingGoal = async (budgetID, spendingGoalID, userID) => {
 };
 
 const getAllSpendingGoals = async (budgetID, { day, month, year }, userID) => {
-	const budget = await budgetService.getBudget(budgetID, userID);
+	const budget = await helperService.checkBudgetExists(budgetID, userID);
 	let query = `SELECT * FROM SpendingGoal WHERE budgetID = ? AND endDate >= ?`;
 	const queryParams = [budget.budgetID];
 
@@ -67,7 +67,7 @@ const updateSpendingGoal = async (
 	spendingGoalData,
 	userID
 ) => {
-	const budget = await budgetService.getBudget(budgetID, userID);
+	const budget = await helperService.checkBudgetExists(budgetID, userID);
 	const spendingGoalQuery = `UPDATE SpendingGoal SET categoryID = ?, spendingLimit = ?, currAmount = ?, startDate = ?, endDate = ? WHERE spendingGoalID = ? AND budgetID = ?`;
 	const spendingGoalValues = [
 		spendingGoalData.categoryID,
@@ -88,7 +88,7 @@ const updateSpendingGoal = async (
 };
 
 const deleteSpendingGoal = async (spendingGoalID, userID) => {
-	const budget = await budgetService.getBudget(budgetID, userID);
+	const budget = await helperService.checkBudgetExists(budgetID, userID);
 	const query = `DELETE FROM SpendingGoal WHERE spendingGoalID = ? AND budgetID = ?`;
 	return new Promise((resolve, reject) => {
 		db.query(query, [spendingGoalID, budget.budgetID], (error, results) => {
