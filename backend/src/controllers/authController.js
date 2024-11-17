@@ -1,33 +1,48 @@
 const authService = require("../services/authService");
-const jwtUtil = require("../utils/jwtUtil");
 
 const register = async (req, res) => {
-	const { email, password } = req.body;
-	if (!email || !password) {
+	const { username, email, password } = req.body;
+	if (!username || !email || !password) {
 		return res.status(400).json({ error: "All fields are required" });
 	}
-
 	try {
-		await authService.registerUser(email, password);
-		res.status(201).json({ message: "User registered successfully" });
+		const token = await authService.registerUser(username, email, password);
+		res.status(201).json(token);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
 };
 
 const login = async (req, res) => {
-	const { email, password } = req.body;
-	if (!email || !password) {
+	const { identifier, password } = req.body;
+	if (!identifier || !password) {
 		return res.status(400).json({ error: "All fields are required" });
 	}
 
 	try {
-		const user = await authService.loginUser(email, password);
-		const token = jwtUtil.generateToken(user);
-		res.json({ token });
+		const token = await authService.loginUser(identifier, password);
+		return res.status(201).json(token);
 	} catch (error) {
 		res.status(401).json({ error });
 	}
 };
 
-module.exports = { register, login };
+const google = async (req, res) => {
+	passport.authenticate("google", { scope: ["profile", "email"] });
+};
+
+const googleCallback = async (req, res) => {
+	passport.authenticate("google"),
+		(req, res) => {
+			const token = jwt.sign(
+				{ id: req.user.id },
+				process.env.JWT_SECRET,
+				{
+					expiresIn: "1h",
+				}
+			);
+			res.json({ token });
+		};
+};
+
+module.exports = { register, login, googleCallback, google };

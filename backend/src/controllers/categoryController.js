@@ -5,7 +5,7 @@ const createCategory = async (req, res) => {
 	const categoryData = { ...req.body, budgetID };
 
 	try {
-		await categoryService.createCategory(categoryData);
+		await categoryService.createCategory(categoryData, req.userID);
 		res.status(201).json({ message: "Category created successfully" });
 	} catch (error) {
 		res.status(500).json({ message: error.message });
@@ -13,12 +13,13 @@ const createCategory = async (req, res) => {
 };
 
 const getCategory = async (req, res) => {
-	const { budgetID, categoryId } = req.params;
+	const { budgetID, categoryID } = req.params;
 
 	try {
 		const category = await categoryService.getCategory(
 			budgetID,
-			categoryId
+			categoryID,
+			req.userID
 		);
 		if (!category)
 			return res.status(404).json({ message: "Category not found" });
@@ -32,7 +33,10 @@ const getAllCategories = async (req, res) => {
 	const { budgetID } = req.params;
 
 	try {
-		const categories = await categoryService.getAllCategories(budgetID);
+		const categories = await categoryService.getAllCategories(
+			budgetID,
+			req.userID
+		);
 		res.json(categories);
 	} catch (error) {
 		res.status(500).json({ message: error.message });
@@ -40,14 +44,15 @@ const getAllCategories = async (req, res) => {
 };
 
 const updateCategory = async (req, res) => {
-	const { budgetID, categoryId } = req.params;
+	const { budgetID, categoryID } = req.params;
 	const categoryData = req.body;
 
 	try {
 		const updatedCategory = await categoryService.updateCategory(
 			budgetID,
-			categoryId,
-			categoryData
+			categoryID,
+			categoryData,
+			req.userID
 		);
 		if (!updatedCategory)
 			return res.status(404).json({ message: "Category not found" });
@@ -60,12 +65,13 @@ const updateCategory = async (req, res) => {
 };
 
 const deleteCategory = async (req, res) => {
-	const { budgetID, categoryId } = req.params;
+	const { budgetID, categoryID } = req.params;
 
 	try {
 		const result = await categoryService.deleteCategory(
 			budgetID,
-			categoryId
+			categoryID,
+			req.userID
 		);
 		if (!result)
 			return res.status(404).json({ message: "Category not found" });
