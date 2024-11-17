@@ -77,8 +77,8 @@ db.connect((err) => {
           recurrenceFrequency ENUM('DAILY', 'MONTHLY', 'YEARLY', 'WEEKLY', 'BI-WEEKLY'),
           recurrenceStartDate DATE,
           recurrenceEndDate DATE,
-          FOREIGN KEY (categoryID) REFERENCES Category(categoryID),
-          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID)
+          FOREIGN KEY (categoryID) REFERENCES Category(categoryID), 
+          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID) ON DELETE CASCADE
         )`;
 
 			const createUserTransactionTable = `
@@ -102,8 +102,8 @@ db.connect((err) => {
           totalExpenses DOUBLE,
           spendingPerCategory JSON,
           savings DOUBLE,
-          FOREIGN KEY (userID) REFERENCES User(userID),
-          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID)
+          FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
+          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID) ON DELETE CASCADE
         )`;
 
 			const createSpendingGoalTable = `
@@ -116,7 +116,7 @@ db.connect((err) => {
           startDate DATE,
           endDate DATE,
           FOREIGN KEY (categoryID) REFERENCES Category(categoryID),
-          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID)
+          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID) ON DELETE CASCADE
         )`;
 
 			// Run all table creation queries

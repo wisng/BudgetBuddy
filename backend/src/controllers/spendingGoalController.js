@@ -62,9 +62,10 @@ const updateSpendingGoal = async (req, res) => {
 };
 
 const deleteSpendingGoal = async (req, res) => {
-	const { spendingGoalID } = req.params;
+	const { budgetID, spendingGoalID } = req.params;
 	try {
 		await spendingGoalService.deleteSpendingGoal(
+			budgetID,
 			spendingGoalID,
 			req.userID
 		);

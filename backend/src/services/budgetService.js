@@ -25,10 +25,10 @@ const createBudget = async (userID, budgetData = null) => {
 
 	if (budgetData) {
 		budgetValues = [
+			budgetData.initialBalance,
 			0,
 			0,
-			0,
-			ACCOUNT_TYPE.INDIVIDUAL,
+			budgetData.accountType,
 			0,
 			new Date(),
 			userID,

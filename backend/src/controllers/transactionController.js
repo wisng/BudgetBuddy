@@ -18,7 +18,6 @@ const getTransaction = async (req, res) => {
 	const { budgetID, transactionID } = req.params;
 	try {
 		const transaction = await transactionService.getTransaction(
-			budgetID,
 			transactionID,
 			req.userID
 		);

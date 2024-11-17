@@ -87,7 +87,7 @@ const updateSpendingGoal = async (
 	});
 };
 
-const deleteSpendingGoal = async (spendingGoalID, userID) => {
+const deleteSpendingGoal = async (budgetID, spendingGoalID, userID) => {
 	const budget = await helperService.checkBudgetExists(budgetID, userID);
 	const query = `DELETE FROM SpendingGoal WHERE spendingGoalID = ? AND budgetID = ?`;
 	return new Promise((resolve, reject) => {

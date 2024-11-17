@@ -33,14 +33,14 @@ const createFinancialReport = (budgetID, userID, data) => {
 						} = transaction;
 
 						if (
-							new Date(recurrenceStartDate) > new Date(endDate) ||
-							new Date(recurrenceEndDate) < new Date(startDate)
+							( recurrenceStartDate && new Date(recurrenceStartDate) > new Date(data.reportPeriodEndDate)) ||
+							(recurrenceEndDate && new Date(recurrenceEndDate) < new Date(data.reportPeriodStartDate))
 						) {
 							return;
 						}
 
 						const daysInPeriod =
-							(new Date(endDate) - new Date(startDate)) /
+							(new Date(data.reportPeriodEndDate) - new Date(data.reportPeriodStartDate)) /
 							(1000 * 60 * 60 * 24);
 						let occurrences = 1;
 

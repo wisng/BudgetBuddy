@@ -68,7 +68,7 @@ router.put(
 	categoryController.updateCategory
 );
 router.delete(
-	"/budget/:budgetID/category/:id",
+	"/budget/:budgetID/category/:categoryID",
 	authMiddleware,
 	categoryController.deleteCategory
 );

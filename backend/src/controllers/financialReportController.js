@@ -18,10 +18,10 @@ const createFinancialReport = async (req, res) => {
 
 const getFinancialReport = async (req, res) => {
 	try {
-		const { budgetID } = req.params;
+		const { financialReportID, budgetID } = req.params;
 		const userID = req.userID;
 		const report = await financialReportService.getFinancialReport(
-			budgetID,
+			financialReportID,
 			userID
 		);
 		res.json(report);
@@ -32,8 +32,10 @@ const getFinancialReport = async (req, res) => {
 
 const getAllFinancialReports = async (req, res) => {
 	try {
+		const { budgetID } = req.params;
 		const userID = req.userID;
 		const reports = await financialReportService.getAllFinancialReports(
+			budgetID,
 			userID
 		);
 		res.json(reports);
@@ -44,9 +46,9 @@ const getAllFinancialReports = async (req, res) => {
 
 const deleteFinancialReport = async (req, res) => {
 	try {
-		const { budgetID } = req.params;
+		const { financialReportID } = req.params;
 		const userID = req.userID;
-		await financialReportService.deleteFinancialReport(budgetID, userID);
+		await financialReportService.deleteFinancialReport(financialReportID, userID);
 		res.status(204).send();
 	} catch (error) {
 		res.status(500).json({ error: error.message });

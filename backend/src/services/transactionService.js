@@ -47,7 +47,7 @@ const getTransaction = (transactionID, userID) => {
 
 const getAllTransaction = (budgetID, userID, { day, month, year }) => {
 	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
-	const queryParams = [budgetID, userID];
+	const queryParams = [userID, budgetID];
 
 	if (year) {
 		query += ` AND YEAR(date) = ?`;
