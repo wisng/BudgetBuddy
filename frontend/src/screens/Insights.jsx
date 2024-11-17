@@ -24,21 +24,29 @@ const Insights = ({ budget, goals }) => {
           <MonthPicker startDate={budget.creationDate} handleSubmit={() => alert("HELLO")} />
         </Grid>
         <Grid size={2} sx={{}}></Grid>
-
-
-        <LineChart
-          sx={{backgroundColor:"white"}}
-          width={500}
-          height={300}
-          series={[
-            { data: pData, label: 'pv' },
-            { data: uData, label: 'uv' },
-          ]}
-          xAxis={[{ scaleType: 'point', data: xLabels }]}
-        />
-
-
       </Grid>
+
+      <Grid
+        container
+        size={7} 
+        sx={{padding:"2rem", justifySelf:"center", borderRadius:"20px"}}>
+        <Paper 
+          elevation={2} 
+          square={false}>
+          <LineChart
+            sx={{backgroundColor:"white", borderRadius:"50px"}}
+            width={800}
+            height={300}
+            series={[
+              { data: pData, label: 'Expenses' },
+              { data: uData, label: 'uv' },
+            ]}
+            xAxis={[{ scaleType: 'point', data: xLabels }]}
+          />
+          </Paper>
+      </Grid>
+
+
     </Box>
   );
 };
