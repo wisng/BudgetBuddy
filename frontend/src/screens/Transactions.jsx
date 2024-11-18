@@ -55,7 +55,7 @@ const INCOME_TRANSACTIONS = [
   {
     transactionID: 5,
     title: "Gift",
-    categoryID: 5,
+    categoryID: 4,
     budgetID: 1,
     amount: 500.0,
     date: "2024-11-01",
@@ -70,7 +70,7 @@ const EXPENSE_TRANSACTIONS = [
   {
     transactionID: 6,
     title: "Groceries",
-    categoryID: 6,
+    categoryID: 5,
     budgetID: 4,
     amount: 250.0,
     date: "2024-11-03",
@@ -82,7 +82,7 @@ const EXPENSE_TRANSACTIONS = [
   {
     transactionID: 7,
     title: "Electricity Bill",
-    categoryID: 7,
+    categoryID: 3,
     budgetID: 5,
     amount: 100.0,
     date: "2024-11-10",
@@ -94,7 +94,7 @@ const EXPENSE_TRANSACTIONS = [
   {
     transactionID: 8,
     title: "Internet Subscription",
-    categoryID: 8,
+    categoryID: 3,
     budgetID: 5,
     amount: 60.0,
     date: "2024-11-01",
@@ -106,7 +106,7 @@ const EXPENSE_TRANSACTIONS = [
   {
     transactionID: 9,
     title: "Gym Membership",
-    categoryID: 9,
+    categoryID: 4,
     budgetID: 4,
     amount: 45.0,
     date: "2024-11-15",
@@ -118,7 +118,7 @@ const EXPENSE_TRANSACTIONS = [
   {
     transactionID: 10,
     title: "Car Maintenance",
-    categoryID: 10,
+    categoryID: 5,
     budgetID: 6,
     amount: 500.0,
     date: "2024-11-15",
@@ -129,7 +129,7 @@ const EXPENSE_TRANSACTIONS = [
   },
 ];
 
-const Transactions = ({ budget, goals }) => {
+const Transactions = ({ budget, goals, categories }) => {
   const sortTransactionsByDate = (transactions) => {
     let sortedTransactions = [];
     let transactionDateMap = {};
@@ -150,6 +150,7 @@ const Transactions = ({ budget, goals }) => {
 
     return sortedTransactions;
   };
+
   return (
     <Grid container spacing={2} sx={{ marginBottom: 5 }}>
       <Grid size={2} sx={{}}></Grid>
@@ -191,7 +192,12 @@ const Transactions = ({ budget, goals }) => {
                 <Typography variant="subtitle2" sx={{ marginTop: 2, fontWeight: "bold" }}>
                   {t[0].date}
                 </Typography>
-                <TransactionGroup type="Income" transactions={t} handleClick={() => alert("hello")} />
+                <TransactionGroup
+                  type="Income"
+                  categories={categories}
+                  transactions={t}
+                  handleClick={() => alert("hello")}
+                />
               </Box>
             ))}
           </Grid>
@@ -222,7 +228,12 @@ const Transactions = ({ budget, goals }) => {
                 <Typography variant="subtitle2" sx={{ marginTop: 2, fontWeight: "bold" }}>
                   {t[0].date}
                 </Typography>
-                <TransactionGroup type="Expense" transactions={t} handleClick={() => alert("hello")} />
+                <TransactionGroup
+                  type="Expense"
+                  categories={categories}
+                  transactions={t}
+                  handleClick={() => alert("hello")}
+                />
               </Box>
             ))}
           </Grid>
