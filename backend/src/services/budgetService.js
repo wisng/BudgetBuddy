@@ -44,7 +44,7 @@ const createBudget = async (userID, budgetData = null) => {
 		  INSERT INTO UserBudget (userID, budgetID) VALUES (?, ?)
 		`;
 			const userBudgetValues = [
-				userId,
+				userID,
 				budgetResults.insertId,
 			];
 

@@ -27,8 +27,8 @@ const getCategory = async (budgetID, categoryID, userID) => {
   });
 };
 
-const getAllCustomCategories = async (budgetID, userId) => {
-	const budget = await budgetService.getBudget(budgetID, userId);
+const getAllCustomCategories = async (budgetID, userID) => {
+	const budget = await budgetService.getBudget(budgetID, userID);
 	const query = `SELECT * FROM Category WHERE budgetID = ? AND isCustom = true`;
 	return new Promise((resolve, reject) => {
 		db.query(query, [budget.budgetID], (error, results) => {

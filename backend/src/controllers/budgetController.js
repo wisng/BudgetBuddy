@@ -23,8 +23,8 @@ const getBudget = async (req, res) => {
 
 const getAllBudgets = async (req, res) => {
 	try {
-		console.log("getting all budgets for user id:", req.userId);
-		const budgets = await budgetService.getAllBudgets(req.userId);
+		console.log("getting all budgets for user id:", req.userID);
+		const budgets = await budgetService.getAllBudgets(req.userID);
 		res.json(budgets);
 	} catch (error) {
 		res.status(500).json({ message: error.message });

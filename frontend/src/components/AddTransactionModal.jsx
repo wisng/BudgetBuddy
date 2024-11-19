@@ -56,7 +56,7 @@ const AddTransactionModal = ({ showModal, setShowModal, budgetID, categories, up
 					recurrenceEndDate,
 				}
 			);
-      updateCurrentBudget();
+			updateCurrentBudget();
 		} catch (err) {
 			console.log(err?.response?.data?.error || err.message);
 		}

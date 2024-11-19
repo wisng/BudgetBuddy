@@ -10,7 +10,7 @@ const createTransaction = async (req, res) => {
 			req.body,
 			req.userID
 		);
-		await budgetService.updateBudget(budgetID, req.userId);
+		// await budgetService.updateBudget(budgetID, req.userID);
 		res.status(201).json(transaction);
 	} catch (error) {
 		console.log(error);

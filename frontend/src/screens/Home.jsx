@@ -284,7 +284,7 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
         </Grid>
         <Grid size={2} sx={{}}></Grid>
       </Grid>
-      <AddTransactionModal budgetID={budget.budgetID} categories={categories} updateBudget={updateCurrentBudget} showModal={showTransactionModal} setShowModal={setShowTransactionModal} />
+      <AddTransactionModal budgetID={budget.budgetID} categories={categories} updateCurrentBudget={updateCurrentBudget} showModal={showTransactionModal} setShowModal={setShowTransactionModal} />
       <AddGoalModal showModal={showGoalModal} setShowModal={setShowGoalModal} />
       <AddCategoryModal showModal={showCategoryModal} setShowModal={setShowCategoryModal} />
       <AddUserModal showModal={showUserModal} setShowModal={setShowUserModal} />

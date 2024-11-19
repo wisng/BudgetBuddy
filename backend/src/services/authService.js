@@ -4,8 +4,8 @@ const bcrypt = require("bcryptjs");
 
 const registerUser = async (email, name, username , password, userType) => {
 	try {
-		const userId = await userService.createUser(email, name, username , password, userType);
-		const user = await userService.findUserById(userId);
+		const userID = await userService.createUser(email, name, username , password, userType);
+		const user = await userService.findUserById(userID);
 		let token = jwtUtil.generateToken(user.userID, user.userType);
 
 		return { token: token };
@@ -25,7 +25,7 @@ const loginUser = async (identifier, password) => {
 			throw new Error("Invalid email/username or password");
 		}
 
-		const token = jwtUtil.generateToken(user.userID, user.userType);
+		let token = jwtUtil.generateToken(user.userID, user.userType);
 
 		return { token: token };
 	} catch (error) {
