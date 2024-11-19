@@ -7,7 +7,6 @@ const authMiddleware = (req, res, next) => {
 		return res.status(401).json({ message: "Access token missing" });
 	}
 	const decoded = jwtUtil.verifyToken(token);
-	console.log("decoded", decoded);
 
 	if (!decoded) {
 		return res.status(403).json({ message: "Invalid or expired token" });

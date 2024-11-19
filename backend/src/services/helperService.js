@@ -5,7 +5,10 @@ const updateBudget = async (budgetID, userID) => {
 		day: null,
 		month: null,
 		year: null,
+		current: null,
 	});
+
+	console.log(transactions);
 
 	let totalBalance = 0;
 	let totalIncome = 0;
@@ -36,6 +39,7 @@ const updateBudget = async (budgetID, userID) => {
 		financialHealthScore,
 		budgetID,
 	];
+	console.log(values);
 
 	return new Promise((resolve, reject) => {
 		db.query(query, values, (error) => {
@@ -89,7 +93,7 @@ const createTransaction = async (budgetID, transaction, userID) => {
 	return await updateBudget(budgetID, userID);
 };
 
-const getAllTransaction = (budgetID, userID, { day, month, year }) => {
+const getAllTransaction = (budgetID, userID, { day, month, year, current }) => {
 	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
 	const queryParams = [userID, budgetID];
 
@@ -108,7 +112,8 @@ const getAllTransaction = (budgetID, userID, { day, month, year }) => {
 		queryParams.push(day);
 	}
 
-	if (!year && !month && !day) {
+	// if (!year && !month && !day) {
+	if (current) {
 		const currentDate = new Date();
 		const currentYear = currentDate.getFullYear();
 		const currentMonth = currentDate.getMonth() + 1;
