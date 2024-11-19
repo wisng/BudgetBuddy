@@ -10,14 +10,11 @@ import {
   FormControl,
   Paper,
   IconButton,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
+  TextField,
   Grid2 as Grid,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 const USERS = ["User 1", "User 2", "User 3"];
 
@@ -27,14 +24,6 @@ const AddUserModal = ({ showModal, setShowModal }) => {
 
   const handleSubmit = () => {
     console.log(username, users);
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  const handleMouseUpPassword = (event) => {
-    event.preventDefault();
   };
 
   return (
@@ -74,8 +63,7 @@ const AddUserModal = ({ showModal, setShowModal }) => {
               }}
             >
               <FormControl fullWidth sx={{ marginTop: 3 }}>
-                <InputLabel htmlFor="username">User</InputLabel>
-                <OutlinedInput
+                <TextField
                   id="username"
                   fullWidth
                   label="User"
@@ -84,30 +72,35 @@ const AddUserModal = ({ showModal, setShowModal }) => {
                   onChange={(e) => setUsername(e.target.value)}
                   size="small"
                   sx={{
+                    marginTop: 3,
                     borderRadius: 16,
                     boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 16,
                     },
                   }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="add user"
-                        onClick={() => {
-                          if (!users.includes(username)) {
-                            setUsers([...users, username]);
-                          }
-                        }}
-                        onMouseDown={handleMouseDownPassword}
-                        onMouseUp={handleMouseUpPassword}
-                        edge="end"
-                      >
-                        <AddCircleIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  }
                 />
+
+                <Grid
+                  container
+                  spacing={0}
+                  sx={{ marginTop: 3, width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
+                >
+                  <Grid size={6}></Grid>
+                  <Grid
+                    size={6}
+                    sx={{ width: "100%", display: "flex", justifyContent: "flex-end", alignItems: "center" }}
+                  >
+                    <Button
+                      variant="contained"
+                      fullWidth={false}
+                      style={{ backgroundColor: "#7459D9" }}
+                      onClick={handleSubmit}
+                    >
+                      Add User
+                    </Button>
+                  </Grid>
+                </Grid>
               </FormControl>
 
               <Grid container spacing={0} sx={{ marginTop: 3, width: "100%", background: "transparent" }}>
@@ -139,27 +132,6 @@ const AddUserModal = ({ showModal, setShowModal }) => {
                       ))}
                     </List>
                   </Paper>
-                </Grid>
-              </Grid>
-
-              <Grid
-                container
-                spacing={0}
-                sx={{ marginTop: 3, width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
-              >
-                <Grid size={6}></Grid>
-                <Grid
-                  size={6}
-                  sx={{ width: "100%", display: "flex", justifyContent: "flex-end", alignItems: "center" }}
-                >
-                  <Button
-                    variant="contained"
-                    fullWidth={false}
-                    style={{ backgroundColor: "#7459D9" }}
-                    onClick={handleSubmit}
-                  >
-                    Add Users
-                  </Button>
                 </Grid>
               </Grid>
             </Paper>

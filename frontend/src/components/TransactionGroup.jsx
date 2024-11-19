@@ -1,23 +1,9 @@
-import React, { useState, useEffect } from "react";
-import {
-  Paper,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Avatar,
-  IconButton,
-  Grid2 as Grid,
-  ListSubheader,
-} from "@mui/material";
+import React from "react";
+import { Paper, List, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 const TransactionGroup = ({ type, categories, transactions, handleClick }) => {
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
-
   let color;
   if (type == "Expense") {
     color = "#EA4335";
@@ -34,16 +20,15 @@ const TransactionGroup = ({ type, categories, transactions, handleClick }) => {
   };
 
   return (
-    <Paper elevation={3} sx={{ borderRadius: 10, marginTop: 3, width: "100%" }}>
+    <Paper elevation={3} sx={{ borderRadius: 10, width: "100%", marginTop: 1 }}>
       <List>
         {transactions.map((t, idx) => {
           let category = getCategoryIcon(t.categoryID, categories);
-          console.log(category);
           return (
             <ListItem
               key={idx}
               secondaryAction={
-                <IconButton edge="end" aria-label="delete" onClick={handleClick}>
+                <IconButton edge="end" aria-label="delete" onClick={() => handleClick(t)}>
                   <ArrowForwardIosIcon />
                 </IconButton>
               }

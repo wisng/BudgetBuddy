@@ -1,7 +1,8 @@
-import React from "react";
-import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
+import React, { useState } from "react";
+import { Typography, Box, Grid2 as Grid } from "@mui/material";
 import MonthPicker from "../components/MonthPicker";
 import TransactionGroup from "../components/TransactionGroup";
+import AddTransactionModal from "../components/AddTransactionModal";
 
 const INCOME_TRANSACTIONS = [
   {
@@ -130,6 +131,9 @@ const EXPENSE_TRANSACTIONS = [
 ];
 
 const Transactions = ({ budget, goals, categories }) => {
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [currTransaction, setCurrTransaction] = useState();
+
   const sortTransactionsByDate = (transactions) => {
     let sortedTransactions = [];
     let transactionDateMap = {};
@@ -149,6 +153,11 @@ const Transactions = ({ budget, goals, categories }) => {
     });
 
     return sortedTransactions;
+  };
+
+  const handleClick = (transaction) => {
+    setCurrTransaction(transaction);
+    setShowTransactionModal(true);
   };
 
   return (
@@ -189,15 +198,10 @@ const Transactions = ({ budget, goals, categories }) => {
                   width: "100%",
                 }}
               >
-                <Typography variant="subtitle2" sx={{ marginTop: 2, fontWeight: "bold" }}>
+                <Typography variant="subtitle2" sx={{ marginTop: 3, fontWeight: "bold" }}>
                   {t[0].date}
                 </Typography>
-                <TransactionGroup
-                  type="Income"
-                  categories={categories}
-                  transactions={t}
-                  handleClick={() => alert("hello")}
-                />
+                <TransactionGroup type="Income" categories={categories} transactions={t} handleClick={handleClick} />
               </Box>
             ))}
           </Grid>
@@ -225,21 +229,22 @@ const Transactions = ({ budget, goals, categories }) => {
                   width: "100%",
                 }}
               >
-                <Typography variant="subtitle2" sx={{ marginTop: 2, fontWeight: "bold" }}>
+                <Typography variant="subtitle2" sx={{ marginTop: 3, fontWeight: "bold" }}>
                   {t[0].date}
                 </Typography>
-                <TransactionGroup
-                  type="Expense"
-                  categories={categories}
-                  transactions={t}
-                  handleClick={() => alert("hello")}
-                />
+                <TransactionGroup type="Expense" categories={categories} transactions={t} handleClick={handleClick} />
               </Box>
             ))}
           </Grid>
         </Grid>
       </Grid>
       <Grid size={2} sx={{}}></Grid>
+      <AddTransactionModal
+        showModal={showTransactionModal}
+        setShowModal={setShowTransactionModal}
+        categories={categories}
+        transaction={currTransaction}
+      />
     </Grid>
   );
 };

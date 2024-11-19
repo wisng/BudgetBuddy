@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   TextField,
@@ -23,10 +23,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import dayjs from "dayjs";
 
 const USERS = ["User 1", "User 2", "User 3"];
 
-const AddTransactionModal = ({ showModal, setShowModal }) => {
+const AddTransactionModal = ({ showModal, setShowModal, categories, transaction = null }) => {
   const [type, setType] = useState("Expense");
   const [recurring, setRecurring] = useState("No");
   const [category, setCategory] = useState();
@@ -36,8 +37,29 @@ const AddTransactionModal = ({ showModal, setShowModal }) => {
   const [user, setUser] = useState("User 1");
   const [users, setUsers] = useState(["User 1"]);
 
+  useEffect(() => {
+    if (transaction) {
+      let category = getCategory(transaction.categoryID, categories);
+      setType(transaction.type || "Expense");
+      setRecurring(transaction.recurringEndDate ? "Yes" : "No");
+      setCategory(category ? category.name : "");
+      setTitle(transaction.title || "");
+      setAmount(transaction.amount || 0);
+      setDate(dayjs(transaction.date));
+      setUsers(transaction.users || []);
+    }
+  }, [transaction]);
+
   const handleSubmit = () => {
     console.log(type, recurring, category, title, amount, date, user, users);
+  };
+
+  const getCategory = (categoryID, categories) => {
+    for (let c of categories) {
+      if (c.categoryID === categoryID) {
+        return c;
+      }
+    }
   };
 
   return (
