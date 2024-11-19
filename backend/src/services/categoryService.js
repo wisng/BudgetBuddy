@@ -1,46 +1,30 @@
 const db = require("../../config/db");
-const budgetService = require("./budgetService");
+const helperService = require("./helperService");
 
-const createCategory = async (categoryData, userId) => {
-	const budget = await budgetService.getBudget(categoryData.budgetID, userId);
-	const query = `
+const createCategory = async (categoryData, userID) => {
+  const budget = await helperService.checkBudgetExists(categoryData.budgetID, userID);
+  const query = `
     INSERT INTO Category (name, colour, isCustom, budgetID) 
     VALUES (?, ?, ?, ?)`;
-	const values = [
-		categoryData.name,
-		categoryData.colour,
-		categoryData.isCustom,
-		budget.budgetID,
-	];
+  const values = [categoryData.name, categoryData.colour, categoryData.isCustom, budget.budgetID];
 
-	return new Promise((resolve, reject) => {
-		db.query(query, values, (error) => {
-			if (error) return reject(error);
-			resolve();
-		});
-	});
+  return new Promise((resolve, reject) => {
+    db.query(query, values, (error) => {
+      if (error) return reject(error);
+      resolve();
+    });
+  });
 };
 
-const getCategory = async (budgetID, categoryId, userId) => {
-	const budget = await budgetService.getBudget(budgetID, userId);
-	const query = `SELECT * FROM Category WHERE budgetID = ? AND categoryID = ?`;
-	return new Promise((resolve, reject) => {
-		db.query(query, [budget.budgetID, categoryId], (error, results) => {
-			if (error) return reject(error);
-			resolve(results[0]);
-		});
-	});
-};
-
-const getAllCategories = async (budgetID, userId) => {
-	const budget = await budgetService.getBudget(budgetID, userId);
-	const query = `SELECT * FROM Category WHERE budgetID = ?`;
-	return new Promise((resolve, reject) => {
-		db.query(query, [budget.budgetID], (error, results) => {
-			if (error) return reject(error);
-			resolve(results);
-		});
-	});
+const getCategory = async (budgetID, categoryID, userID) => {
+  const budget = await helperService.checkBudgetExists(budgetID, userID);
+  const query = `SELECT * FROM Category WHERE budgetID = ? AND categoryID = ?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [budget.budgetID, categoryID], (error, results) => {
+      if (error) return reject(error);
+      resolve(results[0]);
+    });
+  });
 };
 
 const getAllCustomCategories = async (budgetID, userId) => {
@@ -54,47 +38,56 @@ const getAllCustomCategories = async (budgetID, userId) => {
 	});
 };
 
-const updateCategory = async (budgetID, categoryId, categoryData, userId) => {
-	const budget = await budgetService.getBudget(budgetID, userId);
-	const query = `
+const getAllCategories = async (budgetID, userID) => {
+  const budget = await helperService.checkBudgetExists(budgetID, userID);
+  const query = `SELECT * FROM Category WHERE budgetID = ?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [budget.budgetID], (error, results) => {
+      if (error) return reject(error);
+      resolve(results);
+    });
+  });
+};
+
+const updateCategory = async (budgetID, categoryID, categoryData, userID) => {
+  const budget = await helperService.checkBudgetExists(budgetID, userID);
+  const query = `
     UPDATE Category 
     SET name = ?, colour = ?, isCustom = ? 
     WHERE budgetID = ? AND categoryID = ?`;
-	const values = [
-		categoryData.name,
-		categoryData.colour,
-		categoryData.isCustom,
-		budget.budgetID,
-		categoryId,
-	];
+  const values = [categoryData.name, categoryData.colour, categoryData.isCustom, budget.budgetID, categoryID];
 
-	return new Promise((resolve, reject) => {
-		db.query(query, values, (error) => {
-			if (error) return reject(error);
-			resolve({ id, ...categoryData });
-		});
-	});
+  return new Promise((resolve, reject) => {
+    db.query(query, values, (error) => {
+      if (error) return reject(error);
+      resolve({ id, ...categoryData });
+    });
+  });
 };
 
-const deleteCategory = async (budgetID, categoryId, userId) => {
-	const budget = await budgetService.getBudget(budgetID, userId);
-	const query = `DELETE FROM Category WHERE budgetID = ? AND categoryID = ?`;
-	return new Promise((resolve, reject) => {
-		db.query(
-			query,
-			[budget.budgetID, categoryId, userId],
-			(error, results) => {
-				if (error) return reject(error);
-				resolve(results.affectedRows > 0);
-			}
-		);
-	});
+const deleteCategory = async (budgetID, categoryID, userID) => {
+  const budget = await helperService.checkBudgetExists(budgetID, userID);
+  const category = await getCategory(budgetID, categoryID, userID);
+  if (!category) {
+    return { message: "Category not found" };
+  } else if (!category.isCustom) {
+    return { message: "Cannot delete default category" };
+  } else {
+    const query = `DELETE FROM Category WHERE budgetID = ? AND categoryID = ?`;
+    await new Promise((resolve, reject) => {
+      db.query(query, [budget.budgetID, categoryID, userID], (error, results) => {
+        if (error) return reject(error);
+        resolve(results.affectedRows > 0);
+      });
+    });
+    return { message: "Category deleted successfully" };
+  }
 };
 
 module.exports = {
-	createCategory,
-	getCategory,
-	getAllCategories,
-	updateCategory,
-	deleteCategory,
+  createCategory,
+  getCategory,
+  getAllCategories,
+  updateCategory,
+  deleteCategory,
 };

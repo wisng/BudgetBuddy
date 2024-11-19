@@ -12,11 +12,11 @@ passport.use(
 		},
 		async (accessToken, refreshToken, profile, done) => {
 			try {
-				let user = await userService.findUserByGoogleId(profile.id);
+				let user = await userService.findUserByGoogleID(profile.id);
 
 				if (!user) {
 					const newUser = {
-						googleId: profile.id,
+						googleID: profile.id,
 						email: profile.emails[0].value,
 						name: profile.displayName,
 					};

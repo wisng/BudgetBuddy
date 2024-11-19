@@ -6,14 +6,13 @@ const authMiddleware = (req, res, next) => {
 	if (!token) {
 		return res.status(401).json({ message: "Access token missing" });
 	}
-
 	const decoded = jwtUtil.verifyToken(token);
 
 	if (!decoded) {
 		return res.status(403).json({ message: "Invalid or expired token" });
 	}
 
-	req.userId = decoded.userId;
+	req.userID = decoded.userID;
 	next();
 };
 

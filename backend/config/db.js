@@ -26,7 +26,7 @@ db.connect((err) => {
         CREATE TABLE IF NOT EXISTS User (
           userID INT PRIMARY KEY AUTO_INCREMENT,
           name VARCHAR(255),
-          username VARCHAR(255) NOT NULL,
+          username VARCHAR(255) NOT NULL UNIQUE,
           email VARCHAR(255) NOT NULL UNIQUE,
           password VARCHAR(255) NOT NULL,
           userType ENUM('Client', 'FinancialAdvisor'),
@@ -36,12 +36,15 @@ db.connect((err) => {
 			const createBudgetTable = `
         CREATE TABLE IF NOT EXISTS Budget (
           budgetID INT PRIMARY KEY AUTO_INCREMENT,
+          title VARCHAR(255) NOT NULL,
           totalBalance DOUBLE,
           totalIncome DOUBLE,
           totalExpenses DOUBLE,
           accountType ENUM('Individual', 'Shared'),
           financialHealthScore INT,
-          creationDate DATE
+          creationDate DATE,
+          ownerID INT,
+          FOREIGN KEY (ownerID) REFERENCES User(userID) ON DELETE CASCADE
         )`;
 
 			const createUserBudgetTable = `
@@ -75,8 +78,8 @@ db.connect((err) => {
           recurrenceFrequency ENUM('DAILY', 'MONTHLY', 'YEARLY', 'WEEKLY', 'BI-WEEKLY'),
           recurrenceStartDate DATE,
           recurrenceEndDate DATE,
-          FOREIGN KEY (categoryID) REFERENCES Category(categoryID),
-          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID)
+          FOREIGN KEY (categoryID) REFERENCES Category(categoryID), 
+          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID) ON DELETE CASCADE
         )`;
 
 			const createUserTransactionTable = `
@@ -100,8 +103,8 @@ db.connect((err) => {
           totalExpenses DOUBLE,
           spendingPerCategory JSON,
           savings DOUBLE,
-          FOREIGN KEY (userID) REFERENCES User(userID),
-          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID)
+          FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
+          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID) ON DELETE CASCADE
         )`;
 
 			const createSpendingGoalTable = `
@@ -114,7 +117,7 @@ db.connect((err) => {
           startDate DATE,
           endDate DATE,
           FOREIGN KEY (categoryID) REFERENCES Category(categoryID),
-          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID)
+          FOREIGN KEY (budgetID) REFERENCES Budget(budgetID) ON DELETE CASCADE
         )`;
 
 			// Run all table creation queries
