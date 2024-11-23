@@ -68,7 +68,7 @@ const Wrapper = ({ Component }) => {
   const [goals, setGoals] = useState(GOALS);
 
 
-  const fetchAllBudgetData = async () => {
+  const fetchAllBudgets = async () => {
     try {
       const budgetRes = await customAxiosInstance.get("/budgets");
       console.log(budgetRes.data);
@@ -83,7 +83,7 @@ const Wrapper = ({ Component }) => {
   };
 
   useEffect(() => {
-    fetchAllBudgetData();
+    fetchAllBudgets();
   }, []);
 
   if (budgets.length === 0) {

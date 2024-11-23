@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const registerUser = async (email, username, password) => {
 	try {
 		const userID = await userService.createUser(email, username , password);
-		const user = await userService.findUserById(userID);
+		const user = await userService.findUserByID(userID);
 		let token = jwtUtil.generateToken(user.userID, user.userType);
 
 		return { token: token };

@@ -17,6 +17,7 @@ const Navbar = ({ account, setAccount, budgets, setSelectedBudget }) => {
       accountType: "Individual",
       financialHealthScore: 75,
       creationDate: "2023-01-15",
+      title: "My Individual Budget #2",
     },
     {
       budgetID: 3,
@@ -26,6 +27,7 @@ const Navbar = ({ account, setAccount, budgets, setSelectedBudget }) => {
       accountType: "Shared",
       financialHealthScore: 80,
       creationDate: "2023-02-20",
+      title: "My Shared Budget #1",
     },
   ];
 
@@ -122,7 +124,7 @@ const Navbar = ({ account, setAccount, budgets, setSelectedBudget }) => {
               </MenuItem>
             ))} */}
             {budgets.map((budget, i) => {
-              const accountName = `${budget.accountType === "Individual" ? "My Budget" : "My Shared Budget"} ${budget.budgetID}`;
+              const accountName = budget.title;
               return (
                 <MenuItem
                   key={i}

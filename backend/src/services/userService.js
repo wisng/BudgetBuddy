@@ -33,7 +33,7 @@ const createUser = async (
 	});
 
 	const hashedPassword = await bcrypt.hash(password, 10);
-	const query = `INSERT INTO User (email, username, password, userType) VALUES (?, ?, ?, ?, ?)`;
+	const query = `INSERT INTO User (email, username, password, userType) VALUES (?, ?, ?, ?)`;
 	const user = await new Promise((resolve, reject) => {
 		db.query(
 			query,
