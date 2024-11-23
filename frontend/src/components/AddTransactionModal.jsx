@@ -37,9 +37,9 @@ const AddTransactionModal = ({ showModal, setShowModal, budgetID, categories, up
 	const [user, setUser] = useState("User 1");
 	const [users, setUsers] = useState(["User 1"]);
 
-	const [recurrenceStartDate, setRecurrenceStartDate] = useState("");
-	const [recurrenceEndDate, setRecurrenceEndDate] = useState("");
-	const [recurrenceFrequency, setRecurrenceFrequency] = useState("");
+	const [recurrenceStartDate, setRecurrenceStartDate] = useState(null);
+	const [recurrenceEndDate, setRecurrenceEndDate] = useState(null);
+	const [recurrenceFrequency, setRecurrenceFrequency] = useState(null);
 
 	const handleSubmit = async () => {
 		try {
