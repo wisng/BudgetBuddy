@@ -2,9 +2,9 @@ const userService = require("./userService");
 const jwtUtil = require("../utils/jwtUtil");
 const bcrypt = require("bcryptjs");
 
-const registerUser = async (email, username , password, userType) => {
+const registerUser = async (email, username, password) => {
 	try {
-		const userID = await userService.createUser(email, username , password, userType);
+		const userID = await userService.createUser(email, username , password);
 		const user = await userService.findUserById(userID);
 		let token = jwtUtil.generateToken(user.userID, user.userType);
 

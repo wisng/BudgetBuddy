@@ -12,7 +12,7 @@ const createUser = async (
 	email,
 	username,
 	password,
-	userType
+	userType = USER_TYPE.CLIENT
 ) => {
 	await new Promise((resolve, reject) => {
 		db.query(

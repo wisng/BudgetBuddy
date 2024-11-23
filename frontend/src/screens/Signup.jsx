@@ -27,7 +27,6 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
-  const [userType, setUserType] = useState("Client");
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSucessMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +41,7 @@ const Signup = () => {
     }
     else {
       try {
-        const res = await customAxiosInstance.post("/register", { email, username, password, userType });
+        const res = await customAxiosInstance.post("/register", { email, username, password });
         alert(`Login successful, going to Home page...`);
         localStorage.setItem("jwt-token", res.data.token);
         changeScreen("/home");
@@ -209,21 +208,6 @@ const Signup = () => {
                   }
                 />
               </FormControl>
-
-              {/* userType Selection */}
-              <FormControl fullWidth>
-                <RadioGroup
-                  row
-                  aria-label="userType"
-                  name="userType"
-                  value={userType}
-                  onChange={(e) => setUserType(e.target.value)}
-                >
-                  <FormControlLabel value="Client" control={<Radio />} label="Client" />
-                  <FormControlLabel value="FinancialAdvisor" control={<Radio />} label="Financial Advisor" />
-                </RadioGroup>
-              </FormControl>
-
 
               {/* Google Sign-In Button */}
               {/* <Button
