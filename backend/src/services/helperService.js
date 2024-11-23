@@ -8,8 +8,6 @@ const updateBudget = async (budgetID, userID) => {
 		current: null,
 	});
 
-	console.log(transactions);
-
 	let totalBalance = 0;
 	let totalIncome = 0;
 	let totalExpenses = 0;
@@ -39,7 +37,6 @@ const updateBudget = async (budgetID, userID) => {
 		financialHealthScore,
 		budgetID,
 	];
-	console.log(values);
 
 	return new Promise((resolve, reject) => {
 		db.query(query, values, (error) => {

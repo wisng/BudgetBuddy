@@ -19,8 +19,6 @@ const createTransaction = async (budgetID, transaction, userID) => {
 		transaction.recurrenceEndDate ? transaction.recurrenceEndDate.split("T")[0] : null,
 	];
 
-	console.log(transactionValues);
-
 	await new Promise((resolve, reject) => {
 		db.query(transactionQuery, transactionValues, (error, results) => {
 			if (error) return reject(error);

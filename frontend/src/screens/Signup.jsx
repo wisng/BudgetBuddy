@@ -24,7 +24,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
@@ -36,7 +35,6 @@ const Signup = () => {
   const changeScreen = useNavigate();
 
   const handleRegistration = async (e) => {
-    console.log("Registration: User info intaking");
     e.preventDefault();
     if (password !== confirmationPassword) {
       alert("Passwords do not match");
@@ -44,14 +42,13 @@ const Signup = () => {
     }
     else {
       try {
-        const res = await customAxiosInstance.post("/register", { email, name, username, password, userType });
+        const res = await customAxiosInstance.post("/register", { email, username, password, userType });
         alert(`Login successful, going to Home page...`);
         localStorage.setItem("jwt-token", res.data.token);
         changeScreen("/home");
         // setSuccessMsg(`${res.data.message}, redirecting to login page...`);
       }
       catch (err) {
-        console.log(err.message);
         console.log(err.response?.data?.error);
         // setErrorMsg(err.message);
       }
@@ -128,25 +125,6 @@ const Signup = () => {
                 InputProps={{disableUnderline: true}}
               />
 
-              {/* Name Input */}
-              <TextField
-                fullWidth
-                label="Name"
-                variant="standard"
-                margin="normal"
-                placeholder="Name"
-                size="small"
-                sx={{
-                  marginTop: 3,
-                  borderRadius: 16,
-                  boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 16,
-                  },
-                }}
-                InputProps={{disableUnderline: true}}
-                onChange={(e) => setName(e.target.value)}
-              />
               <TextField
                 fullWidth
                 label="Username"
