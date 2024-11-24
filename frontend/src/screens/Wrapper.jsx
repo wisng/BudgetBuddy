@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { Box } from "@mui/material";
 import Header from "../components/Header";
 import Navbar from "../components/Navbar";
+import LocalMallIcon from "@mui/icons-material/LocalMall";
+import MovieIcon from "@mui/icons-material/Movie";
+import FastfoodIcon from "@mui/icons-material/Fastfood";
+import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
 
 const BUDGET = {
   budgetID: 1,
@@ -60,13 +64,70 @@ const GOALS = [
   },
 ];
 
+const CATEGORY_ICONS = {
+  Entertainment: <MovieIcon />,
+  Shopping: <LocalMallIcon />,
+  "Dining Out": <FastfoodIcon />,
+  Transportation: <DirectionsCarFilledIcon />,
+};
+
+const CATEGORIES = [
+  {
+    categoryID: 1,
+    name: "Entertainment",
+    colour: "#00FF00",
+    isCustom: 1,
+    budgetID: 1,
+  },
+  {
+    categoryID: 2,
+    name: "Shopping",
+    colour: "#FF0000",
+    isCustom: 1,
+    budgetID: 1,
+  },
+  {
+    categoryID: 3,
+    name: "Dining Out",
+    colour: "#0000FF",
+    isCustom: 1,
+    budgetID: 1,
+  },
+  {
+    categoryID: 4,
+    name: "Transportation",
+    colour: "#00FFFF",
+    isCustom: 1,
+    budgetID: 1,
+  },
+  {
+    categoryID: 5,
+    name: "Groceries",
+    colour: "#09FFFF",
+    isCustom: 1,
+    budgetID: 1,
+  },
+];
+
 const Wrapper = ({ Component }) => {
   const [account, setAccount] = useState("My Budget");
+
+  const addCategoryIcon = (categories) => {
+    let result = [];
+    for (let c of categories) {
+      if (c.name in CATEGORY_ICONS) {
+        c.icon = CATEGORY_ICONS[c.name];
+      }
+      result.push(c);
+    }
+    return result;
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Header />
       <Navbar account={account} setAccount={setAccount} />
-      <Component budget={BUDGET} goals={GOALS} /> {/* Render the passed-in component here */}
+      <Component budget={BUDGET} goals={GOALS} categories={addCategoryIcon(CATEGORIES)} />{" "}
+      {/* Render the passed-in component here */}
     </Box>
   );
 };
