@@ -5,7 +5,7 @@
   2. Pancho Fernandez, 501014081
   3. Sami El Assi, 501042214
   4. Wahaj Haider
-  5. Wisdom Ng
+  5. Wisdom Ng, 500876253
 
 
 # **Budget Buddy**
