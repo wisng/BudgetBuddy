@@ -65,7 +65,7 @@ const getAllTransaction = (budgetID, userID, { day, month, year }) => {
 		queryParams.push(day);
 	}
 
-	if (!year && !month && !day && current) {
+	if (!year && !month && !day) {
 		const currentDate = new Date();
 		const currentYear = currentDate.getFullYear();
 		const currentMonth = currentDate.getMonth() + 1;
