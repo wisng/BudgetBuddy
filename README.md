@@ -3,7 +3,7 @@
 **TEAM MEMBERS**
   1. Humaira Adeeb, 501030823
   2. Pancho Fernandez
-  3. Sami El Assi
+  3. Sami El Assi, 501042214
   4. Wahaj Haider
   5. Wisdom Ng
 
