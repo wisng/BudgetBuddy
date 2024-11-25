@@ -4,7 +4,7 @@
   1. Humaira Adeeb, 501030823
   2. Pancho Fernandez, 501014081
   3. Sami El Assi, 501042214
-  4. Wahaj Haider
+  4. Wahaj Haider, 501031143
   5. Wisdom Ng, 500876253
 
 
