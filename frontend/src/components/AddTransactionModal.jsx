@@ -84,6 +84,7 @@ const AddTransactionModal = ({
 	}, [transaction]);
 
 	const getCategory = (categoryID, categories) => {
+		console.log("categoreis", categories);
 		for (let c of categories) {
 			if (c.categoryID === categoryID) {
 				return c;

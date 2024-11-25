@@ -161,7 +161,7 @@ const Wrapper = ({ Component }) => {
 				budget={selectedBudget}
 				setSelectedBudget={setSelectedBudget}
 				goals={GOALS}
-				addCategoryIcon={addCategoryIcon}
+        categories={addCategoryIcon(CATEGORIES)}
 			/>{" "}
 			{/* Render the passed-in component here */}
 		</Box>

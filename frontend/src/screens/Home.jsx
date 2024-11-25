@@ -19,7 +19,7 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 import customAxiosInstance from "../utils/customAxiosInstance";
 
-const Home = ({ budget, goals, setSelectedBudget, addCategoryIcon }) => {
+const Home = ({ budget, goals, setSelectedBudget }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -31,7 +31,7 @@ const Home = ({ budget, goals, setSelectedBudget, addCategoryIcon }) => {
   const fetchCategories = async () => {
     try {
       const res = await customAxiosInstance.get(`/budget/${budget.budgetID}/categories`);
-      setCategories(addCategoryIcon(res.data));
+      setCategories(res.data);
     }
     catch (err) {
       console.error(err.response?.data?.error || err.message);
@@ -50,6 +50,7 @@ const Home = ({ budget, goals, setSelectedBudget, addCategoryIcon }) => {
 
   useEffect(() => {
     fetchCategories();
+    console.log("categories", categories);
   }, []);
 
   return (
