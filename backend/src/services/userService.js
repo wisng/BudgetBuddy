@@ -9,8 +9,8 @@ const USER_TYPE = {
 };
 
 const createUser = async (
-	username,
 	email,
+	username,
 	password,
 	userType = USER_TYPE.CLIENT
 ) => {
@@ -33,11 +33,11 @@ const createUser = async (
 	});
 
 	const hashedPassword = await bcrypt.hash(password, 10);
-	const query = `INSERT INTO User (username, email, password, userType) VALUES (?, ?, ?, ?)`;
+	const query = `INSERT INTO User (email, username, password, userType) VALUES (?, ?, ?, ?)`;
 	const user = await new Promise((resolve, reject) => {
 		db.query(
 			query,
-			[username, email, hashedPassword, userType],
+			[email, username, hashedPassword, userType],
 			(err, result) => {
 				if (err) {
 					reject(err);

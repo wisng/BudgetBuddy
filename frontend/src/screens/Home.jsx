@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import { Box, Paper, Typography, Grid2 as Grid } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
+// import jwt from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode";
 import { PieChart } from "@mui/x-charts/PieChart";
 import BudgetFunction from "../components/BudgetFunction";
 import MonthPicker from "../components/MonthPicker";
@@ -14,11 +17,41 @@ import AddCategoryModal from "../components/AddCategoryModal";
 import AddUserModal from "../components/AddUserModal";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
-const Home = ({ budget, goals }) => {
+import customAxiosInstance from "../utils/customAxiosInstance";
+
+const Home = ({ budget, goals, setSelectedBudget }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  console.log(budget);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await customAxiosInstance.get(`/budget/${budget.budgetID}/categories`);
+      setCategories(res.data);
+    }
+    catch (err) {
+      console.error(err.response?.data?.error || err.message);
+    }
+  }
+
+  const updateCurrentBudget = async () => {
+    try {
+      const res = await customAxiosInstance.get(`/budget/${budget.budgetID}`);
+      setSelectedBudget(res.data);
+    }
+    catch (err) {
+      console.error(err.response?.data?.error || err.message);
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories();
+    console.log("categories", categories);
+  }, []);
 
   return (
     <Box>
@@ -252,7 +285,7 @@ const Home = ({ budget, goals }) => {
         </Grid>
         <Grid size={2} sx={{}}></Grid>
       </Grid>
-      <AddTransactionModal showModal={showTransactionModal} setShowModal={setShowTransactionModal} />
+      <AddTransactionModal budgetID={budget.budgetID} categories={categories} updateCurrentBudget={updateCurrentBudget} showModal={showTransactionModal} setShowModal={setShowTransactionModal} />
       <AddGoalModal showModal={showGoalModal} setShowModal={setShowGoalModal} />
       <AddCategoryModal showModal={showCategoryModal} setShowModal={setShowCategoryModal} />
       <AddUserModal showModal={showUserModal} setShowModal={setShowUserModal} />

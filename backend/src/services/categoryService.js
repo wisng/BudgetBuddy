@@ -27,6 +27,17 @@ const getCategory = async (budgetID, categoryID, userID) => {
   });
 };
 
+const getAllCustomCategories = async (budgetID, userID) => {
+	const budget = await budgetService.getBudget(budgetID, userID);
+	const query = `SELECT * FROM Category WHERE budgetID = ? AND isCustom = true`;
+	return new Promise((resolve, reject) => {
+		db.query(query, [budget.budgetID], (error, results) => {
+			if (error) return reject(error);
+			resolve(results);
+		});
+	});
+};
+
 const getAllCategories = async (budgetID, userID) => {
   const budget = await helperService.checkBudgetExists(budgetID, userID);
   const query = `SELECT * FROM Category WHERE budgetID = ?`;

@@ -6,16 +6,17 @@ const createTransaction = async (budgetID, transaction, userID) => {
 	  INSERT INTO Transaction (budgetID, title, categoryID, amount, date, transactionType, recurrenceFrequency, recurrenceStartDate, recurrenceEndDate)
 	  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`;
+
 	const transactionValues = [
 		budgetID,
 		transaction.title,
 		transaction.categoryID,
-		transaction.amount,
-		transaction.date,
+		parseFloat(transaction.amount),
+		transaction.date.split("T")[0],
 		transaction.transactionType,
 		transaction.recurrenceFrequency || null,
-		transaction.recurrenceStartDate || null,
-		transaction.recurrenceEndDate || null,
+		transaction.recurrenceStartDate ? transaction.recurrenceStartDate.split("T")[0] : null,
+		transaction.recurrenceEndDate ? transaction.recurrenceEndDate.split("T")[0] : null,
 	];
 
 	await new Promise((resolve, reject) => {

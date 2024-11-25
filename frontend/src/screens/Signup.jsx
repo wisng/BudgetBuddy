@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import customAxiosInstance from "../utils/customAxiosInstance";
 import {
   Typography,
   TextField,
@@ -12,6 +15,9 @@ import {
   IconButton,
   InputAdornment,
   Grid2 as Grid,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -20,9 +26,33 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmationPassword, setConfirmationPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSucessMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const changeScreen = useNavigate();
+
+  const handleRegistration = async (e) => {
+    e.preventDefault();
+    if (password !== confirmationPassword) {
+      alert("Passwords do not match");
+      // setErrorMsg("Passwords do not match");
+    }
+    else {
+      try {
+        const res = await customAxiosInstance.post("/register", { email, username, password });
+        alert(`Login successful, going to Home page...`);
+        localStorage.setItem("jwt-token", res.data.token);
+        changeScreen("/home");
+        // setSuccessMsg(`${res.data.message}, redirecting to login page...`);
+      }
+      catch (err) {
+        console.log(err.response?.data?.error);
+        // setErrorMsg(err.message);
+      }
+    }
+  };
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -32,9 +62,6 @@ const Signup = () => {
     event.preventDefault();
   };
 
-  const handleSubmit = () => {
-    console.log(email, username, password, confirmPassword);
-  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={0} sx={{ position: "relative" }}>
@@ -65,9 +92,9 @@ const Signup = () => {
             </div>
           </Paper>
         </Grid>
-        <Grid size={4} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <Paper elevation={3} sx={{ height: "450px", width: "100%", borderRadius: 8 }}>
-            {/* Form Container */}
+        <Grid size={4} sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+          <Paper elevation={3} sx={{height: "auto", width: "100%", borderRadius:8}}>
+             {/* Form Container */}
             <Box
               style={{ padding: "20px", paddingTop: "10px" }}
               sx={{
@@ -94,7 +121,9 @@ const Signup = () => {
                     borderRadius: 16,
                   },
                 }}
+                InputProps={{disableUnderline: true}}
               />
+
               <TextField
                 fullWidth
                 label="Username"
@@ -153,8 +182,8 @@ const Signup = () => {
                   fullWidth
                   label="Confirm Password"
                   placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={confirmationPassword}
+                  onChange={(e) => setConfirmationPassword(e.target.value)}
                   size="small"
                   sx={{
                     borderRadius: 16,
@@ -179,6 +208,7 @@ const Signup = () => {
                   }
                 />
               </FormControl>
+
               {/* Google Sign-In Button */}
               {/* <Button
                 fullWidth
@@ -194,8 +224,8 @@ const Signup = () => {
               <Button
                 variant="contained"
                 fullWidth={false}
-                style={{ backgroundColor: "#7459D9", width: "120px" }}
-                onClick={handleSubmit}
+                style={{backgroundColor:  "#7459D9", width: "120px"}}
+                onClick={handleRegistration}
               >
                 Sign Up
               </Button>

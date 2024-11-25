@@ -43,7 +43,10 @@ const createBudget = async (userID, budgetData = null) => {
 			const userBudgetQuery = `
 		  INSERT INTO UserBudget (userID, budgetID) VALUES (?, ?)
 		`;
-			const userBudgetValues = [userID, budgetResults.insertId];
+			const userBudgetValues = [
+				userID,
+				budgetResults.insertId,
+			];
 
 			db.query(userBudgetQuery, userBudgetValues, (error) => {
 				if (error) return reject(error);

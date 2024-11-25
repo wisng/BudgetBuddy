@@ -1,12 +1,14 @@
 const authService = require("../services/authService");
+const budgetService = require("../services/budgetService");
+const jwtUtil = require("../utils/jwtUtil");
 
 const register = async (req, res) => {
-	const { username, email, password } = req.body;
-	if (!username || !email || !password) {
+	const { email, username, password } = req.body;
+	if (!email || !username || !password) {
 		return res.status(400).json({ error: "All fields are required" });
 	}
 	try {
-		const token = await authService.registerUser(username, email, password);
+		let token = await authService.registerUser(email, username, password);
 		res.status(201).json(token);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
@@ -14,18 +16,19 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-	const { identifier, password } = req.body;
-	if (!identifier || !password) {
+	const { email, password } = req.body;
+	if (!email || !password) {
 		return res.status(400).json({ error: "All fields are required" });
 	}
 
 	try {
-		const token = await authService.loginUser(identifier, password);
+		let token = await authService.loginUser(email, password);
 		return res.status(201).json(token);
 	} catch (error) {
 		res.status(401).json({ error });
 	}
 };
+
 
 const google = async (req, res) => {
 	passport.authenticate("google", { scope: ["profile", "email"] });
@@ -34,7 +37,7 @@ const google = async (req, res) => {
 const googleCallback = async (req, res) => {
 	passport.authenticate("google"),
 		(req, res) => {
-			const token = jwt.sign(
+			let token = jwt.sign(
 				{ id: req.user.id },
 				process.env.JWT_SECRET,
 				{
