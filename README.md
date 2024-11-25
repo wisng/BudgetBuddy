@@ -1,7 +1,7 @@
 # CPS731_BudgetBuddy_README
 
 **TEAM MEMBERS**
-  1. Humaira Adeeb
+  1. Humaira Adeeb, 501030823
   2. Pancho Fernandez
   3. Sami El Assi
   4. Wahaj Haider
