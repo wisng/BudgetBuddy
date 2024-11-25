@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	Modal,
 	TextField,
@@ -18,6 +18,7 @@ import {
 	OutlinedInput,
 	Grid2 as Grid,
 } from "@mui/material";
+import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -27,7 +28,14 @@ import customAxiosInstance from "../utils/customAxiosInstance";
 
 const USERS = ["User 1", "User 2", "User 3"];
 
-const AddTransactionModal = ({ showModal, setShowModal, budgetID, categories, updateCurrentBudget }) => {
+const AddTransactionModal = ({
+	showModal,
+	setShowModal,
+	budgetID,
+	categories,
+	updateCurrentBudget,
+	transaction = null,
+}) => {
 	const [type, setType] = useState("Expense");
 	const [recurring, setRecurring] = useState("No");
 	const [category, setCategory] = useState();
@@ -59,6 +67,27 @@ const AddTransactionModal = ({ showModal, setShowModal, budgetID, categories, up
 			updateCurrentBudget();
 		} catch (err) {
 			console.log(err?.response?.data?.error || err.message);
+		}
+	};
+
+	useEffect(() => {
+		if (transaction) {
+			let category = getCategory(transaction.categoryID, categories);
+			setType(transaction.type || "Expense");
+			setRecurring(transaction.recurringEndDate ? "Yes" : "No");
+			setCategory(category ? category.name : "");
+			setTitle(transaction.title || "");
+			setAmount(transaction.amount || 0);
+			setDate(dayjs(transaction.date));
+			setUsers(transaction.users || []);
+		}
+	}, [transaction]);
+
+	const getCategory = (categoryID, categories) => {
+		for (let c of categories) {
+			if (c.categoryID === categoryID) {
+				return c;
+			}
 		}
 	};
 
@@ -184,71 +213,127 @@ const AddTransactionModal = ({ showModal, setShowModal, budgetID, categories, up
 								</Grid>
 							</Grid>
 
-              {recurring === "Yes" && (
-            <>
-              <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
-                <Grid size={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="recurrence-frequency-label">Frequency</InputLabel>
-                    <Select
-                      labelId="recurrence-frequency-label"
-                      id="recurrence-frequency"
-                      value={recurrenceFrequency}
-                      label="Frequency"
-                      onChange={(e) => setRecurrenceFrequency(e.target.value)}
-                      size="small"
-                      sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
-                    >
-                      <MenuItem value="DAILY">Daily</MenuItem>
-                      <MenuItem value="WEEKLY">Weekly</MenuItem>
-                      <MenuItem value="BI-WEEKLY">Bi-Weekly</MenuItem>
-                      <MenuItem value="MONTHLY">Monthly</MenuItem>
-                      <MenuItem value="YEARLY">Yearly</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={6}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Start Date"
-                      value={recurrenceStartDate}
-                      onChange={(newValue) => setRecurrenceStartDate(newValue)}
-                      slotProps={{
-                        textField: {
-                          size: "small",
-                          InputProps: {
-                            sx: { borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }, // Apply the styles here
-                          },
-                        },
-                      }}
-                      sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
-                    />
-                  </LocalizationProvider>
-                </Grid>
-              </Grid>
+							{recurring === "Yes" && (
+								<>
+									<Grid
+										container
+										spacing={2}
+										sx={{ marginTop: 3, width: "100%" }}
+									>
+										<Grid size={6}>
+											<FormControl fullWidth>
+												<InputLabel id="recurrence-frequency-label">
+													Frequency
+												</InputLabel>
+												<Select
+													labelId="recurrence-frequency-label"
+													id="recurrence-frequency"
+													value={recurrenceFrequency}
+													label="Frequency"
+													onChange={(e) =>
+														setRecurrenceFrequency(
+															e.target.value
+														)
+													}
+													size="small"
+													sx={{
+														borderRadius: 16,
+														boxShadow:
+															"0px 4px 8px rgba(0, 0, 0, 0.3)",
+													}}
+												>
+													<MenuItem value="DAILY">
+														Daily
+													</MenuItem>
+													<MenuItem value="WEEKLY">
+														Weekly
+													</MenuItem>
+													<MenuItem value="BI-WEEKLY">
+														Bi-Weekly
+													</MenuItem>
+													<MenuItem value="MONTHLY">
+														Monthly
+													</MenuItem>
+													<MenuItem value="YEARLY">
+														Yearly
+													</MenuItem>
+												</Select>
+											</FormControl>
+										</Grid>
+										<Grid size={6}>
+											<LocalizationProvider
+												dateAdapter={AdapterDayjs}
+											>
+												<DatePicker
+													label="Start Date"
+													value={recurrenceStartDate}
+													onChange={(newValue) =>
+														setRecurrenceStartDate(
+															newValue
+														)
+													}
+													slotProps={{
+														textField: {
+															size: "small",
+															InputProps: {
+																sx: {
+																	borderRadius: 16,
+																	boxShadow:
+																		"0px 4px 8px rgba(0, 0, 0, 0.3)",
+																}, // Apply the styles here
+															},
+														},
+													}}
+													sx={{
+														borderRadius: 16,
+														boxShadow:
+															"0px 4px 8px rgba(0, 0, 0, 0.3)",
+													}}
+												/>
+											</LocalizationProvider>
+										</Grid>
+									</Grid>
 
-              <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
-                <Grid size={6}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="End Date"
-                      value={recurrenceEndDate}
-                      onChange={(newValue) => setRecurrenceEndDate(newValue)}
-                      slotProps={{
-                        textField: {
-                          size: "small",
-                          InputProps: {
-                            sx: { borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }, // Apply the styles here
-                          },
-                        },
-                      }}
-                      sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
-                    />
-                  </LocalizationProvider>
-                </Grid>
-              </Grid>
-            </>
-          )}
+									<Grid
+										container
+										spacing={2}
+										sx={{ marginTop: 3, width: "100%" }}
+									>
+										<Grid size={6}>
+											<LocalizationProvider
+												dateAdapter={AdapterDayjs}
+											>
+												<DatePicker
+													label="End Date"
+													value={recurrenceEndDate}
+													onChange={(newValue) =>
+														setRecurrenceEndDate(
+															newValue
+														)
+													}
+													slotProps={{
+														textField: {
+															size: "small",
+															InputProps: {
+																sx: {
+																	borderRadius: 16,
+																	boxShadow:
+																		"0px 4px 8px rgba(0, 0, 0, 0.3)",
+																}, // Apply the styles here
+															},
+														},
+													}}
+													sx={{
+														borderRadius: 16,
+														boxShadow:
+															"0px 4px 8px rgba(0, 0, 0, 0.3)",
+													}}
+												/>
+											</LocalizationProvider>
+										</Grid>
+									</Grid>
+								</>
+							)}
 
 							<Grid
 								container
@@ -341,11 +426,14 @@ const AddTransactionModal = ({ showModal, setShowModal, budgetID, categories, up
 												setCategory(e.target.value)
 											}
 										>
-                      {categories.map((c) => (
-                        <MenuItem key={c.categoryID} value={c.categoryID}>
-                          {c.name}
-                        </MenuItem>
-                      ))}
+											{categories.map((c) => (
+												<MenuItem
+													key={c.categoryID}
+													value={c.categoryID}
+												>
+													{c.name}
+												</MenuItem>
+											))}
 										</Select>
 									</FormControl>
 								</Grid>
