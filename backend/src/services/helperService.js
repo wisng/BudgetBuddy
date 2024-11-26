@@ -13,12 +13,13 @@ const updateBudget = async (budgetID, userID) => {
 	let totalExpenses = 0;
 	let financialHealthScore = 0;
 
-	for (const transaction of transactions) {
-		totalBalance += transaction.amount;
+	for (const transaction of transactions) {	
 		if (transaction.transactionType === "Income") {
 			totalIncome += transaction.amount;
+			totalBalance += transaction.amount;
 		} else if (transaction.transactionType === "Expense") {
 			totalExpenses += transaction.amount;
+			totalBalance -= transaction.amount;
 		}
 	}
 	if (totalBalance !== 0 && totalExpenses !== 0) {
