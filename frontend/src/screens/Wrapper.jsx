@@ -183,10 +183,12 @@ const Wrapper = ({ Component }) => {
     if (!token) {
       changeScreen("/");
     }
+    
     if (selectedBudget || refresh) {
       fetchAllCategories(selectedBudget.budgetID);
       fetchAllGoals(selectedBudget.budgetID);
       fetchAllUsers(selectedBudget.budgetID);
+      setRefresh(false);
     } else {
       fetchAllBudgets();
     }

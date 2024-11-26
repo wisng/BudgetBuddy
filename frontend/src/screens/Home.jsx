@@ -300,7 +300,13 @@ const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh 
         setShowModal={setShowCategoryModal}
         setRefresh={setRefresh}
       />
-      <AddUserModal showModal={showUserModal} setShowModal={setShowUserModal} />
+      <AddUserModal
+        budgetID={budget.budgetID}
+        users={users}
+        showModal={showUserModal}
+        setShowModal={setShowUserModal}
+        setRefresh={setRefresh}
+      />
     </Box>
   );
 };
