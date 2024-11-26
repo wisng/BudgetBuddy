@@ -180,11 +180,9 @@ const Wrapper = ({ Component }) => {
 
   useEffect(() => {
     let token = localStorage.getItem("jwt-token");
-    console.log("TOKEN", token);
     if (!token) {
       changeScreen("/");
     }
-    console.log(selectedBudget);
     if (selectedBudget || refresh) {
       fetchAllCategories(selectedBudget.budgetID);
       fetchAllGoals(selectedBudget.budgetID);

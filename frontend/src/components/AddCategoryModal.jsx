@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   TextField,
@@ -9,18 +9,48 @@ import {
   InputLabel,
   MenuItem,
   Paper,
+  Alert,
   Grid2 as Grid,
 } from "@mui/material";
 import { MuiColorInput } from "mui-color-input";
+import customAxiosInstance from "../utils/customAxiosInstance";
 
-const AddCategoryModal = ({ showModal, setShowModal }) => {
-  const [type, setType] = useState();
-  const [title, setTitle] = useState("");
+const AddCategoryModal = ({ budgetID, showModal, setShowModal, setRefresh }) => {
+  // const [type, setType] = useState("");
+  const [name, setName] = useState("");
   const [colour, setColour] = useState("#7459D9");
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
-  const handleSubmit = () => {
-    console.log(type, colour, title);
+  const handleSubmit = async () => {
+    try {
+      console.log(type, colour, name);
+      if (!colour || !name) {
+        setError("Missing information. Please fill all fields");
+        return;
+      }
+      let payload = {
+        name,
+        colour,
+        isCustom: true,
+      };
+      console.log(payload);
+      const res = await customAxiosInstance.post(`/budget/${budgetID}/category`, payload);
+      setError(null);
+      setRefresh(true);
+      setSuccess("Successfully added category");
+      setName("");
+      setColour("#7459D9");
+    } catch (err) {
+      console.log(err?.response?.data?.error || err.message);
+      setError(err?.response?.data?.error || err.message);
+    }
   };
+
+  useEffect(() => {
+    setError(null);
+    setSuccess(null);
+  }, [showModal]);
 
   return (
     <Modal
@@ -59,7 +89,7 @@ const AddCategoryModal = ({ showModal, setShowModal }) => {
               }}
             >
               <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
-                <Grid size={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                {/* <Grid size={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                   <FormControl sx={{ width: "100%" }} size="small">
                     <InputLabel id="type-select-label">Type</InputLabel>
                     <Select
@@ -74,7 +104,7 @@ const AddCategoryModal = ({ showModal, setShowModal }) => {
                       <MenuItem value="Income">Income</MenuItem>
                     </Select>
                   </FormControl>
-                </Grid>
+                </Grid> */}
                 <Grid size={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                   <MuiColorInput
                     format="hex"
@@ -95,11 +125,11 @@ const AddCategoryModal = ({ showModal, setShowModal }) => {
 
               <TextField
                 fullWidth
-                label="Title"
+                label="Name"
                 margin="normal"
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 size="small"
                 sx={{
                   marginTop: 3,
@@ -110,6 +140,17 @@ const AddCategoryModal = ({ showModal, setShowModal }) => {
                   },
                 }}
               />
+
+              <Grid
+                container
+                spacing={0}
+                sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
+              >
+                <Grid size={12}>
+                  {error && <Alert severity="error">{error}</Alert>}
+                  {success && <Alert severity="success">{success}</Alert>}
+                </Grid>
+              </Grid>
 
               <Grid
                 container

@@ -160,8 +160,6 @@ const Transactions = ({ budget, goals, categories, users }) => {
     setShowTransactionModal(true);
   };
 
-  console.log("goals", goals);
-  console.log("categories", categories);
   return (
     <Grid container spacing={2} sx={{ marginBottom: 5 }}>
       <Grid size={2} sx={{}}></Grid>

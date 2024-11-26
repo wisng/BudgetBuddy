@@ -294,7 +294,12 @@ const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh 
         setShowModal={setShowGoalModal}
         setRefresh={setRefresh}
       />
-      <AddCategoryModal showModal={showCategoryModal} setShowModal={setShowCategoryModal} />
+      <AddCategoryModal
+        budgetID={budget.budgetID}
+        showModal={showCategoryModal}
+        setShowModal={setShowCategoryModal}
+        setRefresh={setRefresh}
+      />
       <AddUserModal showModal={showUserModal} setShowModal={setShowUserModal} />
     </Box>
   );
