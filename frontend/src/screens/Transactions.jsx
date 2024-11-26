@@ -130,7 +130,7 @@ const EXPENSE_TRANSACTIONS = [
   },
 ];
 
-const Transactions = ({ budget, goals, categories }) => {
+const Transactions = ({ budget, goals, categories, users }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [currTransaction, setCurrTransaction] = useState();
 
@@ -160,6 +160,8 @@ const Transactions = ({ budget, goals, categories }) => {
     setShowTransactionModal(true);
   };
 
+  console.log("goals", goals);
+  console.log("categories", categories);
   return (
     <Grid container spacing={2} sx={{ marginBottom: 5 }}>
       <Grid size={2} sx={{}}></Grid>
@@ -243,6 +245,7 @@ const Transactions = ({ budget, goals, categories }) => {
         showModal={showTransactionModal}
         setShowModal={setShowTransactionModal}
         categories={categories}
+        users={users}
         transaction={currTransaction}
       />
     </Grid>

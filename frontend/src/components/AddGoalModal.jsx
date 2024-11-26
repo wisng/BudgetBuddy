@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   TextField,
@@ -12,30 +12,65 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Avatar,
   Paper,
   InputAdornment,
   IconButton,
   OutlinedInput,
+  Alert,
   Grid2 as Grid,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import customAxiosInstance from "../utils/customAxiosInstance";
 
-const USERS = ["User 1", "User 2", "User 3"];
+const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefresh }) => {
+  const [category, setCategory] = useState("");
+  const [spendingLimit, setSpendingLimit] = useState("");
+  const [endDate, setEndDate] = useState(null);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
-const AddGoalModal = ({ showModal, setShowModal }) => {
-  const [category, setCategory] = useState();
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState();
-  const [date, setDate] = useState();
-  const [user, setUser] = useState("User 1");
-  const [users, setUsers] = useState(["User 1"]);
+  useEffect(() => {
+    setError(null);
+    setSuccess(null);
+  }, [showModal]);
 
-  const handleSubmit = () => {
-    console.log(category, title, amount, date, user, users);
+  const handleSubmit = async () => {
+    try {
+      console.log(category, spendingLimit, endDate);
+      if (!category || !spendingLimit || !endDate) {
+        setError("Missing information. Please fill all fields");
+        return;
+      }
+
+      const todayStart = new Date(); // Get the current date
+      todayStart.setHours(0, 0, 0, 0); // Set time to the beginning of the day (00:00:00)
+
+      if (endDate <= todayStart) {
+        setError("End Date must be after today's date");
+        return;
+      }
+      let payload = {
+        categoryID: category,
+        spendingLimit: spendingLimit,
+        currAmount: 0,
+        currDate: new Date().toISOString().split("T")[0],
+        endDate: endDate.toISOString().split("T")[0],
+      };
+      console.log(payload);
+      const res = await customAxiosInstance.post(`/budget/${budgetID}/spendingGoal`, payload);
+      setError(null);
+      setRefresh(true);
+      setSuccess("Successfully added goal");
+      setSpendingLimit("");
+      setCategory("");
+      setEndDate(null);
+    } catch (err) {
+      console.log(err?.response?.data?.error || err.message);
+      setError(err?.response?.data?.error || err.message);
+    }
   };
 
   return (
@@ -58,7 +93,7 @@ const AddGoalModal = ({ showModal, setShowModal }) => {
           marginTop: 5,
         }}
       >
-        <Grid container spacing={0} sx={{ minHeight: "500px" }}>
+        <Grid container spacing={0} sx={{ minHeight: "300px" }}>
           <Grid size={1}></Grid>
           <Grid size={10} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <Paper
@@ -86,42 +121,28 @@ const AddGoalModal = ({ showModal, setShowModal }) => {
                       sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
                       onChange={(e) => setCategory(e.target.value)}
                     >
-                      <MenuItem value="Expense">Expense</MenuItem>
-                      <MenuItem value="Income">Income</MenuItem>
+                      {categories.map((c) => (
+                        <MenuItem key={c.categoryID} value={c.categoryID}>
+                          {/* <Avatar sx={{ bgcolor: c.colour, marginRight: 3 }}>{c.icon}</Avatar> */}
+                          {c.name}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
               </Grid>
 
-              <TextField
-                fullWidth
-                label="Title"
-                margin="normal"
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                size="small"
-                sx={{
-                  marginTop: 3,
-                  borderRadius: 16,
-                  boxShadow: "inset 0px 4px 8px rgba(0, 0, 0, 0.3)", // Root class for the input field
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 16,
-                  },
-                }}
-              />
-
               <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
                 <Grid size={6}>
                   <FormControl fullWidth>
-                    <InputLabel htmlFor="amount">Amount</InputLabel>
+                    <InputLabel htmlFor="spendingLimit">Spending Limit</InputLabel>
                     <OutlinedInput
-                      id="amount"
+                      id="spendingLimit"
                       placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      value={spendingLimit}
+                      onChange={(e) => setSpendingLimit(e.target.value)}
                       startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                      label="Amount"
+                      label="Spending Limit"
                       size="small"
                       sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
                     />
@@ -130,9 +151,9 @@ const AddGoalModal = ({ showModal, setShowModal }) => {
                 <Grid size={6}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
-                      label="Date"
-                      value={date}
-                      onChange={(newValue) => setDate(newValue)}
+                      label="End Date"
+                      value={endDate}
+                      onChange={(newValue) => setEndDate(newValue)}
                       slotProps={{
                         textField: {
                           size: "small",
@@ -146,61 +167,17 @@ const AddGoalModal = ({ showModal, setShowModal }) => {
                   </LocalizationProvider>
                 </Grid>
               </Grid>
-
-              <Grid container spacing={0} sx={{ marginTop: 3, width: "100%", background: "transparent" }}>
+              <Grid
+                container
+                spacing={0}
+                sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
+              >
                 <Grid size={12}>
-                  <FormControl sx={{ width: "100%" }} size="small">
-                    <InputLabel id="users-select-label">Users</InputLabel>
-                    <Select
-                      labelId="users-select-label"
-                      id="users-select"
-                      value={user}
-                      label="Users"
-                      sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
-                      onChange={(e) => {
-                        setUser(e.target.value);
-                        if (!users.includes(e.target.value)) {
-                          setUsers([...users, e.target.value]);
-                        }
-                      }}
-                    >
-                      {USERS.map((u, i) => (
-                        <MenuItem key={i} value={u}>
-                          {u}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <Paper elevation={3} sx={{ borderRadius: 10, marginTop: 3 }}>
-                    <List>
-                      {users.map((user, idx) => (
-                        <ListItem
-                          key={idx}
-                          secondaryAction={
-                            <IconButton
-                              edge="end"
-                              aria-label="delete"
-                              onClick={() => {
-                                setUsers(users.filter((u) => u !== user));
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          }
-                        >
-                          <ListItemAvatar>
-                            {/* <Avatar> */}
-                            <AccountCircleIcon />
-                            {/* </Avatar> */}
-                          </ListItemAvatar>
-                          <ListItemText primary={user} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Paper>
+                  {error && <Alert severity="error">{error}</Alert>}
+                  {success && <Alert severity="success">{success}</Alert>}
                 </Grid>
               </Grid>
+
               <Grid
                 container
                 spacing={0}

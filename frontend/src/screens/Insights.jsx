@@ -2,7 +2,7 @@ import React from "react";
 import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
 import MonthPicker from "../components/MonthPicker";
 
-const Insights = ({ budget, goals }) => {
+const Insights = ({ budget }) => {
   return (
     <Box>
       <Grid container spacing={2}>

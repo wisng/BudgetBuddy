@@ -19,38 +19,32 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 import customAxiosInstance from "../utils/customAxiosInstance";
 
-const Home = ({ budget, goals, setSelectedBudget }) => {
+const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
-  const [categories, setCategories] = useState([]);
-
-  console.log(budget);
-
-  const fetchCategories = async () => {
-    try {
-      const res = await customAxiosInstance.get(`/budget/${budget.budgetID}/categories`);
-      setCategories(res.data);
-    }
-    catch (err) {
-      console.error(err.response?.data?.error || err.message);
-    }
-  }
 
   const updateCurrentBudget = async () => {
     try {
       const res = await customAxiosInstance.get(`/budget/${budget.budgetID}`);
       setSelectedBudget(res.data);
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err.response?.data?.error || err.message);
     }
-  }
+  };
+
+  const getCategoryName = (categoryID, categories) => {
+    for (let c of categories) {
+      if (c.categoryID === categoryID) {
+        return c.name;
+      }
+    }
+  };
 
   useEffect(() => {
-    fetchCategories();
-    console.log("categories", categories);
+    // fetchCategories();
+    // console.log("categories", categories);
   }, []);
 
   return (
@@ -225,7 +219,7 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
           spacing={1}
           sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center" }}
         >
-          <Paper elevation={3} sx={{ minHeight: "300px", width: "100%", borderRadius: "20px" }}>
+          <Paper elevation={3} sx={{ height: "100%", minHeight: "300px", width: "100%", borderRadius: "20px" }}>
             <Grid container>
               <Grid size={2} sx={{}}></Grid>
               <Grid size={8} sx={{}}>
@@ -235,7 +229,7 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
             </Grid>
 
             {goals.map((g, i) => {
-              let percentage = Math.round((g.currAmount / g.limit) * 100);
+              let percentage = Math.round((g.currAmount / g.spendingLimit) * 100);
 
               // Cap at 100% if currAmount exceeds limit
               if (percentage > 100) percentage = 100;
@@ -269,13 +263,13 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
                     sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}
                   >
                     <Typography gutterBottom sx={{ color: "text.secondary", fontSize: 14 }}>
-                      {g.title}
+                      {getCategoryName(g.categoryID, categories)}
                     </Typography>
 
                     <Typography variant="h5">
-                      <AttachMoneyIcon fontSize="small" /> {g.currAmount}/{g.limit}
+                      <AttachMoneyIcon fontSize="small" /> {g.currAmount}/{g.spendingLimit}
                     </Typography>
-                    <Typography variant="body2">{g.endDate}</Typography>
+                    <Typography variant="body2">{g.endDate.split("T")[0]}</Typography>
                   </Grid>
                   <Grid size={2}></Grid>
                 </Grid>
@@ -285,8 +279,21 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
         </Grid>
         <Grid size={2} sx={{}}></Grid>
       </Grid>
-      <AddTransactionModal budgetID={budget.budgetID} categories={categories} updateCurrentBudget={updateCurrentBudget} showModal={showTransactionModal} setShowModal={setShowTransactionModal} />
-      <AddGoalModal showModal={showGoalModal} setShowModal={setShowGoalModal} />
+      <AddTransactionModal
+        budgetID={budget.budgetID}
+        categories={categories}
+        users={users}
+        updateCurrentBudget={updateCurrentBudget}
+        showModal={showTransactionModal}
+        setShowModal={setShowTransactionModal}
+      />
+      <AddGoalModal
+        budgetID={budget.budgetID}
+        categories={categories}
+        showModal={showGoalModal}
+        setShowModal={setShowGoalModal}
+        setRefresh={setRefresh}
+      />
       <AddCategoryModal showModal={showCategoryModal} setShowModal={setShowCategoryModal} />
       <AddUserModal showModal={showUserModal} setShowModal={setShowUserModal} />
     </Box>
