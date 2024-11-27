@@ -28,6 +28,7 @@ import customAxiosInstance from "../utils/customAxiosInstance";
 const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefresh }) => {
   const [category, setCategory] = useState("");
   const [spendingLimit, setSpendingLimit] = useState("");
+  const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -39,23 +40,20 @@ const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefres
 
   const handleSubmit = async () => {
     try {
-      if (!category || !spendingLimit || !endDate) {
+      if (!category || !spendingLimit || !startDate || !endDate) {
         setError("Missing information. Please fill all fields");
         return;
       }
 
-      const todayStart = new Date(); // Get the current date
-      todayStart.setHours(0, 0, 0, 0); // Set time to the beginning of the day (00:00:00)
-
-      if (endDate <= todayStart) {
-        setError("End Date must be after today's date");
+      if (endDate <= startDate) {
+        setError("End Date must be after Start Date");
         return;
       }
       let payload = {
         categoryID: category,
         spendingLimit: spendingLimit,
         currAmount: 0,
-        currDate: new Date().toISOString().split("T")[0],
+        startDate: startDate.toISOString().split("T")[0],
         endDate: endDate.toISOString().split("T")[0],
       };
       const res = await customAxiosInstance.post(`/budget/${budgetID}/spendingGoal`, payload);
@@ -64,6 +62,7 @@ const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefres
       setSuccess("Successfully added goal");
       setSpendingLimit("");
       setCategory("");
+      setStartDate(null);
       setEndDate(null);
     } catch (err) {
       console.log(err?.response?.data?.error || err.message);
@@ -132,19 +131,22 @@ const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefres
 
               <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
                 <Grid size={6}>
-                  <FormControl fullWidth>
-                    <InputLabel htmlFor="spendingLimit">Spending Limit</InputLabel>
-                    <OutlinedInput
-                      id="spendingLimit"
-                      placeholder="0.00"
-                      value={spendingLimit}
-                      onChange={(e) => setSpendingLimit(e.target.value)}
-                      startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                      label="Spending Limit"
-                      size="small"
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="Start Date"
+                      value={startDate}
+                      onChange={(newValue) => setStartDate(newValue)}
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          InputProps: {
+                            sx: { borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }, // Apply the styles here
+                          },
+                        },
+                      }}
                       sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
                     />
-                  </FormControl>
+                  </LocalizationProvider>
                 </Grid>
                 <Grid size={6}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -163,6 +165,23 @@ const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefres
                       sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
                     />
                   </LocalizationProvider>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
+                <Grid size={6}>
+                  <FormControl fullWidth>
+                    <InputLabel htmlFor="spendingLimit">Spending Limit</InputLabel>
+                    <OutlinedInput
+                      id="spendingLimit"
+                      placeholder="0.00"
+                      value={spendingLimit}
+                      onChange={(e) => setSpendingLimit(e.target.value)}
+                      startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                      label="Spending Limit"
+                      size="small"
+                      sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
+                    />
+                  </FormControl>
                 </Grid>
               </Grid>
               <Grid

@@ -257,10 +257,11 @@ const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh 
                       {getCategoryName(g.categoryID, categories)}
                     </Typography>
 
-                    <Typography variant="h5">
+                    <Typography variant="h6">
                       <AttachMoneyIcon fontSize="small" /> {g.currAmount}/{g.spendingLimit}
                     </Typography>
-                    <Typography variant="body2">{g.endDate.split("T")[0]}</Typography>
+                    <Typography variant="body2">Start: {g.startDate.split("T")[0]}</Typography>
+                    <Typography variant="body2">End: {g.endDate.split("T")[0]}</Typography>
                   </Grid>
                   <Grid size={2}></Grid>
                 </Grid>

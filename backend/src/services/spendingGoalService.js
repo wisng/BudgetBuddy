@@ -31,7 +31,38 @@ const getSpendingGoal = async (budgetID, spendingGoalID, userID) => {
 	return new Promise((resolve, reject) => {
 		db.query(query, [spendingGoalID, budget.budgetID], (error, results) => {
 			if (error) return reject(error);
-			resolve(results[0]);
+			const goal = results[0];
+			const currAmountQuery = `
+				SELECT SUM(amount) AS totalExpenses
+				FROM Transaction
+				WHERE transactionType = 'Expense'
+				AND categoryID = ?
+				AND date BETWEEN ? AND ?
+				AND budgetID = ?;
+			`;
+
+			const currAmountParams = [goal.categoryID, goal.startDate, goal.endDate, budgetID];
+			db.query(currAmountQuery, currAmountParams, (error, results) => {
+				if (error) {
+				return reject(error);
+				}
+				goal.currAmount = results[0]?.totalExpenses || 0; // Return 0 if no expenses found
+
+				const updateCurrAmountQuery = `
+					UPDATE SpendingGoal
+					SET currAmount = ?
+					WHERE spendingGoalID = ?
+				`;
+
+				const updateCurrAmountParams = [goal.currAmount, goal.spendingGoalID];
+				db.query(updateCurrAmountQuery, updateCurrAmountParams, (error) => {
+					if (error) {
+					return reject(error);
+					}
+				});
+
+			});
+			resolve(goal);
 		});
 	});
 };
@@ -56,6 +87,40 @@ const getAllSpendingGoals = async (budgetID, { day, month, year }, userID) => {
 	return new Promise((resolve, reject) => {
 		db.query(query, queryParams, (error, results) => {
 			if (error) return reject(error);
+
+			for (let goal of results){
+				const currAmountQuery = `
+					SELECT SUM(amount) AS totalExpenses
+					FROM Transaction
+					WHERE transactionType = 'Expense'
+					AND categoryID = ?
+					AND date BETWEEN ? AND ?
+					AND budgetID = ?;
+				`;
+
+				const currAmountParams = [goal.categoryID, goal.startDate, goal.endDate, budgetID];
+				db.query(currAmountQuery, currAmountParams, (error, results) => {
+					if (error) {
+					  console.error( error);
+					  return reject(error);
+					}
+					goal.currAmount = results[0]?.totalExpenses || 0; // Return 0 if no expenses found
+
+					const updateCurrAmountQuery = `
+						UPDATE SpendingGoal
+						SET currAmount = ?
+						WHERE spendingGoalID = ?
+					`;
+
+					const updateCurrAmountParams = [goal.currAmount, goal.spendingGoalID];
+					db.query(updateCurrAmountQuery, updateCurrAmountParams, (error) => {
+						if (error) {
+						  return reject(error);
+						}
+					  });
+
+				  });
+			}
 			resolve(results);
 		});
 	});
