@@ -5,13 +5,13 @@ const updateBudget = async (budgetID, userID) => {
 		day: null,
 		month: null,
 		year: null,
-		current: null,
+		current: true,
 	});
 
 	let totalBalance = 0;
 	let totalIncome = 0;
 	let totalExpenses = 0;
-	let financialHealthScore = 0;
+	let financialHealthScore = 50;
 
 	for (const transaction of transactions) {	
 		if (transaction.transactionType === "Income") {
@@ -22,13 +22,30 @@ const updateBudget = async (budgetID, userID) => {
 			totalBalance -= transaction.amount;
 		}
 	}
-	if (totalBalance !== 0 && totalExpenses !== 0) {
-		const savingsRate = (totalBalance - totalExpenses) / totalBalance;
-		const expenseRatio = totalExpenses / totalBalance;
-		const balanceStability = totalBalance / totalExpenses;
 
-		financialHealthScore =
-			(savingsRate + expenseRatio + balanceStability) / 3;
+	if (totalBalance !== 0 && totalExpenses !== 0 && totalIncome !== 0) {
+		
+	
+	  // 1. Calculate Savings Rate as percentage of income
+	  const savingsRate = (totalBalance / totalIncome) * 100; // A higher savings rate contributes positively
+	
+	  // 2. Calculate Expense Ratio, inverted (lower is better)
+	  const expenseRatio = Math.min(Math.max(1 - (totalExpenses / totalBalance), 0), 1); // Cap between 0 and 1
+	  const normalizedExpenseRatio = expenseRatio * 50; // Scale this to contribute up to 50 points
+	
+	  // 3. Calculate Balance Stability (higher balance relative to expenses is better)
+	  const balanceStability = Math.min(Math.max((totalBalance / totalExpenses) * 10, 0), 10); // Cap between 0 and 10
+	  const normalizedBalanceStability = balanceStability * 2; // Scale this to contribute up to 20 points
+	
+	  // Final Financial Health Score as an average of all components
+	  let score = (savingsRate + normalizedExpenseRatio + normalizedBalanceStability) / 100;
+	
+	  // Scale it to a 1-100 score
+	  financialHealthScore = Math.min(Math.max(Math.round(score * 100), 0), 100);
+	}else if (totalIncome > 0 && totalExpenses === 0 ) {
+		financialHealthScore = 100;
+	}else if (totalIncome === 0 && totalExpenses > 0){
+		financialHealthScore = 0;
 	}
 	const query = `UPDATE Budget SET totalBalance = ?, totalIncome = ?, totalExpenses = ?, financialHealthScore = ? WHERE budgetID = ?`;
 	const values = [
@@ -95,31 +112,27 @@ const getAllTransaction = (budgetID, userID, { day, month, year, current }) => {
 	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
 	const queryParams = [userID, budgetID];
 
-	if (year) {
-		query += ` AND YEAR(date) = ?`;
-		queryParams.push(year);
-	}
-
-	if (month) {
-		query += ` AND MONTH(date) = ?`;
-		queryParams.push(month);
-	}
-
-	if (day) {
-		query += ` AND DAY(date) = ?`;
-		queryParams.push(day);
-	}
-
-	// if (!year && !month && !day) {
 	if (current) {
-		const currentDate = new Date();
-		const currentYear = currentDate.getFullYear();
-		const currentMonth = currentDate.getMonth() + 1;
-		const currentDay = currentDate.getDate();
+		query += "AND date <= CURDATE()"
+	}else{
+		if (year) {
+			query += ` AND YEAR(date) = ?`;
+			queryParams.push(year);
+		}
+	
+		if (month) {
+			query += ` AND MONTH(date) = ?`;
+			queryParams.push(month);
+		}
+	
+		if (day) {
+			query += ` AND DAY(date) = ?`;
+			queryParams.push(day);
+		}
 
-		query += ` AND YEAR(date) = ? AND MONTH(date) = ? AND DAY(date) = ?`;
-		queryParams.push(currentYear, currentMonth, currentDay);
 	}
+
+	
 
 	return new Promise((resolve, reject) => {
 		db.query(query, queryParams, (error, results) => {

@@ -230,6 +230,11 @@ const getAllBudgetUsers = (budgetID, userID) => {
 			const query = `SELECT User.userID, User.email, User.username FROM User INNER JOIN UserBudget ON User.userID = UserBudget.userID WHERE UserBudget.budgetID = ?`;
 			db.query(query, [budgetID], (error, results) => {
 				if (error) return reject(error);
+				const currUser  = results.find(user => user.userID === userID);
+				if (currUser) {
+					currUser.current = true; 
+				}
+
 				resolve(results);
 			});
 		});

@@ -25,15 +25,6 @@ const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
 
-  const updateCurrentBudget = async () => {
-    try {
-      const res = await customAxiosInstance.get(`/budget/${budget.budgetID}`);
-      setSelectedBudget(res.data);
-    } catch (err) {
-      console.error(err.response?.data?.error || err.message);
-    }
-  };
-
   const getCategoryName = (categoryID, categories) => {
     for (let c of categories) {
       if (c.categoryID === categoryID) {
@@ -70,7 +61,7 @@ const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh 
 
                 <PieChart
                   // sx={{ position: "absolute", top: "15%", left: "10%" }}
-                  colors={["#FE6C6C", "#FEBD38"]}
+                  colors={["#7459D9", "#EA4335"]}
                   series={[
                     {
                       startAngle: -90,
@@ -283,9 +274,10 @@ const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh 
         budgetID={budget.budgetID}
         categories={categories}
         users={users}
-        updateCurrentBudget={updateCurrentBudget}
+        currUser={users.find((user) => user.current)}
         showModal={showTransactionModal}
         setShowModal={setShowTransactionModal}
+        setRefresh={setRefresh}
       />
       <AddGoalModal
         budgetID={budget.budgetID}

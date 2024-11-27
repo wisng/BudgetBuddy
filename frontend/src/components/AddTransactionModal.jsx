@@ -12,6 +12,7 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Alert,
   Avatar,
   Paper,
   InputAdornment,
@@ -33,25 +34,40 @@ const AddTransactionModal = ({
   budgetID,
   categories,
   users,
-  updateCurrentBudget,
+  currUser,
+  setRefresh,
   transaction = null,
 }) => {
   const [type, setType] = useState("Expense");
   const [recurring, setRecurring] = useState("No");
-  const [category, setCategory] = useState();
+  const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState();
-  const [date, setDate] = useState();
+  const [amount, setAmount] = useState("");
+  const [date, setDate] = useState(null);
   const [user, setUser] = useState("");
-  const [transactionUsers, setTransactionUsers] = useState([]);
-
+  const [transactionUsers, setTransactionUsers] = useState(currUser ? [currUser] : []);
   const [recurrenceStartDate, setRecurrenceStartDate] = useState(null);
   const [recurrenceEndDate, setRecurrenceEndDate] = useState(null);
-  const [recurrenceFrequency, setRecurrenceFrequency] = useState(null);
+  const [recurrenceFrequency, setRecurrenceFrequency] = useState("");
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const handleSubmit = async () => {
     try {
-      const res = await customAxiosInstance.post(`/budget/${budgetID}/transaction`, {
+      if (!title || !category || !amount || !type) {
+        setError("Missing information. Please fill all fields");
+        return;
+      }
+      if (recurring == "Yes") {
+        if (!recurrenceFrequency || !recurrenceStartDate || !recurrenceEndDate) {
+          setError("Missing information. Please fill all fields");
+          return;
+        }
+      } else if (!date) {
+        setError("Missing information. Please fill all fields");
+        return;
+      }
+      let payload = {
         title,
         categoryID: category,
         amount,
@@ -60,28 +76,63 @@ const AddTransactionModal = ({
         recurrenceFrequency,
         recurrenceStartDate,
         recurrenceEndDate,
-      });
-      updateCurrentBudget();
+      };
+
+      if (recurring == "Yes") {
+        payload.date = recurrenceStartDate;
+
+        if (recurrenceStartDate > recurrenceEndDate) {
+          setError("End Date must be after Start Date");
+          return;
+        }
+      }
+      payload.users = [];
+      for (let user of transactionUsers) {
+        payload.users.push(user.userID);
+      }
+      const resp = await customAxiosInstance.post(`/budget/${budgetID}/transaction`, payload);
+      setError(null);
+      setRefresh(true);
+      setSuccess("Successfully added transaction");
+
+      setType("Expense");
+      setRecurring("No");
+      setCategory("");
+      setTitle("");
+      setAmount("");
+      setDate(null);
+      setTransactionUsers(currUser ? [currUser] : []);
+      setRecurrenceStartDate(null);
+      setRecurrenceEndDate(null);
+      setRecurrenceFrequency("");
     } catch (err) {
       console.log(err?.response?.data?.error || err.message);
+      setError("Failed to add transaction");
     }
   };
 
   useEffect(() => {
+    setError(null);
+    setSuccess(null);
     if (transaction) {
       let category = getCategory(transaction.categoryID, categories);
       setType(transaction.type || "Expense");
-      setRecurring(transaction.recurringEndDate ? "Yes" : "No");
+      setRecurring(transaction.recurrenceEndDate ? "Yes" : "No");
       setCategory(category ? category.name : "");
       setTitle(transaction.title || "");
-      setAmount(transaction.amount || 0);
-      setDate(dayjs(transaction.date));
-      setTransactionUsers(transaction.users || []);
+      setAmount(transaction.amount || "");
+      setDate(transaction.date ? dayjs(transaction.date) : null);
+      setTransactionUsers(currUser ? [currUser] : []);
+      setRecurrenceStartDate(transaction.recurrenceStartDate ? dayjs(transaction.recurrenceStartDate) : null);
+      setRecurrenceEndDate(transaction.recurrenceEndDate ? dayjs(transaction.recurrenceEndDate) : null);
+      setRecurrenceFrequency(transaction.recurrenceFrequency || "");
     }
-  }, [transaction]);
+    if (currUser) {
+      setTransactionUsers([currUser]);
+    }
+  }, [transaction, showModal, currUser]);
 
   const getCategory = (categoryID, categories) => {
-    console.log("categoreis", categories);
     for (let c of categories) {
       if (c.categoryID === categoryID) {
         return c;
@@ -381,14 +432,15 @@ const AddTransactionModal = ({
                       }}
                       onChange={(e) => {
                         setUser(e.target.value);
-                        if (!transactionUsers.includes(e.target.value)) {
+                        let found = transactionUsers.find((user) => user.userID == e.target.value.userID);
+                        if (!found) {
                           setTransactionUsers([...transactionUsers, e.target.value]);
                         }
                       }}
                     >
                       {users &&
                         users.map((u, i) => (
-                          <MenuItem key={i} value={u.username}>
+                          <MenuItem key={i} value={u}>
                             {u.username}
                           </MenuItem>
                         ))}
@@ -405,7 +457,9 @@ const AddTransactionModal = ({
                               edge="end"
                               aria-label="delete"
                               onClick={() => {
-                                setTransactionUsers(transactionUsers.filter((u) => u !== user));
+                                if (!user.current) {
+                                  setTransactionUsers(transactionUsers.filter((u) => u.userID !== user.userID));
+                                }
                               }}
                             >
                               <DeleteIcon />
@@ -417,13 +471,25 @@ const AddTransactionModal = ({
                             <AccountCircleIcon />
                             {/* </Avatar> */}
                           </ListItemAvatar>
-                          <ListItemText primary={user} />
+                          <ListItemText primary={user.username} />
                         </ListItem>
                       ))}
                     </List>
                   </Paper>
                 </Grid>
               </Grid>
+
+              <Grid
+                container
+                spacing={0}
+                sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
+              >
+                <Grid size={12}>
+                  {error && <Alert severity="error">{error}</Alert>}
+                  {success && <Alert severity="success">{success}</Alert>}
+                </Grid>
+              </Grid>
+
               <Grid
                 container
                 spacing={0}

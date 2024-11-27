@@ -39,7 +39,6 @@ const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefres
 
   const handleSubmit = async () => {
     try {
-      console.log(category, spendingLimit, endDate);
       if (!category || !spendingLimit || !endDate) {
         setError("Missing information. Please fill all fields");
         return;
@@ -59,7 +58,6 @@ const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefres
         currDate: new Date().toISOString().split("T")[0],
         endDate: endDate.toISOString().split("T")[0],
       };
-      console.log(payload);
       const res = await customAxiosInstance.post(`/budget/${budgetID}/spendingGoal`, payload);
       setError(null);
       setRefresh(true);
@@ -69,7 +67,7 @@ const AddGoalModal = ({ budgetID, categories, showModal, setShowModal, setRefres
       setEndDate(null);
     } catch (err) {
       console.log(err?.response?.data?.error || err.message);
-      setError(err?.response?.data?.error || err.message);
+      setError("Failed to add goal");
     }
   };
 

@@ -1,5 +1,39 @@
 const db = require("../../config/db");
 const helperService = require("./helperService");
+const { format, addDays, addWeeks, addMonths, addYears } = require('date-fns');
+
+const generateRecurringDates = (startDate, endDate, frequency)=>{
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const dates = [];
+    let current = start;
+
+    while (current <= end) {
+        dates.push(format(current, 'yyyy-MM-dd'));
+
+        switch (frequency) {
+            case 'DAILY':
+                current = addDays(current, 1);
+                break;
+            case 'WEEKLY':
+                current = addWeeks(current, 1);
+                break;
+            case 'BI-WEEKLY':
+                current = addWeeks(current, 2);
+                break;
+            case 'MONTHLY':
+                current = addMonths(current, 1);
+                break;
+            case 'YEARLY':
+                current = addYears(current, 1);
+                break;
+            default:
+                throw new Error(`Unknown frequency: ${frequency}`);
+        }
+    }
+
+    return dates;
+}
 
 const createTransaction = async (budgetID, transaction, userID) => {
 	const transactionQuery = `
@@ -7,33 +41,54 @@ const createTransaction = async (budgetID, transaction, userID) => {
 	  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`;
 
-	const transactionValues = [
-		budgetID,
-		transaction.title,
-		transaction.categoryID,
-		parseFloat(transaction.amount),
-		transaction.date.split("T")[0],
-		transaction.transactionType,
-		transaction.recurrenceFrequency || null,
-		transaction.recurrenceStartDate ? transaction.recurrenceStartDate.split("T")[0] : null,
-		transaction.recurrenceEndDate ? transaction.recurrenceEndDate.split("T")[0] : null,
-	];
+	let dates = []
 
-	await new Promise((resolve, reject) => {
-		db.query(transactionQuery, transactionValues, (error, results) => {
-			if (error) return reject(error);
+	if (transaction.recurrenceFrequency && transaction.recurrenceStartDate && transaction.recurrenceEndDate ){
+		dates = generateRecurringDates(transaction.recurrenceStartDate, transaction.recurrenceEndDate, transaction.recurrenceFrequency);
+		
+	}else{
+		dates.push(transaction.date.split("T")[0])
+	}
 
-			const userTransactionQuery = `INSERT INTO UserTransaction (userID, transactionID) VALUES (?, ?)`;
-			const userTransactionValues = [userID, results.insertId];
+	for (let date of dates){
+		const transactionValues = [
+			budgetID,
+			transaction.title,
+			transaction.categoryID,
+			parseFloat(transaction.amount),
+			date,
+			transaction.transactionType,
+			transaction.recurrenceFrequency || null,
+			transaction.recurrenceStartDate ? transaction.recurrenceStartDate.split("T")[0] : null,
+			transaction.recurrenceEndDate ? transaction.recurrenceEndDate.split("T")[0] : null,
+		];
 
-			db.query(userTransactionQuery, userTransactionValues, (error) => {
-				if (error) return reject(error);
-				resolve({ transactionID: results.insertId, ...transaction });
+
+		await new Promise((resolve, reject) => {
+			db.query(transactionQuery, transactionValues, (error, results) => {
+				if (error) {
+					reject(error);
+				}
+				for (let userID of transaction.users){
+					const userTransactionQuery = `INSERT INTO UserTransaction (userID, transactionID) VALUES (?, ?)`;
+					const userTransactionValues = [userID, results.insertId];
+					
+					db.query(userTransactionQuery, userTransactionValues, (error) => {
+						if (error) {
+							reject(error);
+						}else{
+							resolve()
+						}
+
+					});
+					
+				}
 			});
 		});
-	});
-
+	}
+	
 	return await helperService.updateBudget(budgetID, userID);
+	
 };
 
 const getTransaction = (transactionID, userID) => {

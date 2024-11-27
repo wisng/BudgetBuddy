@@ -167,6 +167,15 @@ const Wrapper = ({ Component }) => {
     }
   };
 
+  const updateCurrentBudget = async (budgetID) => {
+    try {
+      const res = await customAxiosInstance.get(`/budget/${budgetID}`);
+      setSelectedBudget(res.data);
+    } catch (err) {
+      console.error(err.response?.data?.error || err.message);
+    }
+  };
+
   const addCategoryIcon = (categories) => {
     let result = [];
     for (let c of categories) {
@@ -183,7 +192,11 @@ const Wrapper = ({ Component }) => {
     if (!token) {
       changeScreen("/");
     }
-    
+
+    if (selectedBudget && refresh) {
+      updateCurrentBudget(selectedBudget.budgetID);
+    }
+
     if (selectedBudget || refresh) {
       fetchAllCategories(selectedBudget.budgetID);
       fetchAllGoals(selectedBudget.budgetID);
@@ -192,7 +205,7 @@ const Wrapper = ({ Component }) => {
     } else {
       fetchAllBudgets();
     }
-  }, [selectedBudget, refresh]);
+  }, [refresh, selectedBudget]);
 
   if (budgets.length === 0) {
     return <div>Loading budget...</div>;

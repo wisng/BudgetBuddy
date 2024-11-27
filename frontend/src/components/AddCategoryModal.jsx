@@ -24,7 +24,6 @@ const AddCategoryModal = ({ budgetID, showModal, setShowModal, setRefresh }) => 
 
   const handleSubmit = async () => {
     try {
-      console.log(type, colour, name);
       if (!colour || !name) {
         setError("Missing information. Please fill all fields");
         return;
@@ -34,7 +33,6 @@ const AddCategoryModal = ({ budgetID, showModal, setShowModal, setRefresh }) => 
         colour,
         isCustom: true,
       };
-      console.log(payload);
       const res = await customAxiosInstance.post(`/budget/${budgetID}/category`, payload);
       setError(null);
       setRefresh(true);
@@ -43,7 +41,7 @@ const AddCategoryModal = ({ budgetID, showModal, setShowModal, setRefresh }) => 
       setColour("#7459D9");
     } catch (err) {
       console.log(err?.response?.data?.error || err.message);
-      setError(err?.response?.data?.error || err.message);
+      setError("Failed to add category");
     }
   };
 
