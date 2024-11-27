@@ -130,7 +130,7 @@ const EXPENSE_TRANSACTIONS = [
   },
 ];
 
-const Transactions = ({ budget, goals, categories, users }) => {
+const Transactions = ({ budget, categories, users, transactions }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [currTransaction, setCurrTransaction] = useState();
 
@@ -187,7 +187,7 @@ const Transactions = ({ budget, goals, categories, users }) => {
               </Typography>
             </Box>
 
-            {sortTransactionsByDate(INCOME_TRANSACTIONS).map((t, i) => (
+            {sortTransactionsByDate(transactions.filter((t) => t.transactionType === "Income")).map((t, i) => (
               <Box
                 key={i}
                 sx={{
@@ -199,7 +199,7 @@ const Transactions = ({ budget, goals, categories, users }) => {
                 }}
               >
                 <Typography variant="subtitle2" sx={{ marginTop: 3, fontWeight: "bold" }}>
-                  {t[0].date}
+                  {t[0].date.split("T")[0]}
                 </Typography>
                 <TransactionGroup type="Income" categories={categories} transactions={t} handleClick={handleClick} />
               </Box>
@@ -218,7 +218,7 @@ const Transactions = ({ budget, goals, categories, users }) => {
                 Expense
               </Typography>
             </Box>
-            {sortTransactionsByDate(EXPENSE_TRANSACTIONS).map((t, i) => (
+            {sortTransactionsByDate(transactions.filter((t) => t.transactionType === "Expense")).map((t, i) => (
               <Box
                 key={i}
                 sx={{
@@ -230,7 +230,7 @@ const Transactions = ({ budget, goals, categories, users }) => {
                 }}
               >
                 <Typography variant="subtitle2" sx={{ marginTop: 3, fontWeight: "bold" }}>
-                  {t[0].date}
+                  {t[0].date.split("T")[0]}
                 </Typography>
                 <TransactionGroup type="Expense" categories={categories} transactions={t} handleClick={handleClick} />
               </Box>

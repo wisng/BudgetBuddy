@@ -39,47 +39,71 @@ const createBudget = async (userID, budgetData = null) => {
 	const budgetID = await new Promise((resolve, reject) => {
 		db.query(budgetQuery, budgetValues, (error, budgetResults) => {
 			if (error) return reject(error);
+			resolve(budgetResults.insertId)
+		});
+	})
 
-			const userBudgetQuery = `
-		  INSERT INTO UserBudget (userID, budgetID) VALUES (?, ?)
-		`;
-			const userBudgetValues = [
-				userID,
-				budgetResults.insertId,
-			];
-
-			db.query(userBudgetQuery, userBudgetValues, (error) => {
-				if (error) return reject(error);
-				resolve(budgetResults.insertId);
-			});
+	await new Promise((resolve, reject)=>{
+		const userBudgetQuery = `INSERT INTO UserBudget (userID, budgetID) VALUES (?, ?)`;
+		db.query(userBudgetQuery, [userID, budgetID], async(error) => {
+			if (error) return reject(error);
+			resolve()
 		});
 	});
-	if (budgetData && budgetData.initialBalance > 0) {
-		const category = await helperService.createCategory(
-			{
-				name: "Initial Balance",
-				colour: "#808080",
-				isCustom: false,
-				budgetID: budgetID,
-			},
-			userID
-		);
-		await helperService.createTransaction(
-			budgetID,
-			{
-				title: "Initial Balance",
-				categoryID: category.insertId,
-				amount: budgetData.initialBalance,
-				date: new Date(),
-				transactionType: "Income",
-				recurrenceFrequency: null,
-				recurrenceStartDate: null,
-				recurrenceEndDate: null,
-			},
-			userID
-		);
+
+	const categoryData = [
+		{
+			name: "Entertainment",
+			colour: "#00FF00",
+			isCustom: false,
+			budgetID: budgetID,
+		},
+		{
+			name: "Shopping",
+			colour: "#FF0000",
+			isCustom: false,
+			budgetID: budgetID,
+		},
+		{
+			name: "Dining Out",
+			colour: "#0000FF",
+			isCustom: false,
+			budgetID: budgetID,
+		},
+		{
+			name: "Transportation",
+			colour: "#00FFFF",
+			isCustom: false,
+			budgetID: budgetID,
+		},
+		{
+			name: "Initial Balance",
+			colour: "#808080",
+			isCustom: false,
+			budgetID: budgetID,
+		}
+	];
+	for (const category of categoryData) {
+		const categoryRes = await helperService.createCategory(category, userID);
+		if (category.name == "Initial Balance" && budgetData && budgetData.initialBalance > 0) {
+			await helperService.createTransaction(
+				budgetID,
+				{
+					title: "Initial Balance",
+					categoryID: categoryRes.insertId,
+					amount: budgetData.initialBalance,
+					date: new Date(),
+					transactionType: "Income",
+					recurrenceFrequency: null,
+					recurrenceStartDate: null,
+					recurrenceEndDate: null,
+				},
+				userID
+			);
+		}
 	}
-	return budgetID;
+	return budgetID
+	
 };
 
 const getBudget = (budgetID, userID) => {

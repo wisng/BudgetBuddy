@@ -58,7 +58,9 @@ const updateBudget = async (budgetID, userID) => {
 
 	return new Promise((resolve, reject) => {
 		db.query(query, values, (error) => {
-			if (error) return reject(error);
+			if (error){
+				return reject(error);
+			} 
 			resolve({ budgetID, ...values });
 		});
 	});
@@ -83,7 +85,7 @@ const createTransaction = async (budgetID, transaction, userID) => {
 		budgetID,
 		transaction.title,
 		transaction.categoryID,
-		transaction.amount,
+		parseFloat(transaction.amount),
 		transaction.date,
 		transaction.transactionType,
 		transaction.recurrenceFrequency || null,
@@ -113,7 +115,7 @@ const getAllTransaction = (budgetID, userID, { day, month, year, current }) => {
 	const queryParams = [userID, budgetID];
 
 	if (current) {
-		query += "AND date <= CURDATE()"
+		query += " AND date <= CURDATE()"
 	}else{
 		if (year) {
 			query += ` AND YEAR(date) = ?`;

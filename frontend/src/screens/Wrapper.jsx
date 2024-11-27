@@ -112,23 +112,29 @@ const CATEGORIES = [
 ];
 
 const Wrapper = ({ Component }) => {
-  const [account, setAccount] = useState("My Budgets");
+  const [account, setAccount] = useState("My Budget");
   const [budgets, setBudgets] = useState([]);
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [goals, setGoals] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [users, setUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
   const changeScreen = useNavigate();
 
-  const fetchAllBudgets = async () => {
+  const fetchAllBudgets = async (title = null) => {
     try {
       const budgetRes = await customAxiosInstance.get("/budgets");
       console.log("BUDGETS", budgetRes.data);
       setBudgets(budgetRes.data);
       if (budgetRes.data.length > 0) {
-        setSelectedBudget(budgetRes.data[0]);
+        if (title) {
+          let budget = budgetRes.data.find((b) => b.title === title);
+          setSelectedBudget(budget);
+        } else {
+          setSelectedBudget(budgetRes.data[0]);
+        }
       }
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
@@ -162,6 +168,24 @@ const Wrapper = ({ Component }) => {
       const usersRes = await customAxiosInstance.get(`/budget/${budgetID}/getAllBudgetUsers`);
       console.log("USERS", usersRes.data);
       setUsers(usersRes.data);
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+    }
+  };
+
+  const fetchAllTransactions = async (budgetID, month = null, year = null) => {
+    try {
+      if (!month || !year) {
+        const currentDate = new Date();
+        year = currentDate.getFullYear();
+        month = currentDate.getMonth() + 1;
+      }
+
+      const transactionsRes = await customAxiosInstance.get(
+        `/budget/${budgetID}/transactions?month=${month}&year=${year}`
+      );
+      console.log("TRANSACTIONS", transactionsRes.data);
+      setTransactions(transactionsRes.data);
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
     }
@@ -201,6 +225,7 @@ const Wrapper = ({ Component }) => {
       fetchAllCategories(selectedBudget.budgetID);
       fetchAllGoals(selectedBudget.budgetID);
       fetchAllUsers(selectedBudget.budgetID);
+      fetchAllTransactions(selectedBudget.budgetID);
       setRefresh(false);
     } else {
       fetchAllBudgets();
@@ -214,13 +239,21 @@ const Wrapper = ({ Component }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Header />
-      <Navbar account={account} setAccount={setAccount} budgets={budgets} setSelectedBudget={setSelectedBudget} />
+      <Navbar
+        account={account}
+        setAccount={setAccount}
+        budgets={budgets}
+        setSelectedBudget={setSelectedBudget}
+        setRefresh={setRefresh}
+        fetchAllBudgets={fetchAllBudgets}
+      />
       <Component
         budget={selectedBudget}
         setSelectedBudget={setSelectedBudget}
         goals={goals}
         categories={addCategoryIcon(categories)}
         users={users}
+        transactions={transactions}
         setRefresh={setRefresh}
       />
       {/* Render the passed-in component here */}

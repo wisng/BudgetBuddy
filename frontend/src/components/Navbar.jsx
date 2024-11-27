@@ -4,34 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import AddSharedBudgetModal from "./AddSharedBudget";
 
-const ACCOUNTS = ["My Shared Budget 1", "My Shared Budget 2"];
-const Navbar = ({ account, setAccount, budgets, setSelectedBudget }) => {
-
-  budgets = [
-    ...budgets,
-    {
-      budgetID: 2,
-      totalBalance: 15000.22,
-      totalIncome: 45000.55,
-      totalExpenses: 30000.31,
-      accountType: "Individual",
-      financialHealthScore: 75,
-      creationDate: "2023-01-15",
-      title: "My Individual Budget #2",
-    },
-    {
-      budgetID: 3,
-      totalBalance: 20000.00,
-      totalIncome: 50000.00,
-      totalExpenses: 30000.00,
-      accountType: "Shared",
-      financialHealthScore: 80,
-      creationDate: "2023-02-20",
-      title: "My Shared Budget #1",
-    },
-  ];
-
-
+const Navbar = ({ account, setAccount, budgets, setSelectedBudget, setRefresh, fetchAllBudgets }) => {
   let navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
@@ -124,12 +97,12 @@ const Navbar = ({ account, setAccount, budgets, setSelectedBudget }) => {
               </MenuItem>
             ))} */}
             {budgets.map((budget, i) => {
-              const accountName = budget.title;
+              const accountName = budget.title == "Default" ? "My Budget" : budget.title;
               return (
                 <MenuItem
                   key={i}
                   onClick={() => {
-                    handleClose()
+                    handleClose();
                     setAccount(accountName);
                     setSelectedBudget(budget);
                     navigate("/home");
@@ -149,7 +122,7 @@ const Navbar = ({ account, setAccount, budgets, setSelectedBudget }) => {
               <ListItemIcon>
                 <PersonAdd fontSize="small" />
               </ListItemIcon>
-              Add shared account
+              Add Budget
             </MenuItem>
 
             <MenuItem
@@ -162,7 +135,12 @@ const Navbar = ({ account, setAccount, budgets, setSelectedBudget }) => {
             </MenuItem>
           </Menu>
         </Box>
-        <AddSharedBudgetModal showModal={showSharedBudgetModal} setShowModal={setShowSharedBudgetModal} />
+        <AddSharedBudgetModal
+          showModal={showSharedBudgetModal}
+          setShowModal={setShowSharedBudgetModal}
+          setRefresh={setRefresh}
+          fetchAllBudgets={fetchAllBudgets}
+        />
       </Grid>
     </Grid>
   );
