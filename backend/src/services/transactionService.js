@@ -98,6 +98,10 @@ const getTransaction = (transactionID, budgetID) => {
 		db.query(query, [budgetID, transactionID], async (error, results) => {
 			if (error) return reject(error);
 			let transaction = results[0];
+
+			if (!transaction){
+				return reject("Transaction does not exist")
+			}
 			
 			let transactionUsersQuery = "SELECT User.userID, User.username FROM User INNER JOIN UserTransaction ON User.userID = UserTransaction.userID INNER JOIN Transaction ON Transaction.transactionID = UserTransaction.transactionID WHERE Transaction.transactionID = ?"
 			
@@ -105,7 +109,6 @@ const getTransaction = (transactionID, budgetID) => {
 			db.query(transactionUsersQuery, [transactionID], (error, userResults) => {	
 				if (error) return reject(error)
 				transaction.users = userResults
-				console.log(transaction)
 				resolve(transaction);
 			})			
 
@@ -180,7 +183,6 @@ const updateTransaction = async (
 		transactionID,
 		userID,
 	];
-	console.log("VALUES", values)
 	await new Promise((resolve, reject) => {
 		db.query(query, values, (error, results) => {
 			if (error) return reject(error);
@@ -197,8 +199,6 @@ const updateTransaction = async (
 		});
 	})
 	
-	console.log("CURR USERS", currTransactionUsers)
-	console.log("NEW USERS",transactionData.users)
 	// add new users to transaction 
 	for (const newUserID of transactionData.users){
 		let found = currTransactionUsers.find((t)=>t.userID === newUserID) 
@@ -211,7 +211,6 @@ const updateTransaction = async (
 					if (error) {
 						reject(error);
 					}
-					console.log("ADD",results)
 					resolve()
 				})
 			});
@@ -233,7 +232,6 @@ const updateTransaction = async (
 						if (error) {
 							reject(error);
 						}
-						console.log("DELETE",results)
 						count -= 1;
 						resolve()
 					})
@@ -248,7 +246,7 @@ const updateTransaction = async (
 };
 
 const deleteTransaction = async (transactionID, userID, budgetID) => {
-	new Promise((resolve, reject) => {
+	await new Promise((resolve, reject) => {
 		const checkOwnershipQuery = `
 		SELECT * FROM UserTransaction WHERE transactionID = ? AND userID = ?
 		`;
@@ -259,7 +257,7 @@ const deleteTransaction = async (transactionID, userID, budgetID) => {
 			(error, results) => {
 				if (error) return reject(error);
 				if (results.length === 0) {
-					return resolve({ affectedRows: 0 });
+					return reject("Failed to delete transaction. User not part of transaction")
 				}
 
 				const deleteUserTransactionQuery = `DELETE FROM UserTransaction WHERE transactionID = ?`;

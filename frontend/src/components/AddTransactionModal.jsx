@@ -110,6 +110,7 @@ const AddTransactionModal = ({
         setTitle("");
         setAmount("");
         setDate(null);
+        setUser("");
         setTransactionUsers(currUser ? [currUser] : []);
         setRecurrenceStartDate(null);
         setRecurrenceEndDate(null);
@@ -122,6 +123,22 @@ const AddTransactionModal = ({
       } else {
         setError("Failed to add transaction");
       }
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      if (!transaction) {
+        return;
+      }
+      const resp = await customAxiosInstance.delete(`/budget/${budgetID}/transaction/${transaction.transactionID}`);
+      setError(null);
+      setRefresh(true);
+      setSuccess("Successfully added transaction");
+      setShowModal(false);
+    } catch (err) {
+      console.log(err?.response?.data?.error || err.message);
+      setError("Failed to delete transaction");
     }
   };
 
@@ -142,6 +159,7 @@ const AddTransactionModal = ({
       setRecurrenceEndDate(currTransaction.recurrenceEndDate ? dayjs(currTransaction.recurrenceEndDate) : null);
       setRecurrenceFrequency(currTransaction.recurrenceFrequency || "");
       setTransactionUsers(currTransaction.users);
+      setUser("");
     } catch (err) {
       console.log(err?.response?.data?.error || err.message);
       setError("Failed to retrieve transaction users");
@@ -149,7 +167,7 @@ const AddTransactionModal = ({
   };
 
   useEffect(() => {
-    if (transaction) {
+    if (transaction && showModal) {
       getTransactionDetails(transaction.transactionID);
     }
     if (currUser && !transaction) {
@@ -552,6 +570,16 @@ const AddTransactionModal = ({
                   >
                     {transaction ? "Update Transaction" : "Add Transaction"}
                   </Button>
+                  {transaction && (
+                    <Button
+                      variant="contained"
+                      fullWidth={false}
+                      style={{ backgroundColor: "#EA4335", marginLeft: 5 }}
+                      onClick={handleDelete}
+                    >
+                      <DeleteIcon color="white" />
+                    </Button>
+                  )}
                 </Grid>
               </Grid>
             </Paper>
