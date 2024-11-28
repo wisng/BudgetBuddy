@@ -111,8 +111,9 @@ const createTransaction = async (budgetID, transaction, userID) => {
 };
 
 const getAllTransaction = (budgetID, userID, { day, month, year, current }) => {
-	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
-	const queryParams = [userID, budgetID];
+	//need to pull all transactions in budget including when the current user is not a part of transaction (shared budget)
+	let query = `SELECT * FROM Transaction WHERE budgetID = ?`;
+	const queryParams = [budgetID];
 
 	if (current) {
 		query += " AND date <= CURDATE()"

@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
-// import jwt from "jsonwebtoken";
-import { jwtDecode } from "jwt-decode";
+import React, { useState } from "react";
+import { Typography, Box, Paper, Grid2 as Grid } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import BudgetFunction from "../components/BudgetFunction";
 import MonthPicker from "../components/MonthPicker";
@@ -17,9 +14,7 @@ import AddCategoryModal from "../components/AddCategoryModal";
 import AddUserModal from "../components/AddUserModal";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
-import customAxiosInstance from "../utils/customAxiosInstance";
-
-const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh }) => {
+const Home = ({ budget, goals, categories, users, setRefresh }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -32,11 +27,6 @@ const Home = ({ budget, setSelectedBudget, goals, categories, users, setRefresh 
       }
     }
   };
-
-  useEffect(() => {
-    // fetchCategories();
-    // console.log("categories", categories);
-  }, []);
 
   return (
     <Box>

@@ -21,7 +21,7 @@ const getTransaction = async (req, res) => {
 	try {
 		const transaction = await transactionService.getTransaction(
 			transactionID,
-			req.userID
+			budgetID
 		);
 		if (!transaction)
 			return res.status(404).json({ message: "Transaction not found" });

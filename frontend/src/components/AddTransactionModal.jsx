@@ -90,45 +90,74 @@ const AddTransactionModal = ({
       for (let user of transactionUsers) {
         payload.users.push(user.userID);
       }
-      const resp = await customAxiosInstance.post(`/budget/${budgetID}/transaction`, payload);
-      setError(null);
-      setRefresh(true);
-      setSuccess("Successfully added transaction");
+      if (transaction) {
+        const resp = await customAxiosInstance.put(
+          `/budget/${budgetID}/transaction/${transaction.transactionID}`,
+          payload
+        );
+        setError(null);
+        setRefresh(true);
+        setSuccess("Successfully updated transaction");
+      } else {
+        const resp = await customAxiosInstance.post(`/budget/${budgetID}/transaction`, payload);
+        setError(null);
+        setRefresh(true);
+        setSuccess("Successfully added transaction");
 
-      setType("Expense");
-      setRecurring("No");
-      setCategory("");
-      setTitle("");
-      setAmount("");
-      setDate(null);
-      setTransactionUsers(currUser ? [currUser] : []);
-      setRecurrenceStartDate(null);
-      setRecurrenceEndDate(null);
-      setRecurrenceFrequency("");
+        setType("Expense");
+        setRecurring("No");
+        setCategory("");
+        setTitle("");
+        setAmount("");
+        setDate(null);
+        setTransactionUsers(currUser ? [currUser] : []);
+        setRecurrenceStartDate(null);
+        setRecurrenceEndDate(null);
+        setRecurrenceFrequency("");
+      }
     } catch (err) {
       console.log(err?.response?.data?.error || err.message);
-      setError("Failed to add transaction");
+      if (transaction) {
+        setError("Failed to update transaction");
+      } else {
+        setError("Failed to add transaction");
+      }
+    }
+  };
+
+  const getTransactionDetails = async (transactionID) => {
+    try {
+      const resp = await customAxiosInstance.get(`/budget/${budgetID}/transaction/${transactionID}`);
+      const currTransaction = resp.data;
+      console.log("TRANSACTION DETAILS", currTransaction);
+      let category = getCategory(currTransaction.categoryID, categories);
+
+      setType(currTransaction.transactionType || "Expense");
+      setRecurring(currTransaction.recurrenceEndDate ? "Yes" : "No");
+      setCategory(category.categoryID || "");
+      setTitle(currTransaction.title || "");
+      setAmount(currTransaction.amount || "");
+      setDate(currTransaction.date ? dayjs(currTransaction.date) : null);
+      setRecurrenceStartDate(currTransaction.recurrenceStartDate ? dayjs(currTransaction.recurrenceStartDate) : null);
+      setRecurrenceEndDate(currTransaction.recurrenceEndDate ? dayjs(currTransaction.recurrenceEndDate) : null);
+      setRecurrenceFrequency(currTransaction.recurrenceFrequency || "");
+      setTransactionUsers(currTransaction.users);
+    } catch (err) {
+      console.log(err?.response?.data?.error || err.message);
+      setError("Failed to retrieve transaction users");
     }
   };
 
   useEffect(() => {
-    setError(null);
-    setSuccess(null);
     if (transaction) {
-      let category = getCategory(transaction.categoryID, categories);
-      setType(transaction.type || "Expense");
-      setRecurring(transaction.recurrenceEndDate ? "Yes" : "No");
-      setCategory(category ? category.name : "");
-      setTitle(transaction.title || "");
-      setAmount(transaction.amount || "");
-      setDate(transaction.date ? dayjs(transaction.date) : null);
-      setTransactionUsers(currUser ? [currUser] : []);
-      setRecurrenceStartDate(transaction.recurrenceStartDate ? dayjs(transaction.recurrenceStartDate) : null);
-      setRecurrenceEndDate(transaction.recurrenceEndDate ? dayjs(transaction.recurrenceEndDate) : null);
-      setRecurrenceFrequency(transaction.recurrenceFrequency || "");
+      getTransactionDetails(transaction.transactionID);
     }
-    if (currUser) {
+    if (currUser && !transaction) {
       setTransactionUsers([currUser]);
+    }
+    if (!showModal) {
+      setError(null);
+      setSuccess(null);
     }
   }, [transaction, showModal, currUser]);
 
@@ -221,6 +250,7 @@ const AddTransactionModal = ({
                   <FormControl sx={{ width: "100%" }} size="small">
                     <InputLabel id="recurring-select-label">Recurring</InputLabel>
                     <Select
+                      disabled={transaction ? true : false}
                       labelId="recurring-select-label"
                       id="recurring-select"
                       value={recurring}
@@ -264,30 +294,32 @@ const AddTransactionModal = ({
                         </Select>
                       </FormControl>
                     </Grid>
-                    <Grid size={6}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label="Start Date"
-                          value={recurrenceStartDate}
-                          onChange={(newValue) => setRecurrenceStartDate(newValue)}
-                          slotProps={{
-                            textField: {
-                              size: "small",
-                              InputProps: {
-                                sx: {
-                                  borderRadius: 16,
-                                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
-                                }, // Apply the styles here
+                    {!transaction && (
+                      <Grid size={6}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            label="Start Date"
+                            value={recurrenceStartDate}
+                            onChange={(newValue) => setRecurrenceStartDate(newValue)}
+                            slotProps={{
+                              textField: {
+                                size: "small",
+                                InputProps: {
+                                  sx: {
+                                    borderRadius: 16,
+                                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
+                                  }, // Apply the styles here
+                                },
                               },
-                            },
-                          }}
-                          sx={{
-                            borderRadius: 16,
-                            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
-                          }}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
+                            }}
+                            sx={{
+                              borderRadius: 16,
+                              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
+                            }}
+                          />
+                        </LocalizationProvider>
+                      </Grid>
+                    )}
                   </Grid>
                 </>
               )}
@@ -312,7 +344,7 @@ const AddTransactionModal = ({
                   </FormControl>
                 </Grid>
 
-                {recurring === "Yes" ? (
+                {recurring === "Yes" && !transaction ? (
                   <Grid size={6}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
@@ -432,6 +464,7 @@ const AddTransactionModal = ({
                       }}
                       onChange={(e) => {
                         setUser(e.target.value);
+                        //handle duplicates
                         let found = transactionUsers.find((user) => user.userID == e.target.value.userID);
                         if (!found) {
                           setTransactionUsers([...transactionUsers, e.target.value]);
@@ -449,31 +482,32 @@ const AddTransactionModal = ({
 
                   <Paper elevation={3} sx={{ borderRadius: 10, marginTop: 3 }}>
                     <List>
-                      {transactionUsers.map((user, idx) => (
-                        <ListItem
-                          key={idx}
-                          secondaryAction={
-                            <IconButton
-                              edge="end"
-                              aria-label="delete"
-                              onClick={() => {
-                                if (!user.current) {
-                                  setTransactionUsers(transactionUsers.filter((u) => u.userID !== user.userID));
-                                }
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          }
-                        >
-                          <ListItemAvatar>
-                            {/* <Avatar> */}
-                            <AccountCircleIcon />
-                            {/* </Avatar> */}
-                          </ListItemAvatar>
-                          <ListItemText primary={user.username} />
-                        </ListItem>
-                      ))}
+                      {transactionUsers &&
+                        transactionUsers.map((user, idx) => (
+                          <ListItem
+                            key={idx}
+                            secondaryAction={
+                              <IconButton
+                                edge="end"
+                                aria-label="delete"
+                                onClick={() => {
+                                  if (!user.current && transactionUsers && transactionUsers.length > 1) {
+                                    setTransactionUsers(transactionUsers.filter((u) => u.userID !== user.userID));
+                                  }
+                                }}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            }
+                          >
+                            <ListItemAvatar>
+                              {/* <Avatar> */}
+                              <AccountCircleIcon />
+                              {/* </Avatar> */}
+                            </ListItemAvatar>
+                            <ListItemText primary={user.username} />
+                          </ListItem>
+                        ))}
                     </List>
                   </Paper>
                 </Grid>
@@ -516,7 +550,7 @@ const AddTransactionModal = ({
                     style={{ backgroundColor: "#7459D9" }}
                     onClick={handleSubmit}
                   >
-                    Add Transaction
+                    {transaction ? "Update Transaction" : "Add Transaction"}
                   </Button>
                 </Grid>
               </Grid>

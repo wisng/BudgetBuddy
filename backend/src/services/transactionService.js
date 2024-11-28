@@ -91,19 +91,35 @@ const createTransaction = async (budgetID, transaction, userID) => {
 	
 };
 
-const getTransaction = (transactionID, userID) => {
-	const query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.transactionID = ?`;
+const getTransaction = (transactionID, budgetID) => {
+	//need to pull any transaction in budget including when the current user is not a part of transaction (shared budget)
+	const query = `SELECT * FROM Transaction  WHERE budgetID = ? AND transactionID = ?`;
 	return new Promise((resolve, reject) => {
-		db.query(query, [userID, transactionID], (error, results) => {
+		db.query(query, [budgetID, transactionID], async (error, results) => {
 			if (error) return reject(error);
-			resolve(results[0]);
+			let transaction = results[0];
+			
+			let transactionUsersQuery = "SELECT User.userID, User.username FROM User INNER JOIN UserTransaction ON User.userID = UserTransaction.userID INNER JOIN Transaction ON Transaction.transactionID = UserTransaction.transactionID WHERE Transaction.transactionID = ?"
+			
+			// retrieve users associated with transaction
+			db.query(transactionUsersQuery, [transactionID], (error, userResults) => {	
+				if (error) return reject(error)
+				transaction.users = userResults
+				console.log(transaction)
+				resolve(transaction);
+			})			
+
+			
+			
+			
 		});
 	});
 };
 
 const getAllTransaction = (budgetID, userID, { day, month, year }) => {
-	let query = `SELECT Transaction.* FROM Transaction INNER JOIN UserTransaction ON Transaction.transactionID = UserTransaction.transactionID WHERE UserTransaction.userID = ? AND Transaction.budgetID = ?`;
-	const queryParams = [userID, budgetID];
+	//need to pull all transactions in budget including transactions the current user is not a part of like in a shared budget
+	let query = `SELECT * FROM transaction WHERE budgetID = ?`
+	const queryParams = [budgetID];
 
 	if (year) {
 		query += ` AND YEAR(date) = ?`;
@@ -155,8 +171,8 @@ const updateTransaction = async (
 	const values = [
 		transactionData.title,
 		transactionData.categoryID,
-		transactionData.amount,
-		transactionData.date,
+		parseFloat(transactionData.amount),
+		transactionData.date.split("T")[0],
 		transactionData.transactionType,
 		transactionData.recurrenceFrequency || null,
 		transactionData.recurrenceStartDate || null,
@@ -164,13 +180,69 @@ const updateTransaction = async (
 		transactionID,
 		userID,
 	];
-
-	new Promise((resolve, reject) => {
+	console.log("VALUES", values)
+	await new Promise((resolve, reject) => {
 		db.query(query, values, (error, results) => {
 			if (error) return reject(error);
 			resolve(results);
+			
 		});
 	});
+
+	const currTransactionUsers = await new Promise((resolve,reject)=>{
+		const userTransactionQuery = `SELECT * FROM UserTransaction WHERE transactionID = ?`;
+		db.query(userTransactionQuery, [ transactionID], (error, results) => {
+			if (error) return reject(error);
+			resolve(results);
+		});
+	})
+	
+	console.log("CURR USERS", currTransactionUsers)
+	console.log("NEW USERS",transactionData.users)
+	// add new users to transaction 
+	for (const newUserID of transactionData.users){
+		let found = currTransactionUsers.find((t)=>t.userID === newUserID) 
+		if (!found){
+			const addUserTransactionQuery = `INSERT IGNORE INTO UserTransaction (userID, transactionID) VALUES (?, ?)`;
+			const addUserTransactionValues = [newUserID, transactionID];
+		
+			await new Promise((resolve, reject) => { 
+				db.query(addUserTransactionQuery, addUserTransactionValues, (error, results) => {
+					if (error) {
+						reject(error);
+					}
+					console.log("ADD",results)
+					resolve()
+				})
+			});
+	
+		}
+	}
+
+	// delete any users not in new users to be added only if there are at least 1 user tied to transaction
+	if (currTransactionUsers.length > 1){
+		let count = currTransactionUsers.length;
+		for (const currUser of currTransactionUsers){
+			let found = transactionData.users.find((id)=>id === currUser.userID) 
+			if (!found && count > 1){
+				const addUserTransactionQuery = `DELETE FROM UserTransaction WHERE userID = ? AND transactionID = ?`;
+				const addUserTransactionValues = [currUser.userID, transactionID];
+				
+				await new Promise((resolve, reject) => { 
+					db.query(addUserTransactionQuery, addUserTransactionValues, (error, results) => {
+						if (error) {
+							reject(error);
+						}
+						console.log("DELETE",results)
+						count -= 1;
+						resolve()
+					})
+				});
+			}
+		}
+
+	}	
+	
 
 	return await helperService.updateBudget(budgetID, userID);
 };
