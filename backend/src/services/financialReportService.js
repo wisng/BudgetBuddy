@@ -1,6 +1,6 @@
 const db = require("../../config/db");
 
-const createFinancialReport = (budgetID, userID, data) => {
+const createFinancialReport = async (budgetID, userID, data) => {
 	const financialReportQuery = `
         INSERT INTO FinancialReport ( userID, budgetID, generatedDate, reportPeriodStartDate, reportPeriodEndDate, totalIncome, totalExpenses, spendingPerCategory, savings )
         VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )
@@ -13,7 +13,7 @@ const createFinancialReport = (budgetID, userID, data) => {
 
 	const transactionQuery = `SELECT * FROM Transaction WHERE budgetID = ? AND date BETWEEN ? AND ?`;
 
-	return new Promise((resolve, reject) => {
+	const transactions = await new Promise((resolve, reject) => {
 		db.query(
 			transactionQuery,
 			[budgetID, data.reportPeriodStartDate, data.reportPeriodEndDate],
@@ -22,88 +22,101 @@ const createFinancialReport = (budgetID, userID, data) => {
 					reject(err);
 				} else {
 					const transactions = results;
-					transactions.forEach((transaction) => {
-						let {
-							amount,
-							transactionType,
-							categoryID,
-							recurrenceFrequency,
-							recurrenceStartDate,
-							recurrenceEndDate,
-						} = transaction;
+					resolve(results)
+				}
+			})
+		})
 
-						if (
-							( recurrenceStartDate && new Date(recurrenceStartDate) > new Date(data.reportPeriodEndDate)) ||
-							(recurrenceEndDate && new Date(recurrenceEndDate) < new Date(data.reportPeriodStartDate))
-						) {
-							return;
-						}
+	transactions.forEach((transaction) => {
+		let {
+			amount,
+			transactionType,
+			categoryID,
+			recurrenceFrequency,
+			recurrenceStartDate,
+			recurrenceEndDate,
+		} = transaction;
 
-						const daysInPeriod =
-							(new Date(data.reportPeriodEndDate) - new Date(data.reportPeriodStartDate)) /
-							(1000 * 60 * 60 * 24);
-						let occurrences = 1;
+		if (
+			( recurrenceStartDate && new Date(recurrenceStartDate) > new Date(data.reportPeriodEndDate)) ||
+			(recurrenceEndDate && new Date(recurrenceEndDate) < new Date(data.reportPeriodStartDate))
+		) {
+			return;
+		}
 
-						switch (recurrenceFrequency) {
-							case "DAILY":
-								occurrences = daysInPeriod;
-								break;
-							case "WEEKLY":
-								occurrences = Math.floor(daysInPeriod / 7);
-								break;
-							case "BI-WEEKLY":
-								occurrences = Math.floor(daysInPeriod / 14);
-								break;
-							case "MONTHLY":
-								occurrences = Math.floor(daysInPeriod / 30);
-								break;
-							case "YEARLY":
-								occurrences = Math.floor(daysInPeriod / 365);
-								break;
-						}
+		const daysInPeriod =
+			(new Date(data.reportPeriodEndDate) - new Date(data.reportPeriodStartDate)) /
+			(1000 * 60 * 60 * 24);
+		let occurrences = 1;
 
-						const totalAmount = amount * occurrences;
+		switch (recurrenceFrequency) {
+			case "DAILY":
+				occurrences = daysInPeriod;
+				break;
+			case "WEEKLY":
+				occurrences = Math.floor(daysInPeriod / 7);
+				break;
+			case "BI-WEEKLY":
+				occurrences = Math.floor(daysInPeriod / 14);
+				break;
+			case "MONTHLY":
+				occurrences = Math.floor(daysInPeriod / 30);
+				break;
+			case "YEARLY":
+				occurrences = Math.floor(daysInPeriod / 365);
+				break;
+		}
 
-						if (transactionType === "Income") {
-							totalIncome += totalAmount;
-						} else if (transactionType === "Expense") {
-							totalExpenses += totalAmount;
-							spendingPerCategory[categoryID] =
-								(spendingPerCategory[categoryID] || 0) +
-								totalAmount;
-						}
-					});
+		const totalAmount = amount * occurrences;
 
-					savings = totalIncome - totalExpenses;
+		if (transactionType === "Income") {
+			totalIncome += totalAmount;
+		} else if (transactionType === "Expense") {
+			totalExpenses += totalAmount;
+			spendingPerCategory[categoryID] =
+				(spendingPerCategory[categoryID] || 0) +
+				totalAmount;
+		}
+	});
 
-					db.query(
-						financialReportQuery,
-						[
-							userID,
-							budgetID,
-							data.generatedDate,
-							data.reportPeriodStartDate,
-							data.reportPeriodEndDate,
-							totalIncome,
-							totalExpenses,
-							JSON.stringify(spendingPerCategory),
-							savings,
-						],
-						(err, results) => {
-							if (err) {
-								reject(err);
-							} else {
-								resolve(results);
-							}
-						}
-					);
+	savings = totalIncome - totalExpenses;
+
+	const financialReportID = await new Promise((resolve, reject) => {	
+		db.query(
+			financialReportQuery,
+			[
+				userID,
+				budgetID,
+				data.generatedDate,
+				data.reportPeriodStartDate,
+				data.reportPeriodEndDate,
+				totalIncome,
+				totalExpenses,
+				JSON.stringify(spendingPerCategory),
+				savings,
+			],
+			(err, results) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(results.insertId);
 				}
 			}
 		);
-	});
+	})
+
+	return await new Promise((resolve, reject) => {	
+		const retrieveFinancialReportQuery = `SELECT * FROM FinancialReport WHERE reportID = ?`;
+		db.query(retrieveFinancialReportQuery, [financialReportID], (error, results) => {
+		  if (error) return reject(error);
+		  // Resolve with the inserted row
+		  resolve({...results[0], transactions});
+		});
+	})
+			
 };
 
-const getFinancialReport = (reportID, userID) => {
+const getFinancialReport = (reportID, budgetID, userID) => {
 	const financialReportQuery = `
 		SELECT * FROM FinancialReport WHERE reportID = ? AND userID = ?
 	`;
@@ -113,7 +126,20 @@ const getFinancialReport = (reportID, userID) => {
 			if (err) {
 				reject(err);
 			} else {
-				resolve(results[0]);
+				
+				const financialReport = results[0];	
+				const transactionQuery = `SELECT * FROM Transaction WHERE budgetID = ? AND date BETWEEN ? AND ?`;
+				db.query(
+					transactionQuery,
+					[budgetID, financialReport.reportPeriodStartDate, financialReport.reportPeriodEndDate],
+					(err, results) => {
+						if (err) {
+							reject(err);
+						} else {
+							const transactions = results;
+							resolve({ ...financialReport, transactions})
+						}
+					})
 			}
 		});
 	});

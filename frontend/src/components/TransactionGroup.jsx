@@ -11,7 +11,7 @@ const TransactionGroup = ({ type, categories, transactions, handleClick }) => {
     color = "#2BDE73";
   }
 
-  const getCategoryIcon = (categoryID, categories) => {
+  const getCategory = (categoryID, categories) => {
     for (let c of categories) {
       if (c.categoryID === categoryID) {
         return c;
@@ -23,7 +23,7 @@ const TransactionGroup = ({ type, categories, transactions, handleClick }) => {
     <Paper elevation={3} sx={{ borderRadius: 10, width: "100%", marginTop: 1 }}>
       <List>
         {transactions.map((t, idx) => {
-          let category = getCategoryIcon(t.categoryID, categories);
+          let category = getCategory(t.categoryID, categories);
           return (
             <ListItem
               key={idx}

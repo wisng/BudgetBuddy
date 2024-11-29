@@ -10,15 +10,17 @@ import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import AddTransactionModal from "../components/AddTransactionModal";
 import AddGoalModal from "../components/AddGoalModal";
+import FinancialReportModal from "../components/FinancialReportModal";
 import AddCategoryModal from "../components/AddCategoryModal";
 import AddUserModal from "../components/AddUserModal";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
-const Home = ({ budget, goals, categories, users, setRefresh }) => {
+const Home = ({ budget, goals, categories, users, financialReports, setRefresh }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   const getCategoryName = (categoryID, categories) => {
     for (let c of categories) {
@@ -192,6 +194,7 @@ const Home = ({ budget, goals, categories, users, setRefresh }) => {
           <BudgetFunction
             title="View Financial Report"
             icon={<PieChartSharpIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
+            handleClick={setShowReportModal}
           />
         </Grid>
         <Grid
@@ -288,6 +291,14 @@ const Home = ({ budget, goals, categories, users, setRefresh }) => {
         users={users}
         showModal={showUserModal}
         setShowModal={setShowUserModal}
+        setRefresh={setRefresh}
+      />
+      <FinancialReportModal
+        budgetID={budget.budgetID}
+        categories={categories}
+        financialReports={financialReports}
+        showModal={showReportModal}
+        setShowModal={setShowReportModal}
         setRefresh={setRefresh}
       />
     </Box>

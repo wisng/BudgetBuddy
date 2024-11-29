@@ -23,6 +23,7 @@ const Wrapper = ({ Component }) => {
   const [goals, setGoals] = useState([]);
   const [categories, setCategories] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [financialReports, setFinancialReports] = useState([]);
   const [users, setUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
@@ -96,6 +97,16 @@ const Wrapper = ({ Component }) => {
     }
   };
 
+  const fetchAllFinancialReports = async (budgetID) => {
+    try {
+      const res = await customAxiosInstance.get(`/budget/${budgetID}/financialReports`);
+      console.log("FINANCIAL REPORTS", res.data);
+      setFinancialReports(res.data);
+    } catch (err) {
+      console.error(error.response?.data?.error || error.message);
+    }
+  };
+
   const updateCurrentBudget = async (budgetID) => {
     try {
       const res = await customAxiosInstance.get(`/budget/${budgetID}`);
@@ -131,6 +142,7 @@ const Wrapper = ({ Component }) => {
       fetchAllGoals(selectedBudget.budgetID);
       fetchAllUsers(selectedBudget.budgetID);
       fetchAllTransactions(selectedBudget.budgetID);
+      fetchAllFinancialReports(selectedBudget.budgetID);
       setRefresh(false);
     } else {
       fetchAllBudgets();
@@ -158,6 +170,7 @@ const Wrapper = ({ Component }) => {
         goals={goals}
         categories={addCategoryIcon(categories)}
         users={users}
+        financialReports={financialReports}
         transactions={transactions}
         setRefresh={setRefresh}
       />
