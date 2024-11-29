@@ -4,7 +4,7 @@ import MonthPicker from "../components/MonthPicker";
 import TransactionGroup from "../components/TransactionGroup";
 import AddTransactionModal from "../components/AddTransactionModal";
 
-const Transactions = ({ budget, categories, users, transactions, setRefresh }) => {
+const Transactions = ({ budget, categories, users, transactions, setRefresh, fetchAllTransactions }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [currTransaction, setCurrTransaction] = useState();
 
@@ -43,7 +43,7 @@ const Transactions = ({ budget, categories, users, transactions, setRefresh }) =
         sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}
       >
         <Grid size={12}>
-          <MonthPicker startDate={budget.creationDate} handleSubmit={() => alert("HELLO")} />
+          <MonthPicker budgetID={budget.budgetID} startDate={budget.creationDate} handleSubmit={fetchAllTransactions} />
         </Grid>
 
         <Grid container spacing={6} size={12}>

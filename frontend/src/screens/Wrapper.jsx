@@ -173,6 +173,7 @@ const Wrapper = ({ Component }) => {
         financialReports={financialReports}
         transactions={transactions}
         setRefresh={setRefresh}
+        fetchAllTransactions={fetchAllTransactions}
       />
       {/* Render the passed-in component here */}
     </Box>

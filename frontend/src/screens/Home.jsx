@@ -32,15 +32,15 @@ const Home = ({ budget, goals, categories, users, financialReports, setRefresh }
 
   return (
     <Box>
-      <Grid container spacing={2}>
+      {/* <Grid container spacing={2}>
         <Grid size={2} sx={{}}></Grid>
         <Grid size={8}>
           <MonthPicker startDate={budget.creationDate} handleSubmit={() => alert("HELLO")} />
         </Grid>
         <Grid size={2} sx={{}}></Grid>
-      </Grid>
+      </Grid> */}
 
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ marginTop: 5 }}>
         <Grid size={2} sx={{}}></Grid>
         <Grid container size={5} sx={{ height: "325px" }}>
           <Paper elevation={3} sx={{ height: "100%", width: "100%", borderRadius: "20px" }}>
