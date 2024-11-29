@@ -52,27 +52,33 @@ const createUser = async (
 		{
 			name: "Entertainment",
 			colour: "#00FF00",
-			isCustom: true,
+			isCustom: false,
 			budgetID: budgetID,
 		},
 		{
 			name: "Shopping",
 			colour: "#FF0000",
-			isCustom: true,
+			isCustom: false,
 			budgetID: budgetID,
 		},
 		{
 			name: "Dining Out",
 			colour: "#0000FF",
-			isCustom: true,
+			isCustom: false,
 			budgetID: budgetID,
 		},
 		{
 			name: "Transportation",
 			colour: "#00FFFF",
-			isCustom: true,
+			isCustom: false,
 			budgetID: budgetID,
 		},
+		{
+			name: "Initial Balance",
+			colour: "#808080",
+			isCustom: false,
+			budgetID: budgetID,
+		}
 	];
 	for (const category of categoryData) {
 		categoryService.createCategory(category, user.insertId);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Box,
@@ -11,20 +11,62 @@ import {
   Paper,
   IconButton,
   TextField,
+  Alert,
   Grid2 as Grid,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import customAxiosInstance from "../utils/customAxiosInstance";
 
-const USERS = ["User 1", "User 2", "User 3"];
-
-const AddUserModal = ({ showModal, setShowModal }) => {
+const AddUserModal = ({ budgetID, users, showModal, setShowModal, setRefresh }) => {
   const [username, setUsername] = useState("");
-  const [users, setUsers] = useState([...USERS]);
 
-  const handleSubmit = () => {
-    console.log(username, users);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  const handleSubmit = async () => {
+    try {
+      if (!username) {
+        setSuccess(null);
+        setError("Missing information. Please fill all fields");
+        return;
+      }
+      let payload = {
+        identifier: username,
+      };
+      const res = await customAxiosInstance.post(`/budget/${budgetID}/addUser`, payload);
+      setError(null);
+      setRefresh(true);
+      setSuccess("Successfully added user");
+      setUsername("");
+    } catch (err) {
+      console.log(err?.response?.data?.error || err.message);
+      setSuccess(null);
+      setError(err?.response?.data?.error || err.message);
+    }
   };
+
+  const handleDelete = async (userID) => {
+    try {
+      let payload = {
+        userID,
+      };
+      console.log(payload);
+      const res = await customAxiosInstance.post(`/budget/${budgetID}/removeUser`, payload);
+      setError(null);
+      setSuccess("Successfully removed user");
+      setRefresh(true);
+    } catch (err) {
+      console.log(err?.response?.data?.error || err.message);
+      setSuccess(null);
+      setError(err?.response?.data?.error || err.message);
+    }
+  };
+
+  useEffect(() => {
+    setError(null);
+    setSuccess(null);
+  }, [showModal]);
 
   return (
     <Modal
@@ -103,6 +145,17 @@ const AddUserModal = ({ showModal, setShowModal }) => {
                 </Grid>
               </FormControl>
 
+              <Grid
+                container
+                spacing={0}
+                sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
+              >
+                <Grid size={12}>
+                  {error && <Alert severity="error">{error}</Alert>}
+                  {success && <Alert severity="success">{success}</Alert>}
+                </Grid>
+              </Grid>
+
               <Grid container spacing={0} sx={{ marginTop: 3, width: "100%", background: "transparent" }}>
                 <Grid size={12}>
                   <Paper elevation={3} sx={{ borderRadius: 10 }}>
@@ -111,13 +164,7 @@ const AddUserModal = ({ showModal, setShowModal }) => {
                         <ListItem
                           key={idx}
                           secondaryAction={
-                            <IconButton
-                              edge="end"
-                              aria-label="delete"
-                              onClick={() => {
-                                setUsers(users.filter((u) => u !== user));
-                              }}
-                            >
+                            <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(user.userID)}>
                               <DeleteIcon />
                             </IconButton>
                           }
@@ -127,7 +174,7 @@ const AddUserModal = ({ showModal, setShowModal }) => {
                             <AccountCircleIcon />
                             {/* </Avatar> */}
                           </ListItemAvatar>
-                          <ListItemText primary={user} />
+                          <ListItemText primary={user.username} />
                         </ListItem>
                       ))}
                     </List>

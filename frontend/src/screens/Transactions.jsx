@@ -4,133 +4,7 @@ import MonthPicker from "../components/MonthPicker";
 import TransactionGroup from "../components/TransactionGroup";
 import AddTransactionModal from "../components/AddTransactionModal";
 
-const INCOME_TRANSACTIONS = [
-  {
-    transactionID: 1,
-    title: "Salary",
-    categoryID: 1,
-    budgetID: 1,
-    amount: 3000.0,
-    date: "2024-11-01",
-    transactionType: "Income",
-    recurrenceFrequency: "MONTHLY",
-    recurrenceStartDate: "2024-11-01",
-    recurrenceEndDate: null,
-  },
-  {
-    transactionID: 2,
-    title: "Freelance Project",
-    categoryID: 2,
-    budgetID: 1,
-    amount: 1500.0,
-    date: "2024-11-10",
-    transactionType: "Income",
-    recurrenceFrequency: null,
-    recurrenceStartDate: null,
-    recurrenceEndDate: null,
-  },
-  {
-    transactionID: 3,
-    title: "Investment Dividend",
-    categoryID: 3,
-    budgetID: 2,
-    amount: 200.0,
-    date: "2024-11-15",
-    transactionType: "Income",
-    recurrenceFrequency: "YEARLY",
-    recurrenceStartDate: "2024-11-15",
-    recurrenceEndDate: "2026-11-15",
-  },
-  {
-    transactionID: 4,
-    title: "Rental Income",
-    categoryID: 4,
-    budgetID: 3,
-    amount: 1200.0,
-    date: "2024-11-05",
-    transactionType: "Income",
-    recurrenceFrequency: "MONTHLY",
-    recurrenceStartDate: "2024-11-05",
-    recurrenceEndDate: null,
-  },
-  {
-    transactionID: 5,
-    title: "Gift",
-    categoryID: 4,
-    budgetID: 1,
-    amount: 500.0,
-    date: "2024-11-01",
-    transactionType: "Income",
-    recurrenceFrequency: null,
-    recurrenceStartDate: null,
-    recurrenceEndDate: null,
-  },
-];
-
-const EXPENSE_TRANSACTIONS = [
-  {
-    transactionID: 6,
-    title: "Groceries",
-    categoryID: 5,
-    budgetID: 4,
-    amount: 250.0,
-    date: "2024-11-03",
-    transactionType: "Expense",
-    recurrenceFrequency: "WEEKLY",
-    recurrenceStartDate: "2024-11-03",
-    recurrenceEndDate: "2024-12-31",
-  },
-  {
-    transactionID: 7,
-    title: "Electricity Bill",
-    categoryID: 3,
-    budgetID: 5,
-    amount: 100.0,
-    date: "2024-11-10",
-    transactionType: "Expense",
-    recurrenceFrequency: "MONTHLY",
-    recurrenceStartDate: "2024-11-10",
-    recurrenceEndDate: null,
-  },
-  {
-    transactionID: 8,
-    title: "Internet Subscription",
-    categoryID: 3,
-    budgetID: 5,
-    amount: 60.0,
-    date: "2024-11-01",
-    transactionType: "Expense",
-    recurrenceFrequency: "MONTHLY",
-    recurrenceStartDate: "2024-11-01",
-    recurrenceEndDate: null,
-  },
-  {
-    transactionID: 9,
-    title: "Gym Membership",
-    categoryID: 4,
-    budgetID: 4,
-    amount: 45.0,
-    date: "2024-11-15",
-    transactionType: "Expense",
-    recurrenceFrequency: "YEARLY",
-    recurrenceStartDate: "2024-11-15",
-    recurrenceEndDate: "2025-11-15",
-  },
-  {
-    transactionID: 10,
-    title: "Car Maintenance",
-    categoryID: 5,
-    budgetID: 6,
-    amount: 500.0,
-    date: "2024-11-15",
-    transactionType: "Expense",
-    recurrenceFrequency: null,
-    recurrenceStartDate: null,
-    recurrenceEndDate: null,
-  },
-];
-
-const Transactions = ({ budget, goals, categories }) => {
+const Transactions = ({ budget, categories, users, transactions, setRefresh, fetchAllTransactions }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [currTransaction, setCurrTransaction] = useState();
 
@@ -169,7 +43,7 @@ const Transactions = ({ budget, goals, categories }) => {
         sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}
       >
         <Grid size={12}>
-          <MonthPicker startDate={budget.creationDate} handleSubmit={() => alert("HELLO")} />
+          <MonthPicker budgetID={budget.budgetID} startDate={budget.creationDate} handleSubmit={fetchAllTransactions} />
         </Grid>
 
         <Grid container spacing={6} size={12}>
@@ -187,7 +61,7 @@ const Transactions = ({ budget, goals, categories }) => {
               </Typography>
             </Box>
 
-            {sortTransactionsByDate(INCOME_TRANSACTIONS).map((t, i) => (
+            {sortTransactionsByDate(transactions.filter((t) => t.transactionType === "Income")).map((t, i) => (
               <Box
                 key={i}
                 sx={{
@@ -199,7 +73,7 @@ const Transactions = ({ budget, goals, categories }) => {
                 }}
               >
                 <Typography variant="subtitle2" sx={{ marginTop: 3, fontWeight: "bold" }}>
-                  {t[0].date}
+                  {t[0].date.split("T")[0]}
                 </Typography>
                 <TransactionGroup type="Income" categories={categories} transactions={t} handleClick={handleClick} />
               </Box>
@@ -218,7 +92,7 @@ const Transactions = ({ budget, goals, categories }) => {
                 Expense
               </Typography>
             </Box>
-            {sortTransactionsByDate(EXPENSE_TRANSACTIONS).map((t, i) => (
+            {sortTransactionsByDate(transactions.filter((t) => t.transactionType === "Expense")).map((t, i) => (
               <Box
                 key={i}
                 sx={{
@@ -230,7 +104,7 @@ const Transactions = ({ budget, goals, categories }) => {
                 }}
               >
                 <Typography variant="subtitle2" sx={{ marginTop: 3, fontWeight: "bold" }}>
-                  {t[0].date}
+                  {t[0].date.split("T")[0]}
                 </Typography>
                 <TransactionGroup type="Expense" categories={categories} transactions={t} handleClick={handleClick} />
               </Box>
@@ -242,7 +116,11 @@ const Transactions = ({ budget, goals, categories }) => {
       <AddTransactionModal
         showModal={showTransactionModal}
         setShowModal={setShowTransactionModal}
+        budgetID={budget.budgetID}
         categories={categories}
+        users={users}
+        currUser={users.find((user) => user.current)}
+        setRefresh={setRefresh}
         transaction={currTransaction}
       />
     </Grid>

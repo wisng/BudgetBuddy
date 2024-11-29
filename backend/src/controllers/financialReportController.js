@@ -22,6 +22,7 @@ const getFinancialReport = async (req, res) => {
 		const userID = req.userID;
 		const report = await financialReportService.getFinancialReport(
 			financialReportID,
+			budgetID,
 			userID
 		);
 		res.json(report);

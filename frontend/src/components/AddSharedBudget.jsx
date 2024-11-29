@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   TextField,
@@ -9,15 +9,45 @@ import {
   Paper,
   InputAdornment,
   OutlinedInput,
+  Alert,
   Grid2 as Grid,
 } from "@mui/material";
+import customAxiosInstance from "../utils/customAxiosInstance";
 
-const AddSharedBudgetModal = ({ showModal, setShowModal }) => {
+const AddSharedBudgetModal = ({ showModal, setShowModal, setRefresh, fetchAllBudgets }) => {
   const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState();
+  const [initialBalance, setInitialBalance] = useState("");
 
-  const handleSubmit = () => {
-    console.log(title, amount);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  useEffect(() => {
+    setError(null);
+    setSuccess(null);
+  }, [showModal]);
+
+  const handleSubmit = async () => {
+    try {
+      if (!title || !initialBalance) {
+        setError("Missing information. Please fill all fields.");
+        return;
+      }
+      let payload = {
+        title,
+        initialBalance,
+        accountType: "Individual",
+      };
+      const res = await customAxiosInstance.post(`/budget`, payload);
+      setError(null);
+      fetchAllBudgets(title);
+      setRefresh(true);
+      setSuccess("Successfully added budget");
+      setInitialBalance("");
+      setTitle("");
+    } catch (err) {
+      console.log(err?.response?.data?.error || err.message);
+      setError("Failed to add budget");
+    }
   };
 
   return (
@@ -77,20 +107,32 @@ const AddSharedBudgetModal = ({ showModal, setShowModal }) => {
               <Grid container spacing={2} sx={{ marginTop: 3, width: "100%" }}>
                 <Grid size={6}>
                   <FormControl fullWidth>
-                    <InputLabel htmlFor="amount">Starting Amount</InputLabel>
+                    <InputLabel htmlFor="initialBalance">Initial Balance</InputLabel>
                     <OutlinedInput
-                      id="amount"
+                      id="initialBalance"
                       placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      value={initialBalance}
+                      onChange={(e) => setInitialBalance(e.target.value)}
                       startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                      label="Starting Amount"
+                      label="Initial Balance"
                       size="small"
                       sx={{ borderRadius: 16, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)" }}
                     />
                   </FormControl>
                 </Grid>
               </Grid>
+
+              <Grid
+                container
+                spacing={0}
+                sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
+              >
+                <Grid size={12}>
+                  {error && <Alert severity="error">{error}</Alert>}
+                  {success && <Alert severity="success">{success}</Alert>}
+                </Grid>
+              </Grid>
+
               <Grid
                 container
                 spacing={0}
@@ -107,7 +149,7 @@ const AddSharedBudgetModal = ({ showModal, setShowModal }) => {
                     style={{ backgroundColor: "#7459D9" }}
                     onClick={handleSubmit}
                   >
-                    Add Shared Budget
+                    Add Budget
                   </Button>
                 </Grid>
               </Grid>

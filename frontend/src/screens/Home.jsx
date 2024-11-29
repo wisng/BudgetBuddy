@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
-// import jwt from "jsonwebtoken";
-import { jwtDecode } from "jwt-decode";
+import React, { useState } from "react";
+import { Typography, Box, Paper, Grid2 as Grid } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import BudgetFunction from "../components/BudgetFunction";
 import MonthPicker from "../components/MonthPicker";
@@ -13,57 +10,37 @@ import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import AddTransactionModal from "../components/AddTransactionModal";
 import AddGoalModal from "../components/AddGoalModal";
+import FinancialReportModal from "../components/FinancialReportModal";
 import AddCategoryModal from "../components/AddCategoryModal";
 import AddUserModal from "../components/AddUserModal";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
-import customAxiosInstance from "../utils/customAxiosInstance";
-
-const Home = ({ budget, goals, setSelectedBudget }) => {
+const Home = ({ budget, goals, categories, users, financialReports, setRefresh }) => {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [showReportModal, setShowReportModal] = useState(false);
 
-  console.log(budget);
-
-  const fetchCategories = async () => {
-    try {
-      const res = await customAxiosInstance.get(`/budget/${budget.budgetID}/categories`);
-      setCategories(res.data);
+  const getCategoryName = (categoryID, categories) => {
+    for (let c of categories) {
+      if (c.categoryID === categoryID) {
+        return c.name;
+      }
     }
-    catch (err) {
-      console.error(err.response?.data?.error || err.message);
-    }
-  }
-
-  const updateCurrentBudget = async () => {
-    try {
-      const res = await customAxiosInstance.get(`/budget/${budget.budgetID}`);
-      setSelectedBudget(res.data);
-    }
-    catch (err) {
-      console.error(err.response?.data?.error || err.message);
-    }
-  }
-
-  useEffect(() => {
-    fetchCategories();
-    console.log("categories", categories);
-  }, []);
+  };
 
   return (
     <Box>
-      <Grid container spacing={2}>
+      {/* <Grid container spacing={2}>
         <Grid size={2} sx={{}}></Grid>
         <Grid size={8}>
           <MonthPicker startDate={budget.creationDate} handleSubmit={() => alert("HELLO")} />
         </Grid>
         <Grid size={2} sx={{}}></Grid>
-      </Grid>
+      </Grid> */}
 
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ marginTop: 5 }}>
         <Grid size={2} sx={{}}></Grid>
         <Grid container size={5} sx={{ height: "325px" }}>
           <Paper elevation={3} sx={{ height: "100%", width: "100%", borderRadius: "20px" }}>
@@ -76,7 +53,7 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
 
                 <PieChart
                   // sx={{ position: "absolute", top: "15%", left: "10%" }}
-                  colors={["#FE6C6C", "#FEBD38"]}
+                  colors={["#7459D9", "#EA4335"]}
                   series={[
                     {
                       startAngle: -90,
@@ -217,6 +194,7 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
           <BudgetFunction
             title="View Financial Report"
             icon={<PieChartSharpIcon sx={{ color: "#7459D9", fontSize: "60px" }} />}
+            handleClick={setShowReportModal}
           />
         </Grid>
         <Grid
@@ -225,7 +203,7 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
           spacing={1}
           sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center" }}
         >
-          <Paper elevation={3} sx={{ minHeight: "300px", width: "100%", borderRadius: "20px" }}>
+          <Paper elevation={3} sx={{ height: "100%", minHeight: "300px", width: "100%", borderRadius: "20px" }}>
             <Grid container>
               <Grid size={2} sx={{}}></Grid>
               <Grid size={8} sx={{}}>
@@ -235,7 +213,7 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
             </Grid>
 
             {goals.map((g, i) => {
-              let percentage = Math.round((g.currAmount / g.limit) * 100);
+              let percentage = Math.round((g.currAmount / g.spendingLimit) * 100);
 
               // Cap at 100% if currAmount exceeds limit
               if (percentage > 100) percentage = 100;
@@ -269,13 +247,14 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
                     sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}
                   >
                     <Typography gutterBottom sx={{ color: "text.secondary", fontSize: 14 }}>
-                      {g.title}
+                      {getCategoryName(g.categoryID, categories)}
                     </Typography>
 
-                    <Typography variant="h5">
-                      <AttachMoneyIcon fontSize="small" /> {g.currAmount}/{g.limit}
+                    <Typography variant="h6">
+                      <AttachMoneyIcon fontSize="small" /> {g.currAmount}/{g.spendingLimit}
                     </Typography>
-                    <Typography variant="body2">{g.endDate}</Typography>
+                    <Typography variant="body2">Start: {g.startDate.split("T")[0]}</Typography>
+                    <Typography variant="body2">End: {g.endDate.split("T")[0]}</Typography>
                   </Grid>
                   <Grid size={2}></Grid>
                 </Grid>
@@ -285,10 +264,43 @@ const Home = ({ budget, goals, setSelectedBudget }) => {
         </Grid>
         <Grid size={2} sx={{}}></Grid>
       </Grid>
-      <AddTransactionModal budgetID={budget.budgetID} categories={categories} updateCurrentBudget={updateCurrentBudget} showModal={showTransactionModal} setShowModal={setShowTransactionModal} />
-      <AddGoalModal showModal={showGoalModal} setShowModal={setShowGoalModal} />
-      <AddCategoryModal showModal={showCategoryModal} setShowModal={setShowCategoryModal} />
-      <AddUserModal showModal={showUserModal} setShowModal={setShowUserModal} />
+      <AddTransactionModal
+        budgetID={budget.budgetID}
+        categories={categories}
+        users={users}
+        currUser={users.find((user) => user.current)}
+        showModal={showTransactionModal}
+        setShowModal={setShowTransactionModal}
+        setRefresh={setRefresh}
+      />
+      <AddGoalModal
+        budgetID={budget.budgetID}
+        categories={categories}
+        showModal={showGoalModal}
+        setShowModal={setShowGoalModal}
+        setRefresh={setRefresh}
+      />
+      <AddCategoryModal
+        budgetID={budget.budgetID}
+        showModal={showCategoryModal}
+        setShowModal={setShowCategoryModal}
+        setRefresh={setRefresh}
+      />
+      <AddUserModal
+        budgetID={budget.budgetID}
+        users={users}
+        showModal={showUserModal}
+        setShowModal={setShowUserModal}
+        setRefresh={setRefresh}
+      />
+      <FinancialReportModal
+        budgetID={budget.budgetID}
+        categories={categories}
+        financialReports={financialReports}
+        showModal={showReportModal}
+        setShowModal={setShowReportModal}
+        setRefresh={setRefresh}
+      />
     </Box>
   );
 };

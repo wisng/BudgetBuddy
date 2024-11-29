@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import customAxiosInstance from "../utils/customAxiosInstance";
 import {
   Typography,
@@ -15,9 +14,6 @@ import {
   IconButton,
   InputAdornment,
   Grid2 as Grid,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -38,16 +34,14 @@ const Signup = () => {
     if (password !== confirmationPassword) {
       alert("Passwords do not match");
       // setErrorMsg("Passwords do not match");
-    }
-    else {
+    } else {
       try {
         const res = await customAxiosInstance.post("/register", { email, username, password });
         alert(`Login successful, going to Home page...`);
         localStorage.setItem("jwt-token", res.data.token);
         changeScreen("/home");
         // setSuccessMsg(`${res.data.message}, redirecting to login page...`);
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err.response?.data?.error);
         // setErrorMsg(err.message);
       }
@@ -92,9 +86,9 @@ const Signup = () => {
             </div>
           </Paper>
         </Grid>
-        <Grid size={4} sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-          <Paper elevation={3} sx={{height: "auto", width: "100%", borderRadius:8}}>
-             {/* Form Container */}
+        <Grid size={4} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Paper elevation={3} sx={{ height: "auto", minHeight: "350px", width: "100%", borderRadius: 8 }}>
+            {/* Form Container */}
             <Box
               style={{ padding: "20px", paddingTop: "10px" }}
               sx={{
@@ -121,7 +115,6 @@ const Signup = () => {
                     borderRadius: 16,
                   },
                 }}
-                InputProps={{disableUnderline: true}}
               />
 
               <TextField
@@ -221,10 +214,11 @@ const Signup = () => {
 
               {/* Sign Up Button */}
               {/* <ThemeProvider theme={theme}> */}
+
               <Button
                 variant="contained"
                 fullWidth={false}
-                style={{backgroundColor:  "#7459D9", width: "120px"}}
+                style={{ backgroundColor: "#7459D9", width: "120px", marginTop: 15 }}
                 onClick={handleRegistration}
               >
                 Sign Up
