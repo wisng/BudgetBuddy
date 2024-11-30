@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --config jest.config.js",
     "start": "node app.js"
   },
   "keywords": [],
@@ -23,8 +23,5 @@
   },
   "devDependencies": {
     "jest": "^29.7.0"
-  },
-  "jest": {
-    "testEnvironment": "node"
   }
 }
