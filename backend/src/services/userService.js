@@ -113,4 +113,17 @@ const findUserByID = (userID) => {
 	});
 };
 
-module.exports = { createUser, findUser, findUserByID };
+const getAllUsers = () => {
+	const query = `SELECT * FROM User`;
+	return new Promise((resolve, reject) => {
+		db.query(query, (err, results) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+};
+
+module.exports = { createUser, findUser, findUserByID, getAllUsers };

@@ -1,5 +1,5 @@
 const authService = require("../services/authService");
-const budgetService = require("../services/budgetService");
+const passport = require("../../config/passportConfig");
 const jwtUtil = require("../utils/jwtUtil");
 
 const register = async (req, res) => {
@@ -29,23 +29,29 @@ const login = async (req, res) => {
 	}
 };
 
+const google = passport.authenticate("google", {
+	scope: ["profile", "email"],
+});
 
-const google = async (req, res) => {
-	passport.authenticate("google", { scope: ["profile", "email"] });
+const googleCallback = passport.authenticate("google", {
+	session: false,
+	access_type: "offline",
+	scope: ["profile", "email"],
+});
+
+const googleCallbackFunction = (req, res) => {
+	if (!req.user) {
+		res.redirect("http://localhost:5173/login");
+	}
+	const token = jwtUtil.generateToken(req.user.userID, req.user.userType);
+
+	res.redirect(`http://localhost:5173/login-success?token=${token}`);
 };
 
-const googleCallback = async (req, res) => {
-	passport.authenticate("google"),
-		(req, res) => {
-			let token = jwt.sign(
-				{ id: req.user.id },
-				process.env.JWT_SECRET,
-				{
-					expiresIn: "1h",
-				}
-			);
-			res.json({ token });
-		};
+module.exports = {
+	register,
+	login,
+	googleCallback,
+	google,
+	googleCallbackFunction,
 };
-
-module.exports = { register, login, googleCallback, google };

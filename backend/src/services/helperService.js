@@ -1,4 +1,5 @@
 const db = require("../../config/db");
+const { sendEmail } = require("./emailService");
 
 const updateBudget = async (budgetID, userID) => {
 	const transactions = await getAllTransaction(budgetID, userID, {
@@ -55,6 +56,9 @@ const updateBudget = async (budgetID, userID) => {
 		financialHealthScore,
 		budgetID,
 	];
+
+	// Check if goals are met
+	checkSpendingGoal(userID, budgetID);
 
 	return new Promise((resolve, reject) => {
 		db.query(query, values, (error) => {
@@ -163,6 +167,52 @@ const createCategory = async (categoryData, userID) => {
 			resolve(results);
 		});
 	});
+};
+
+const checkSpendingGoal = async (userID, budgetID) => {
+	const spendingGoalQuery = `SELECT * FROM SpendingGoal WHERE budgetID = ? AND endDate >= CURDATE()`;
+
+	// Get All Spending goals
+	const goals = await new Promise((resolve, reject) => {
+		db.query(spendingGoalQuery, [budgetID], (error, results) => {
+			if (error) return reject(error);
+			resolve(results);
+		});
+	});
+
+	for (const goal of goals) {
+		const transactionQuery = `SELECT * FROM Transaction WHERE budgetID = ? AND date >= ? AND date <= ? AND categoryID = ?`;
+
+		const transactions = await new Promise((resolve, reject) => {
+			db.query(
+				transactionQuery,
+				[budgetID, goal.startDate, goal.endDate, goal.categoryID],
+				(error, results) => {
+					if (error) return reject(error);
+					resolve(results);
+				}
+			);
+		});
+
+		let total = 0;
+
+		for (const transaction of transactions) {
+			if (transaction.transactionType === "Expense") {
+				total += transaction.amount;
+			} else if (transaction.transactionType === "Income") {
+				total -= transaction.amount;
+			}
+		}
+
+		if (total >= goal.amount) {
+			const user = await userService.findUserByID(userID);
+			sendEmail(
+				user.email,
+				"Spending Goal Exceeded",
+				"<h1>Spending Goal Exceeded</h1><p> You have exceeded your spending goal.</p>"
+			);
+		}
+	}
 };
 
 module.exports = {
