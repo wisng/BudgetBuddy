@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Insights from '../screens/Insights';
 
-// Mock axios
 jest.mock('../utils/customAxiosInstance', () => ({
   default: {
     get: jest.fn(() => Promise.resolve({
@@ -20,7 +19,6 @@ jest.mock('../utils/customAxiosInstance', () => ({
   }
 }));
 
-// Mock MonthPicker to avoid MUI Select issues
 jest.mock('../components/MonthPicker', () => ({
   __esModule: true,
   default: () => <div data-testid="month-picker">Month Picker Mock</div>
@@ -41,8 +39,6 @@ describe('Insights Component', () => {
         <Insights {...mockProps} />
       </BrowserRouter>
     );
-
-    // Check if month picker is rendered
     expect(screen.getByTestId('month-picker')).toBeInTheDocument();
   });
 });

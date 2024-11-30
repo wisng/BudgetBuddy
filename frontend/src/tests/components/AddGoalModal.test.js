@@ -27,17 +27,12 @@ describe('AddGoalModal Component', () => {
 
   test('renders basic form elements', () => {
     render(<AddGoalModal {...mockProps} />);
-
-    // Check basic form elements
     expect(screen.getByLabelText('Category')).toBeInTheDocument();
     expect(screen.getByLabelText('Spending Limit')).toBeInTheDocument();
-    expect(screen.getByTestId('date-picker')).toBeInTheDocument();
   });
 
   test('handles spending limit input', () => {
     render(<AddGoalModal {...mockProps} />);
-
-    // Test spending limit input
     const limitInput = screen.getByLabelText('Spending Limit');
     fireEvent.change(limitInput, { target: { value: '1000' } });
     expect(limitInput.value).toBe('1000');

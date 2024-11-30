@@ -2,7 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Signup from '../screens/Signup';
 
-// Mock axios
 jest.mock('../utils/customAxiosInstance', () => ({
   post: jest.fn(() => Promise.resolve({ data: { token: 'test-token' } }))
 }));
@@ -15,7 +14,6 @@ describe('Signup Component', () => {
       </BrowserRouter>
     );
 
-    // Check basic form elements
     expect(screen.getByText('BudgetBuddy')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /email/i })).toBeInTheDocument();
@@ -31,7 +29,6 @@ describe('Signup Component', () => {
       </BrowserRouter>
     );
 
-    // Test input fields
     const emailInput = screen.getByRole('textbox', { name: /email/i });
     const usernameInput = screen.getByRole('textbox', { name: /username/i });
     const passwordInput = screen.getByLabelText('Password');

@@ -2,13 +2,11 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Transactions from '../screens/Transactions';
 
-// Mock MonthPicker to avoid MUI Select issues
 jest.mock('../components/MonthPicker', () => ({
   __esModule: true,
   default: () => <div data-testid="month-picker">Month Picker Mock</div>
 }));
 
-// Mock axios with default export
 jest.mock('../utils/customAxiosInstance', () => ({
   default: {
     get: jest.fn(() => Promise.resolve({ data: {} }))
@@ -56,10 +54,7 @@ describe('Transactions Component', () => {
       </BrowserRouter>
     );
 
-    // Check if month picker is rendered
     expect(screen.getByTestId('month-picker')).toBeInTheDocument();
-
-    // Check if transactions are displayed
     expect(screen.getByText('Groceries')).toBeInTheDocument();
     expect(screen.getByText('Salary')).toBeInTheDocument();
   });
@@ -76,7 +71,6 @@ describe('Transactions Component', () => {
       </BrowserRouter>
     );
 
-    // Check that transactions are not displayed
     expect(screen.queryByText('Groceries')).not.toBeInTheDocument();
     expect(screen.queryByText('Salary')).not.toBeInTheDocument();
   });

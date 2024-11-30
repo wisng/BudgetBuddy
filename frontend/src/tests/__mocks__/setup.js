@@ -1,4 +1,3 @@
-// Mock window.matchMedia
 window.matchMedia = window.matchMedia || function() {
   return {
     matches: false,
@@ -12,17 +11,14 @@ window.matchMedia = window.matchMedia || function() {
   };
 };
 
-// Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
 };
 
-// Mock window.alert
 window.alert = jest.fn();
 
-// Mock console.error to suppress React warnings
 const originalError = console.error;
 console.error = function(...args) {
   if (
