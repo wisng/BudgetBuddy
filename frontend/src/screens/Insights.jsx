@@ -13,17 +13,6 @@ const spendingHabits = {
   "Recurring Payments": 50
 }
 
-const uData = [4000, 3000, 2000, 6780, 7890, 2390, 3490];
-const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
-const xLabels = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-];
 export const dataset = [
   {
     london: 59,
@@ -101,6 +90,7 @@ function PieCenterLabel({ children }) {
 
 
 const Insights = ({ budget, fetchAllTransactions }) => {
+  console.log(fetchAllTransactions);
   const theme = useTheme();
   return (
     <Box>
@@ -133,10 +123,11 @@ const Insights = ({ budget, fetchAllTransactions }) => {
             sx={{backgroundColor:"white", borderRadius:"50px"}}
             height={300}
             series={[
-              { data: pData, area: true, color:"#dad4f9", label:"Expenses"},
-              { data: uData,  color:"#8c75ff", label: "Income"},
+              { data: [2400, 1398, 9800, 3908, 4800, 3800, 4300], area: true, color:"#dad4f9", label:"Expenses"},
+              { data: [4000, 3000, 2000, 6780, 7890, 2390, 3490],  color:"#8c75ff", label: "Income"},
             ]}
-            xAxis={[{ scaleType: 'point', data: xLabels }]}
+            xAxis={[{ scaleType: 'point', data: ['January', 'February', 'March', 'April', 'May', 'June','July',] 
+            }]}
             slotProps={{
               legend: {
                   direction: 'row',
