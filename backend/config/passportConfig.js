@@ -1,24 +1,25 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const userService = require("./userService");
+const userService = require("../src/services/userService");
 require("dotenv").config();
 
 passport.use(
 	new GoogleStrategy(
 		{
-			clientID: process.env.GOOGLE_CLIENT_ID,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-			callbackURL: process.env.GOOGLE_CALLBACK_URL,
+			clientID:
+				"214877163850-tmto7o3oikdpdrlmvtd46dpcpg2ok067.apps.googleusercontent.com",
+			clientSecret: "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",
+			callbackURL: "http://localhost:3000/api/google/callback",
 		},
 		async (accessToken, refreshToken, profile, done) => {
 			try {
-				let user = await userService.findUserByGoogleID(profile.id);
-
+				let user = await userService.findUser(profile.emails[0].value);
 				if (!user) {
 					const newUser = {
-						googleID: profile.id,
 						email: profile.emails[0].value,
-						name: profile.displayName,
+						username:
+							profile.displayName +
+							Math.floor(Math.random() * 10000),
 					};
 					user = await userService.createUser(newUser);
 				}

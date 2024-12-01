@@ -13,7 +13,11 @@ const router = express.Router();
 router.post("/register", authController.register);
 router.post("/login", authController.login);
 router.get("/google", authController.google);
-router.get("/google/callback", authController.googleCallback);
+router.get(
+	"/google/callback",
+	authController.googleCallback,
+	authController.googleCallbackFunction
+);
 
 // Budget Routes
 router.post("/budget", authMiddleware, budgetController.createBudget);

@@ -1,6 +1,8 @@
 const transactionService = require("../services/transactionService");
+const budgetService = require("../services/budgetService");
 
 const createTransaction = async (req, res) => {
+	// console.log(req.params);
 	const { budgetID } = req.params;
 	try {
 		const transaction = await transactionService.createTransaction(
@@ -19,7 +21,7 @@ const getTransaction = async (req, res) => {
 	try {
 		const transaction = await transactionService.getTransaction(
 			transactionID,
-			req.userID
+			budgetID
 		);
 		if (!transaction)
 			return res.status(404).json({ message: "Transaction not found" });

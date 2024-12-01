@@ -1,0 +1,72 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest": true,
+    "node": true,
+    "commonjs": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "globals": {
+    "test": "readonly",
+    "expect": "readonly",
+    "jest": "readonly",
+    "describe": "readonly",
+    "beforeEach": "readonly",
+    "afterEach": "readonly",
+    "window": "readonly",
+    "require": "readonly",
+    "module": "readonly",
+    "__dirname": "readonly",
+    "__filename": "readonly",
+    "global": "readonly"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.cjs", "**/*.config.cjs", "**/__mocks__/**/*.cjs"],
+      "env": {
+        "node": true,
+        "commonjs": true,
+        "jest": true
+      },
+      "parserOptions": {
+        "sourceType": "script"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "build/",
+    "coverage/",
+    ".vite/",
+    "src/setupTests.js",
+    "src/tests/setupTests.js",
+    "src/tests/Home.test.jsx",
+    "src/tests/Login.test.jsx",
+    "src/tests/Wrapper.test.jsx",
+    "src/tests/__mocks__/customAxiosInstance.js"
+  ]
+}

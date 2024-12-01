@@ -100,7 +100,7 @@ function PieCenterLabel({ children }) {
 }
 
 
-const Insights = ({ budget, goals }) => {
+const Insights = ({ budget, fetchAllTransactions }) => {
   const theme = useTheme();
   return (
     <Box>

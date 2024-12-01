@@ -9,8 +9,8 @@ const USER_TYPE = {
 };
 
 const createUser = async (
-	username,
 	email,
+	username,
 	password,
 	userType = USER_TYPE.CLIENT
 ) => {
@@ -33,11 +33,11 @@ const createUser = async (
 	});
 
 	const hashedPassword = await bcrypt.hash(password, 10);
-	const query = `INSERT INTO User (username, email, password, userType) VALUES (?, ?, ?, ?)`;
+	const query = `INSERT INTO User (email, username, password, userType) VALUES (?, ?, ?, ?)`;
 	const user = await new Promise((resolve, reject) => {
 		db.query(
 			query,
-			[username, email, hashedPassword, userType],
+			[email, username, hashedPassword, userType],
 			(err, result) => {
 				if (err) {
 					reject(err);
@@ -52,27 +52,33 @@ const createUser = async (
 		{
 			name: "Entertainment",
 			colour: "#00FF00",
-			isCustom: true,
+			isCustom: false,
 			budgetID: budgetID,
 		},
 		{
 			name: "Shopping",
 			colour: "#FF0000",
-			isCustom: true,
+			isCustom: false,
 			budgetID: budgetID,
 		},
 		{
 			name: "Dining Out",
 			colour: "#0000FF",
-			isCustom: true,
+			isCustom: false,
 			budgetID: budgetID,
 		},
 		{
 			name: "Transportation",
 			colour: "#00FFFF",
-			isCustom: true,
+			isCustom: false,
 			budgetID: budgetID,
 		},
+		{
+			name: "Initial Balance",
+			colour: "#808080",
+			isCustom: false,
+			budgetID: budgetID,
+		}
 	];
 	for (const category of categoryData) {
 		categoryService.createCategory(category, user.insertId);
@@ -107,4 +113,17 @@ const findUserByID = (userID) => {
 	});
 };
 
-module.exports = { createUser, findUser, findUserByID };
+const getAllUsers = () => {
+	const query = `SELECT * FROM User`;
+	return new Promise((resolve, reject) => {
+		db.query(query, (err, results) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+};
+
+module.exports = { createUser, findUser, findUserByID, getAllUsers };

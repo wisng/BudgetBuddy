@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FormControl, InputLabel, Select, MenuItem, IconButton, Grid2 as Grid } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-const MonthPicker = ({ startDate, handleSubmit }) => {
+const MonthPicker = ({ budgetID, startDate, handleSubmit }) => {
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
   const [monthsArray, setMonthsArray] = useState([]);
@@ -17,16 +17,14 @@ const MonthPicker = ({ startDate, handleSubmit }) => {
 
   useEffect(() => {
     function getDateArray(startDate) {
-      const monthsArray = [];
+      // const monthsArray = [];
       const yearsArray = [];
       const start = new Date(startDate);
       const current = new Date();
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
       const yearDifference = current.getFullYear() - start.getFullYear();
-      const currMonth = new Date(current.getFullYear(), current.getMonth()).toLocaleString("default", {
-        month: "short",
-      });
+      const currMonth = new Date().getMonth() + 1;
       const currYear = current.getFullYear().toString();
 
       // If more than a year has passed
@@ -40,13 +38,13 @@ const MonthPicker = ({ startDate, handleSubmit }) => {
         // Less than or equal to a year, so return months in the target year (start year or current year)
         const targetYear = start.getFullYear();
 
-        for (let month = start.getMonth(); month <= current.getMonth(); month++) {
-          const monthName = new Date(targetYear, month).toLocaleString("default", { month: "short" });
-          monthsArray.push(monthName);
-        }
+        // for (let month = start.getMonth(); month <= current.getMonth(); month++) {
+        //   const monthName = new Date(targetYear, month).toLocaleString("default", { month: "short" });
+        //   monthsArray.push(monthName);
+        // }
 
         return {
-          monthsArray,
+          monthsArray: months,
           yearsArray: [targetYear],
           currMonth,
           currYear,
@@ -75,7 +73,7 @@ const MonthPicker = ({ startDate, handleSubmit }) => {
             onChange={handleMonthChange}
           >
             {monthsArray.map((m, i) => (
-              <MenuItem key={i} value={m}>
+              <MenuItem key={i} value={i + 1}>
                 {m}
               </MenuItem>
             ))}
@@ -95,7 +93,7 @@ const MonthPicker = ({ startDate, handleSubmit }) => {
         </FormControl>
       </Grid>
       <Grid size={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <IconButton aria-label="delete" onClick={handleSubmit}>
+        <IconButton onClick={() => handleSubmit(budgetID, month, year)}>
           <ArrowForwardIosIcon />
         </IconButton>
       </Grid>
