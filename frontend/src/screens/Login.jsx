@@ -40,6 +40,10 @@ const Login = () => {
 		}
 	};
 
+	const handleGoogleSignIn = async () => {
+		window.location.href = "http://localhost:3000/api/google";
+	};
+
 	const handleMouseDownPassword = (event) => {
 		event.preventDefault();
 	};
@@ -207,14 +211,19 @@ const Login = () => {
 								/>
 							</FormControl>
 							{/* Google Sign-In Button */}
-							{/* <Button
-                fullWidth
-                variant="outlined"
-                // startIcon={<GoogleIcon />}
-                sx={{ marginTop: 2, borderColor: '#4285F4', color: '#4285F4' }}
-              >
-                Sign in with Google
-              </Button> */}
+							<Button
+								fullWidth
+								variant="outlined"
+								// startIcon={<GoogleIcon />}
+								sx={{
+									marginTop: 2,
+									borderColor: "#4285F4",
+									color: "#4285F4",
+								}}
+								onClick={handleGoogleSignIn}
+							>
+								Sign in with Google
+							</Button>
 
 							{/* Sign Up Button */}
 							{/* <ThemeProvider theme={theme}> */}
