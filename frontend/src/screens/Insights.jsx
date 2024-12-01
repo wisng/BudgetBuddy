@@ -2,7 +2,7 @@ import React from "react";
 import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
 import MonthPicker from "../components/MonthPicker";
 import { LineChart, BarChart, PieChart } from '@mui/x-charts';
-import { alpha, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { useDrawingArea } from '@mui/x-charts/hooks';
 import { styled } from '@mui/material/styles';
 
@@ -100,40 +100,10 @@ function PieCenterLabel({ children }) {
 }
 
 
-const Colorswitch = () => {
-  const { top, height, bottom } = useDrawingArea();
-  const svgHeight = top + bottom + height;
-
-  return (
-      <>
-          <defs>
-              <linearGradient id="paint0_linear_45_2" x1="300.25" y1="46.9999" x2="300.25" y2={`${svgHeight}px`} gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#dad4f9" stop-opacity="0.4" />
-                  <stop offset="1" stop-color="#2F4CDD" stop-opacity="0" />
-              </linearGradient>
-          </defs>
-
-          <defs>
-              <linearGradient id="paint0_linear_45_3" x1="299.498" y1="-4.28272" x2="299.498" y2={`${svgHeight}px`} gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#B519EC" stop-opacity="0.4" />
-                  <stop offset="1" stop-color="#B519EC" stop-opacity="0" />
-              </linearGradient>
-          </defs>
-      </>
-  )
-}
-
 const Insights = ({ budget, goals }) => {
   const theme = useTheme();
   return (
     <Box>
-      {/* <Grid container spacing={2}>
-        <Grid size={2} sx={{}}></Grid>
-        <Grid size={8}>
-          <MonthPicker startDate={budget.creationDate} handleSubmit={() => alert("HELLO")} />
-        </Grid>
-        <Grid size={2} sx={{}}></Grid>
-      </Grid> */}
       <Grid
         container
         spacing={4}
@@ -175,7 +145,6 @@ const Insights = ({ budget, goals }) => {
               },
           }}
           />
-          <Colorswitch />
           </Paper>
           </Grid>
           <Grid size={3}></Grid>
