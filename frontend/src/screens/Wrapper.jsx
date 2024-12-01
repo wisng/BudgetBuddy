@@ -103,7 +103,7 @@ const Wrapper = ({ Component }) => {
       console.log("FINANCIAL REPORTS", res.data);
       setFinancialReports(res.data);
     } catch (err) {
-      console.error(err.response?.data?.error || err.message);
+      console.error(error.response?.data?.error || error.message);
     }
   };
 
@@ -153,8 +153,6 @@ const Wrapper = ({ Component }) => {
     return <div>Loading budget...</div>;
   }
 
-  console.log("Rendering Navbar with budgets:", budgets);
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Header />
@@ -169,8 +167,15 @@ const Wrapper = ({ Component }) => {
       <Component
         budget={selectedBudget}
         setSelectedBudget={setSelectedBudget}
+        goals={goals}
+        categories={addCategoryIcon(categories)}
+        users={users}
+        financialReports={financialReports}
+        transactions={transactions}
         setRefresh={setRefresh}
+        fetchAllTransactions={fetchAllTransactions}
       />
+      {/* Render the passed-in component here */}
     </Box>
   );
 };
