@@ -1,5 +1,5 @@
-import React from "react";
-import { Typography, TextField, Button, Box, Link, Paper, Grid2 as Grid } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Typography, Box, Paper, Grid2 as Grid } from "@mui/material";
 import MonthPicker from "../components/MonthPicker";
 import { LineChart, BarChart, PieChart } from '@mui/x-charts';
 import { useTheme } from "@mui/material";
@@ -13,58 +13,43 @@ const spendingHabits = {
   "Recurring Payments": 50
 }
 
-export const dataset = [
+export const spendingDataset = [
   {
-    london: 59,
-    paris: 57,
-    newYork: 86,
-    seoul: 21,
+    spending: 59,
+    expected: 57,
     month: 'Mon',
   },
   {
-    london: 50,
-    paris: 52,
-    newYork: 78,
-    seoul: 28,
+    spending: 50,
+    expected: 52,
     month: 'Tues',
   },
   {
-    london: 47,
-    paris: 53,
-    newYork: 106,
-    seoul: 41,
+    spending: 47,
+    expected: 53,
     month: 'Wed',
   },
   {
-    london: 54,
-    paris: 56,
-    newYork: 92,
-    seoul: 73,
+    spending: 54,
+    expected: 56,
     month: 'Thurs',
   },
   {
-    london: 57,
-    paris: 69,
-    newYork: 92,
-    seoul: 99,
+    spending: 57,
+    expected: 69,
     month: 'Fri',
   },
   {
-    london: 60,
-    paris: 63,
-    newYork: 103,
-    seoul: 144,
+    spending: 60,
+    expected: 63,
     month: 'Sat',
   },
   {
-    london: 59,
-    paris: 60,
-    newYork: 105,
-    seoul: 319,
+    spending: 59,
+    expected: 60,
     month: 'Sun',
   }
 ];
-
 
 const chartSetting = {
   yAxis: [],
@@ -88,10 +73,16 @@ function PieCenterLabel({ children }) {
   );
 }
 
-
 const Insights = ({ budget, fetchAllTransactions }) => {
   console.log(fetchAllTransactions);
+  const [total, setTotal] = useState(0);
   const theme = useTheme();
+
+  useEffect(()=> {
+    const spendingTotal = Object.values(spendingDataset).reduce((a, b)=> a+b['spending'], 0);
+    setTotal(spendingTotal);
+  }, [])
+
   return (
     <Box>
       <Grid
@@ -158,9 +149,9 @@ const Insights = ({ budget, fetchAllTransactions }) => {
                 disableTicks: true
               }}
               borderRadius={20}
-              dataset={dataset}
-               xAxis={[{ scaleType: 'band', data: dataset.map((i)=>i.month)}]}
-               series={[{ data: dataset.map((item)=> item.london), color: "#646cffaa" }, { data: dataset.map((item)=> item.newYork), color: "#535bf2"}]}
+              dataset={spendingDataset}
+               xAxis={[{ scaleType: 'band', data: spendingDataset.map((i)=>i.month)}]}
+               series={[{ data: spendingDataset.map((item)=> item.spending), color: "#646cffaa" }, { data: spendingDataset.map((item)=> item.expected), color: "#535bf2"}]}
                {...chartSetting}
             />
           </Paper>
@@ -202,7 +193,7 @@ const Insights = ({ budget, fetchAllTransactions }) => {
               legend: { hidden: true },
             }}
           >
-          <PieCenterLabel>$450</PieCenterLabel>
+          <PieCenterLabel>${total}</PieCenterLabel>
           </PieChart>
           </Paper>
         </Grid>
