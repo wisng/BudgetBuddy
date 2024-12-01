@@ -9,6 +9,12 @@ module.exports = {
   verbose: true,
   testTimeout: 10000,
   moduleNameMapper: {
+    '^../../config/(.*)$': '<rootDir>/src/config/__mocks__/$1',
     '^../config/(.*)$': '<rootDir>/src/config/__mocks__/$1'
-  }
+  },
+  transformIgnorePatterns: [
+    '/node_modules/',
+    'config/db\\.js$'
+  ],
+  setupFiles: ['<rootDir>/src/tests/__mocks__/setup.js'],
 };

@@ -40,3 +40,25 @@ node app.js
 ```
 
 The server will start on http://localhost:3000.
+
+## Running Tests
+
+To run the tests:
+
+1. Make sure you're in the backend directory:
+```bash
+cd backend
+```
+
+2. Run all tests:
+```bash
+npm test
+```
+
+3. Run a specific test file:
+```bash
+npm test src/tests/YourTestFile.test.js
+```
+
+Test files are located in:
+- `src/tests/` 
