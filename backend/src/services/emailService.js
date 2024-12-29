@@ -1,12 +1,10 @@
 const postmark = require("postmark");
-const client = new postmark.ServerClient(
-	"8d5d6dfa-16b7-4678-adbb-e1c1b1cae65c"
-);
+const client = new postmark.ServerClient("YOUR API KEY");
 
 async function sendEmail(to, subject, htmlBody) {
 	try {
 		await client.sendEmail({
-			From: "wisdom1.ng@torontomu.ca",
+			From: "YOUR EMAIL",
 			To: to,
 			Subject: subject,
 			HtmlBody: htmlBody,
